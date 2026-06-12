@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java 面试备战指南 - 张炜增</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .navbar h1 {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .navbar .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px 20px 40px;
+        }
+
+        /* 个人信息卡片 */
+        .profile-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .profile-card h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .profile-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .profile-item {
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .profile-item .label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .profile-item .value {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        /* 分类区块 */
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            margin-right: 15px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            color: #333;
+        }
+
+        /* 文档列表 */
+        .doc-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .doc-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .doc-item:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        .doc-item a {
+            display: block;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .doc-item .doc-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .doc-item .doc-desc {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .doc-item .doc-tag {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 4px 10px;
+            background: #667eea;
+            color: white;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+
+        .doc-item .doc-tag.deep {
+            background: #e74c3c;
+        }
+
+        /* 重点提示 */
+        .highlight-box {
+            background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #f9a825;
+        }
+
+        .highlight-box h3 {
+            color: #f57f17;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .highlight-box ul {
+            margin-left: 20px;
+        }
+
+        .highlight-box li {
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        /* 底部 */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 15px;
+            }
+
+            .navbar h1 {
+                font-size: 18px;
+            }
+
+            .container {
+                padding: 80px 15px 30px;
+            }
+
+            .profile-card, .section {
+                padding: 20px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .section-icon {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+
+            .doc-list {
+                grid-template-columns: 1fr;
+            }
+
+            .doc-item {
+                padding: 12px;
+            }
+        }
+
+        /* 进度指示 */
+        .progress-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .progress-title {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .progress-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .progress-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .progress-item .name {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .progress-item .status {
+            font-size: 12px;
+            color: #28a745;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <h1>Java 面试备战指南</h1>
+        <div class="subtitle">张炜增 | 7年经验 | Java后端开发</div>
+    </nav>
+
+    <!-- 主容器 -->
+    <div class="container">
+        <!-- 个人信息 -->
+        <div class="profile-card">
+            <h2>基本信息</h2>
+            <div class="profile-info">
+                <div class="profile-item">
+                    <div class="label">姓名</div>
+                    <div class="value">张炜增</div>
+                </div>
+                <div class="profile-item">
+                    <div class="label">工作年限</div>
+                    <div class="value">约 7 年</div>
+                </div>
+                <div class="profile-item">
+                    <div class="label">联系电话</div>
+                    <div class="value">18814113524</div>
+                </div>
+                <div class="profile-item">
+                    <div class="label">邮箱</div>
+                    <div class="value">787928784@qq.com</div>
+                </div>
+                <div class="profile-item">
+                    <div class="label">核心定位</div>
+                    <div class="value">中高级 Java 后端开发</div>
+                </div>
+                <div class="profile-item">
+                    <div class="label">行业背景</div>
+                    <div class="value">在线教育、移动平台</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 重点提示 -->
+        <div class="highlight-box">
+            <h3>面试前必看</h3>
+            <ul>
+                <li><strong>简历优化版</strong> - 查看 <a href="简历优化版.html" style="color:#667eea">优化后的简历</a></li>
+                <li><strong>面试说辞</strong> - 查看 <a href="面试说辞.html" style="color:#667eea">配套说辞文档</a></li>
+                <li><strong>面试策略</strong> - 查看 <a href="面试备战指南.html" style="color:#667eea">面试备战指南</a></li>
+            </ul>
+        </div>
+
+        <!-- 基础文档 -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">📚</div>
+                <div class="section-title">基础技术文档（快速复习）</div>
+            </div>
+            <div class="doc-list">
+                <div class="doc-item">
+                    <a href="01_Java基础.html">
+                        <div class="doc-title">01. Java 基础</div>
+                        <div class="doc-desc">集合框架、多线程、线程池、CAS、锁机制</div>
+                        <span class="doc-tag">基础</span>
+                    </a>
+                </div>
+                <div class="doc-item">
+                    <a href="02_JVM.html">
+                        <div class="doc-title">02. JVM</div>
+                        <div class="doc-desc">内存结构、垃圾回收、调优工具、类加载</div>
+                        <span class="doc-tag">基础</span>
+                    </a>
+                </div>
+                <div class="doc-item">
+                    <a href="03_Spring.html">
+                        <div class="doc-title">03. Spring</div>
+                        <div class="doc-desc">IOC/AOP、Bean生命周期、事务、Boot自动配置</div>
+                        <span class="doc-tag">基础</span>
+                    </a>
+                </div>
+                <div class="doc-item">
+                    <a href="04_MySQL.html">
+                        <div class="doc-title">04. MySQL</div>
+                        <div class="doc-desc">索引、事务隔离、MVCC、锁机制、SQL优化</div>
+                        <span class="doc-tag">基础</span>
+                    </a>
+                </div>
+                <div class="doc-item">
+                    <a href="05_Redis.html">
+                        <div class="doc-title">05. Redis</div>
+                        <div class="doc-desc">数据类型、持久化、分布式锁、缓存问题</div>
+                        <span class="doc-tag">基础</span>
+                    </a>
+                </div>
+                <div class="doc-item">
+                    <a href="06_Elasticsearch.html">
+                        <div class="doc-title">06. Elasticsearch</div>
+                        <div class="doc-desc">倒排索引、DSL查询、集群、性能优化</div>
+                        <span class="doc-tag">基础</span>
+                    </a>
+                </div>
+                <div class="doc-item">
+                    <a href="07_Netty.html">
+                        <div class="doc-title">07. Netty</div>
+                        <div class="doc-desc">Reactor模型、ByteBuf、编解码、心跳断线重连</div>
+                        <span class="doc-tag">基础</span>
+                    </a>
+                </div>
+                <div class="doc-item">
+                    <a href="08_SpringWebFlux.html">
+                        <div class="doc-title">08. Spring WebFlux</div>
+                        <div class="doc-desc">Reactor操作符、背压、Sinks、WebClient</div>
+                        <span class="doc-tag">基础</span>
+                    </a>
+                </div>
+                <div class="doc-item">
+                    <a href="09_分布式系统.html">
+                        <div class="doc-title">09. 分布式系统</div>
+                        <div class="doc-desc">CAP/BASE、分布式锁、分布式事务、幂等性</div>
+                        <span class="doc-tag">基础</span>
+                    </a>
+                </div>
+                <div class="doc-item">
+                    <a href="10_DDD.html">
+                        <div class="doc-title">10. DDD 领域驱动设计</div>
+                        <div class="doc-desc">领域建模、聚合设计、Repository、防腐层</div>
+                        <span class="doc-tag">基础</span>
+                    </a>
+                </div>
+                <div class="doc-item">
+                    <a href="11_消息队列.html">
+                        <div class="doc-title">11. 消息队列</div>
+                        <div class="doc-desc">ActiveMQ使用、消息可靠性、顺序、幂等消费</div>
+                        <span class="doc-tag">基础</span>
+                    </a>
+                </div>
+                <div class="doc-item">
+                    <a href="12_Linux与CI_CD.html">
+                        <div class="doc-title">12. Linux 与 CI/CD</div>
+                        <div class="doc-desc">Linux命令、Shell脚本、Jenkins、Docker部署</div>
+                        <span class="doc-tag">基础</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底层原理文档 -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">🔬</div>
+                <div class="section-title">底层原理文档（应对深入追问）</div>
+            </div>
+            <div class="doc-list">
+                <div class="doc-item">
+                    <a href="深入原理_01_Java基础底层.html">
+                        <div class="doc-title">深入原理 01. Java 基础底层</div>
+                        <div class="doc-desc">HashMap源码级实现、ConcurrentHashMap CAS细节、线程池每步流程、synchronized对象头+Monitor、volatile MESI、AQS acquire/release</div>
+                        <span class="doc-tag deep">源码级</span>
+                    </a>
+                </div>
+                <div class="doc-item">
+                    <a href="深入原理_02_JVM底层.html">
+                        <div class="doc-title">深入原理 02. JVM 底层</div>
+                        <div class="doc-desc">对象内存布局每个字节、GC三色标记、CMS/G1并发标记SATB、类加载每阶段、JIT分层编译+热点探测、GC触发条件细节</div>
+                        <span class="doc-tag deep">源码级</span>
+                    </a>
+                </div>
+                <div class="doc-item">
+                    <a href="深入原理_03_MySQL底层.html">
+                        <div class="doc-title">深入原理 03. MySQL 底层</div>
+                        <div class="doc-desc">InnoDB页结构每字段、B+树节点结构、MVCC Read View可见性算法、锁加锁规则、Redo/Undo/两阶段提交细节、Buffer Pool LRU分区</div>
+                        <span class="doc-tag deep">源码级</span>
+                    </a>
+                </div>
+                <div class="doc-item">
+                    <a href="深入原理_04_Redis底层.html">
+                        <div class="doc-title">深入原理 04. Redis 底层</div>
+                        <div class="doc-desc">SDS扩容策略、字典渐进式rehash每步、跳跃表层数算法、压缩列表连锁更新、RDB fork+COW、AOF重写流程、过期删除实现、PSYNC断线重连</div>
+                        <span class="doc-tag deep">源码级</span>
+                    </a>
+                </div>
+                <div class="doc-item">
+                    <a href="深入原理_05_Spring底层.html">
+                        <div class="doc-title">深入原理 05. Spring 底层</div>
+                        <div class="doc-desc">refresh()12步详解、getBean每步、doCreateBean()6步、三级缓存循环依赖完整流程、AOP代理创建过程、拦截器链proceed顺序、事务底层实现</div>
+                        <span class="doc-tag deep">源码级</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 核心亮点 -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">⭐</div>
+                <div class="section-title">面试核心亮点（区分度高）</div>
+            </div>
+            <div class="highlight-box">
+                <h3>必须准备的技术亮点</h3>
+                <ul>
+                    <li><strong>购物车 + 分布式锁</strong> - 必问，你的项目里有，准备完整说辞</li>
+                    <li><strong>实时讲解 + WebFlux</strong> - 响应式编程是亮点，能说清楚为什么用、怎么用</li>
+                    <li><strong>Netty 长连接</strong> - 很多候选人没用过，你用过就是加分项</li>
+                    <li><strong>慢 SQL 优化案例</strong> - 要有具体过程（发现→分析→解决）</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 底部 -->
+        <div class="footer">
+            <p>文档生成时间：2024年6月</p>
+            <p>建议面试前花 2-3 天系统复习这些材料</p>
+        </div>
+    </div>
+</body>
+</html>
