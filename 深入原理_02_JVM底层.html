@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深入原理_02. JVM底层 - Java 面试备战</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="back-btn">← 返回目录</a>
+        <h1>深入原理：JVM 底层</h1>
+    </nav>
+    <main class="main-content" style="margin-left: 0;">
+        <article class="content">
+            <h2>一、JVM 内存结构底层</h2>
+
+            <h3>1. 对象内存布局</h3>
+            <pre><code>64 位 JVM 对象结构：
+
+对象头（Header）：
+- Mark Word：64 位（锁状态、GC 年龄、hash 等）
+- Class Pointer：64 位（指向类元数据）
+- 开启指针压缩（-XX:+UseCompressedClassPointers）：32 位
+
+实例数据（Instance Data）：
+- 对象字段值
+- 基本类型直接存储
+- 引用类型存储地址
+
+对齐填充（Padding）：
+- 对象大小必须是 8 字节的倍数
+- 不够则填充
+
+示例：
+class User {
+    int id;          // 4 字节
+    String name;     // 4 字节（压缩指针）
+}
+
+User 对象大小：
+- Mark Word：8 字节
+- Class Pointer：4 字节（压缩）
+- id：4 字节
+- name：4 字节
+- 总计：20 字节
+- 对齐填充：4 字节
+- 实际大小：24 字节</code></pre>
+
+            <h3>2. 对象创建流程</h3>
+            <pre><code>1. 类加载检查
+   - 检查类是否已加载
+   - 未加载则先加载
+
+2. 分配内存
+   - 指针碰撞（Bump the Pointer）：堆规整时
+     已分配和未分配用指针分隔
+   - 空闲列表（Free List）：堆不规整时
+     维护可用空间列表
+
+   分配冲突处理：
+   - CAS + 失败重试
+   - TLAB（Thread Local Allocation Buffer）
+     每个线程有小块内存，在 TLAB 内分配无冲突
+
+3. 初始化零值
+   - 分配后，字段初始化为零值
+   - int = 0, boolean = false, reference = null
+
+4. 设置对象头
+   - 设置 Mark Word
+   - 设置 Class Pointer
+
+5. 执行构造方法
+   - 执行 &lt;init&gt;() 方法</code></pre>
+
+            <h3>3. 堆内存结构</h3>
+            <pre><code>堆划分：
+
+新生代（Young）：
+- Eden：80%
+- Survivor 0（From）：10%
+- Survivor 1（To）：10%
+- 默认大小：堆的 1/3
+
+老年代（Old）：
+- 默认大小：堆的 2/3
+
+对象分配：
+- 新对象在 Eden 分配
+- 大对象直接进老年代（-XX:PretenureSizeThreshold）
+- Survivor 满了，存活对象晋升老年代
+
+GC 年龄：
+- 每次 Young GC，年龄 +1
+- 年龄达到阈值（默认 15），晋升老年代</code></pre>
+
+            <h2>二、垃圾回收底层原理</h2>
+
+            <h3>1. GC Root 定义</h3>
+            <pre><code>GC Roots：
+
+1. 虚拟机栈中的引用
+   - 方法中的局部变量、参数
+
+2. 方法区中静态属性引用
+   - static 变量
+
+3. 方法区中常量引用
+   - final static 变量
+
+4. 本地方法栈中 JNI 引用
+   - Native 方法参数
+
+5. 同步锁持有的对象
+   - synchronized 锁对象
+
+6. JVM 内部引用
+   - 基本类型的 Class 对象
+   - 常驻异常对象（OOM、NPE）
+   - 系统类加载器
+
+7. Thread 对象
+   - 所有活跃线程</code></pre>
+
+            <h3>2. 三色标记法</h3>
+            <pre><code>三色标记：
+
+白色：未访问
+灰色：已访问，但引用的对象未访问完
+黑色：已访问，引用的对象也都访问完
+
+流程：
+1. 初始：所有对象白色
+2. GC Roots 加入灰色集合
+3. 从灰色集合取出对象，标记为黑色
+4. 该对象引用的对象加入灰色集合
+5. 重复，直到灰色集合为空
+6. 白色对象可回收
+
+并发标记问题（对象消失）：
+- 灰色→白色引用被删除
+- 黑色→白色新建引用
+- 结果：白色对象本该存活，但被回收
+
+解决：增量更新或原始快照（SATB）</code></pre>
+
+            <h3>3. CMS 并发标记实现</h3>
+            <pre><code>CMS 并发标记：
+
+初始标记（STW）：
+- 只标记 GC Roots 直接关联的对象
+- 时间短
+
+并发标记：
+- 从 GC Roots 遍历整个引用链
+- 和用户线程并发执行
+- 用增量更新处理引用变化
+
+重新标记（STW）：
+- 扫描并发标记期间变化的对象
+- 处理增量更新的记录
+
+并发清除：
+- 清除未标记对象
+- 和用户线程并发执行
+
+问题：
+- 浮动垃圾：并发清除时新产生的垃圾
+- 内存碎片：标记-清除产生碎片
+- Concurrent Mode Failure：老年代满时触发 Full GC</code></pre>
+
+            <h3>4. G1 并发标记实现</h3>
+            <pre><code>G1 用 SATB（Snapshot-At-The-Beginning）：
+- 标记开始时的对象引用图快照
+- 标记期间新建引用不处理
+- 标记期间删除引用不处理
+
+SATB 实现：
+- 每个 Region 有 SATB Mark Queue
+- 删除引用时，将旧引用值入队
+- 重新标记时，扫描队列中的引用
+
+流程：
+1. 初始标记（STW）
+2. 并发标记：遍历引用链
+3. 最终标记（STW）：处理 SATB Mark Queue
+4. 筛选回收（STW）：选择价值最高的 Region
+
+价值计算：
+value = 回收空间 / 预估回收时间
+根据 MaxGCPauseMillis 选择 Region</code></pre>
+
+            <h2>三、类加载底层原理</h2>
+
+            <h3>1. Class 文件结构</h3>
+            <pre><code>Class 文件格式：
+
+魔数：0xCAFEBABE（4 字节）
+版本号：minor_version + major_version（4 字节）
+常量池：constant_pool_count + constant_pool
+访问标志：access_flags
+类索引：this_class
+父类索引：super_class
+接口索引：interfaces
+字段表：fields
+方法表：methods
+属性表：attributes</code></pre>
+
+            <h3>2. 类加载过程</h3>
+            <pre><code>加载：
+- 通过类名获取二进制字节流
+- 转为方法区的运行时数据结构
+- 在堆中生成 Class 对象
+
+验证：
+- 文件格式验证：魔数、版本、常量池
+- 元数据验证：是否有父类、父类是否 final
+- 字节码验证：数据流分析、控制流分析
+
+准备：
+- 为类变量分配内存（方法区）
+- 设置初始零值（不是代码中的初值）
+  static int a = 10; → a = 0（准备阶段）
+  static final int b = 10; → b = 10（常量）
+
+解析：
+- 符号引用转为直接引用
+
+初始化：
+- 执行类构造器 &lt;clinit&gt;()
+- &lt;clinit&gt;() = static 变量赋值 + static 代码块
+- 父类 &lt;clinit&gt;() 先执行</code></pre>
+
+            <h3>3. 类加载器实现</h3>
+            <pre><code>Bootstrap ClassLoader：
+- C++ 实现，Java 中表示为 null
+- 加载核心类：rt.jar
+
+Extension ClassLoader：
+- Java 实现：Launcher$ExtClassLoader
+- 加载扩展类：ext 目录
+
+Application ClassLoader：
+- Java 实现：Launcher$AppClassLoader
+- 加载应用类：classpath
+
+双亲委派模型：
+loadClass(String name) {
+    1. 检查是否已加载：findLoadedClass(name)
+    2. 未加载，委派父加载器：parent.loadClass(name)
+    3. 父加载器失败，自己加载：findClass(name)
+}
+
+优点：
+- 保证核心类不被篡改
+- 防止类重复加载</code></pre>
+
+            <h2>四、JIT 编译底层原理</h2>
+
+            <h3>1. 编译模式</h3>
+            <pre><code>解释执行：
+- 字节码逐条解释执行
+- 启动快，执行慢
+
+编译执行：
+- 字节码编译为机器码
+- 启动慢，执行快
+
+混合模式（默认）：
+- 先解释执行
+- 热点代码编译执行
+
+分层编译：
+- Level 0：解释执行
+- Level 1-3：C1 编译（简单到完整）
+- Level 4：C2 编译（高度优化）</code></pre>
+
+            <h3>2. 热点探测</h3>
+            <pre><code>方法调用计数器：
+- 统计方法调用次数
+- 超过阈值触发编译
+- 计数器有衰减
+
+回边计数器：
+- 统计循环回边次数
+- 超过阈值触发 OSR（On Stack Replacement）编译
+- 在循环中替换为编译代码</code></pre>
+
+            <h3>3. 编译优化技术</h3>
+            <pre><code>方法内联：
+- 把被调用方法的代码嵌入调用处
+- 消除方法调用开销
+
+逃逸分析：
+- 分析对象是否逃逸方法
+- 不逃逸：可在栈上分配、消除同步锁
+- 标量替换：对象拆成字段，直接在栈上分配
+
+锁消除：
+- 逃逸分析确定锁对象不逃逸
+- 同步锁可消除
+
+循环优化：
+- 循环展开：减少循环次数
+- 循环分离：提取循环内的不变代码</code></pre>
+
+            <h2>五、JVM 调优底层分析</h2>
+
+            <h3>1. Young GC 触发条件</h3>
+            <pre><code>Young GC 触发：
+- Eden 区满
+
+Young GC 过程：
+1. 扫描 GC Roots，标记存活对象
+2. 存活对象复制到 Survivor（或晋升老年代）
+3. 清空 Eden 和另一个 Survivor
+4. 两个 Survivor 交换角色
+
+时间影响因素：
+- 存活对象数量（复制开销）
+- Eden 大小（扫描范围）</code></pre>
+
+            <h3>2. Full GC 触发条件</h3>
+            <pre><code>Full GC 触发：
+
+1. System.gc()
+   - 建议 JVM 执行 Full GC
+   - 可用 -XX:+DisableExplicitGC 禁用
+
+2. 老年代空间不足
+   - 晋升对象大小 > 老年代剩余空间
+   - CMS：Concurrent Mode Failure
+
+3. Metaspace 满
+   - 类元数据超过 MaxMetaspaceSize
+
+4. CMS 检测到晋升失败
+
+5. 堆转储（jmap -histo:live）
+
+避免 Full GC：
+- 增大新生代（减少晋升）
+- 增大 Survivor（减少过早晋升）
+- 调低 CMSInitiatingOccupancyFraction</code></pre>
+
+            <h3>3. 内存泄漏底层分析</h3>
+            <pre><code>内存泄漏原因：
+
+1. 长生命周期对象持有短生命周期对象引用
+   - 静态集合持有对象
+   - 监听器未注销
+
+2. 资源未关闭
+   - Connection、Stream 未 close()
+
+3. ThreadLocal 未 remove
+   - 线程池线程复用
+
+分析方法：
+1. jmap -histo：看对象分布
+2. jmap -dump：导出堆转储
+3. MAT 分析：
+   - Leak Suspects：可疑泄漏点
+   - Dominator Tree：对象支配树
+   - GC Roots：查看引用链</code></pre>
+
+            <div class="page-nav">
+                <a href="深入原理_01_Java基础底层.html" class="prev-page">←上一篇：Java 基础底层</a>
+                <a href="index.html" class="home-page">返回目录</a>
+                <a href="深入原理_03_MySQL底层.html" class="next-page">下一篇：MySQL 底层原理 →</a>
+            </div>
+        </article>
+    </main>
+</body>
+</html>

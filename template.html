@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{TITLE}} - Java 面试备战</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="navbar">
+        <a href="index.html" class="back-btn">← 返回目录</a>
+        <h1>{{TITLE}}</h1>
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+    </nav>
+
+    <!-- 侧边栏目录 -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <span>目录导航</span>
+        </div>
+        <nav class="toc">
+{{TOC}}
+        </nav>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+        <article class="content">
+{{CONTENT}}
+        </article>
+
+        <!-- 底部导航 -->
+        <div class="page-nav">
+            <a href="{{PREV_PAGE}}" class="prev-page">← 上一篇</a>
+            <a href="index.html" class="home-page">返回目录</a>
+            <a href="{{NEXT_PAGE}}" class="next-page">下一篇 →</a>
+        </div>
+    </main>
+
+    <!-- 移动端遮罩 -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <script>
+        function toggleSidebar() {
+            var sidebar = document.getElementById('sidebar');
+            var overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        // 高亮当前目录项
+        function highlightToc() {
+            var headings = document.querySelectorAll('.content h2, .content h3');
+            var tocLinks = document.querySelectorAll('.toc a');
+
+            window.addEventListener('scroll', function() {
+                var current = '';
+                headings.forEach(function(h) {
+                    if (window.scrollY >= h.offsetTop - 100) {
+                        current = h.id;
+                    }
+                });
+
+                tocLinks.forEach(function(link) {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === '#' + current) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        }
+
+        highlightToc();
+    </script>
+</body>
+</html>

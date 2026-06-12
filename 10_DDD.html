@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10. DDD 领域驱动设计 - Java 面试备战</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="back-btn">← 返回目录</a>
+        <h1>10. DDD 领域驱动设计</h1>
+    </nav>
+    <main class="main-content" style="margin-left: 0;">
+        <article class="content">
+            <h2>一、DDD 核心概念</h2>
+
+            <h3>1. 什么是 DDD？</h3>
+            <pre><code>DDD（Domain-Driven Design）：领域驱动设计
+
+核心思想：
+- 以领域为中心设计系统
+- 业务语言和技术语言统一
+- 解决复杂业务问题
+
+与传统设计对比：
+传统设计：
+- 以数据为中心（数据库表设计）
+- 业务逻辑分散在各层
+- 业务变化时改动多处
+
+DDD：
+- 以领域为中心（业务模型）
+- 业务逻辑集中在领域层
+- 业务变化时改动集中
+
+适用场景：
+- 业务复杂
+- 业务规则多变
+- 需要长期维护</code></pre>
+
+            <h3>2. DDD 分层架构</h3>
+            <pre><code>四层架构：
+
+用户界面层（UI Layer）
+- 接收请求、返回响应
+- Controller、API
+
+应用层（Application Layer）
+- 编排业务流程
+- Service、DTO
+- 无业务逻辑，只调度
+
+领域层（Domain Layer）
+- 核心业务逻辑
+- Entity、Value Object、Aggregate
+- Domain Service
+- Repository Interface
+
+基础设施层（Infrastructure）
+- 技术实现
+- Repository Implementation
+- Database、MQ、External API
+
+依赖方向：
+- 上层依赖下层
+- 领域层不依赖基础设施层（依赖倒置）
+- Repository 接口在领域层，实现在基础设施层</code></pre>
+
+            <h3>3. 领域核心元素</h3>
+            <pre><code>实体（Entity）：
+- 有唯一标识（ID）
+- 有生命周期
+- 属性可变，但 ID 不变
+- 例：订单（Order）、用户（User）
+
+值对象（Value Object）：
+- 无唯一标识
+- 不可变
+- 通过属性值判断相等
+- 例：地址（Address）、金额（Money）
+
+聚合（Aggregate）：
+- 一组相关对象的集合
+- 有聚合根（Aggregate Root）
+- 外部只能通过聚合根访问
+- 例：订单聚合（Order + OrderItem + Address）
+
+聚合根（Aggregate Root）：
+- 聚合的入口
+- 对外暴露的实体
+- 维护聚合内部一致性
+
+领域服务（Domain Service）：
+- 不属于任何实体或值对象的业务逻辑
+- 跨实体操作
+
+仓库（Repository）：
+- 持久化抽象
+- 接口在领域层，实现在基础设施层</code></pre>
+
+            <h2>二、领域建模</h2>
+
+            <h3>1. 限界上下文（Bounded Context）</h3>
+            <pre><code>限界上下文：
+- 明确的业务边界
+- 同一概念在不同上下文有不同含义
+- 微服务的划分依据
+
+示例（电商）：
+订单上下文：
+- Order：订单实体
+- Product：订单中的商品（简化，只含 ID、名称、价格）
+
+商品上下文：
+- Product：完整商品实体（含库存、详情、分类）
+
+用户上下文：
+- User：用户实体
+- Address：地址值对象</code></pre>
+
+            <h3>2. 上下文映射</h3>
+            <pre><code>上下文映射：不同上下文之间的关系
+
+关系类型：
+
+1. 共享内核（Shared Kernel）
+   - 共享部分模型
+
+2. 客户-供应商（Customer-Supplier）
+   - 上游提供服务，下游消费
+
+3. 防腐层（Anti-Corruption Layer）
+   - 下游用自己的模型
+   - 通过防腐层适配上游
+   - 防止上游模型污染下游
+
+防腐层示例：
+// 上游商品服务返回的商品模型（很多字段）
+public class ProductDTO {
+    String id;
+    String name;
+    BigDecimal price;
+    int stock;
+    String category;
+}
+
+// 订单上下文只需要部分信息
+public class OrderProduct {
+    String id;
+    String name;
+    BigDecimal price;
+}
+
+// 防腐层：适配转换
+public class ProductAdapter {
+    public OrderProduct adapt(ProductDTO dto) {
+        return new OrderProduct(dto.id, dto.name, dto.price);
+    }
+}</code></pre>
+
+            <h3>3. 聚合设计原则</h3>
+            <pre><code>聚合设计原则：
+
+1. 聚合要小
+   - 只包含必要的对象
+   - 大聚合影响性能和一致性
+
+2. 通过 ID 引用其他聚合
+   - 不直接引用其他聚合对象
+   - 减少耦合，避免大聚合
+
+3. 聚合边界外的对象用 ID 关联
+   - Order 引用 User（userId），不是 User 对象
+   - OrderItem 引用 Product（productId），不是 Product 对象
+
+4. 单一事务修改单个聚合
+   - 一个事务只修改一个聚合
+   - 多聚合修改用最终一致性
+
+5. 聚合根维护一致性
+   - 外部不能直接修改聚合内部对象
+   - 通过聚合根操作</code></pre>
+
+            <h2>三、实体设计示例</h2>
+
+            <pre><code>// 实体：有唯一标识
+public class Order {
+    private OrderId id;
+    private String userId;
+    private List&lt;OrderItem&gt; items;
+    private OrderStatus status;
+    private Money totalAmount;
+
+    // 构造方法（工厂创建）
+    private Order(OrderId id, String userId) {
+        this.id = id;
+        this.userId = userId;
+        this.status = OrderStatus.CREATED;
+        this.items = new ArrayList&lt;&gt;();
+    }
+
+    // 业务方法（行为）
+    public void addItem(ProductId productId, int quantity, Money price) {
+        // 业务规则
+        if (status != OrderStatus.CREATED) {
+            throw new BusinessException("只能添加商品到未支付订单");
+        }
+        OrderItem item = new OrderItem(productId, quantity, price);
+        items.add(item);
+        recalculateTotal();
+    }
+
+    public void pay(PaymentId paymentId) {
+        if (status != OrderStatus.CREATED) {
+            throw new BusinessException("订单已支付或取消");
+        }
+        this.status = OrderStatus.PAID;
+    }
+
+    // 不暴露 items 的 add/remove（通过 addItem 控制）
+    public List&lt;OrderItem&gt; getItems() {
+        return Collections.unmodifiableList(items);
+    }
+}</code></pre>
+
+            <h2>四、实战说辞</h2>
+
+            <div class="tips-box">
+                <h4>DDD 实际应用</h4>
+                <p>我们项目借鉴了 DDD 思想做业务建模，不是严格的 DDD。</p>
+                <p>主要做了以下工作：</p>
+                <ol>
+                    <li><strong>领域划分</strong>：我们把系统划分为知识树、组题引擎、错题册、学情统计等几个领域。每个领域有自己的业务规则和数据。</li>
+                    <li><strong>聚合设计</strong>：比如"作业"是聚合根，包含题目列表、作答结果、批阅结果等。外部只能通过作业对象操作。</li>
+                    <li><strong>用 ID 引用</strong>：作业引用知识点的 ID，不直接引用知识点对象。这样作业和知识点解耦。</li>
+                    <li><strong>防腐层</strong>：对接第三方系统时，我们用防腐层隔离。把他们的题目模型转换成我们的模型。</li>
+                </ol>
+            </div>
+
+            <div class="tips-box">
+                <h4>聚合设计经验</h4>
+                <p>我们聚合设计的原则是尽量小，避免大聚合。</p>
+                <p>比如"作业"聚合，只包含题目列表和作答结果，不包含学生信息、知识点详情等。学生信息用 ID 引用，知识点也用 ID 引用。</p>
+                <p>好处：加载作业时不用加载学生和知识点，性能好；解耦，各自独立变化；一个事务只修改一个聚合，并发控制简单。</p>
+            </div>
+
+            <h2>五、可能追问</h2>
+
+            <div class="question-box">
+                <h4>Q: DDD 和三层架构的区别？</h4>
+            </div>
+            <blockquote>
+                三层架构：<br>
+                - 先设计数据库表<br>
+                - 业务逻辑写在 Service 层（分散）<br>
+                - 实体只是数据载体（贫血模型）<br><br>
+                DDD：<br>
+                - 先设计领域模型<br>
+                - 业务逻辑在实体和领域服务（集中）<br>
+                - 实体有行为（充血模型）
+            </blockquote>
+
+            <div class="question-box">
+                <h4>Q: 贫血模型 vs 充血模型？</h4>
+            </div>
+            <blockquote>
+                贫血模型：<br>
+                - 实体只有属性，没有行为<br>
+                - 行为放在 Service 层<br><br>
+                充血模型：<br>
+                - 实体有属性和行为<br>
+                - 业务逻辑在实体内<br><br>
+                DDD 倡导充血模型，业务逻辑集中在领域层。
+            </blockquote>
+
+            <div class="question-box">
+                <h4>Q: Entity 和 Value Object 的区别？</h4>
+            </div>
+            <blockquote>
+                Entity：<br>
+                - 有唯一 ID<br>
+                - ID 相等 = 相等<br>
+                - 可变（属性）<br><br>
+                Value Object：<br>
+                - 无标识<br>
+                - 所有属性相等 = 相等<br>
+                - 不可变
+            </blockquote>
+
+            <div class="page-nav">
+                <a href="09_分布式系统.html" class="prev-page">←上一篇：分布式系统</a>
+                <a href="index.html" class="home-page">返回目录</a>
+                <a href="11_消息队列.html" class="next-page">下一篇：消息队列 →</a>
+            </div>
+        </article>
+    </main>
+</body>
+</html>

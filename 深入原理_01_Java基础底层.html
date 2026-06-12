@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深入原理_01. Java基础底层 - Java 面试备战</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="back-btn">← 返回目录</a>
+        <h1>深入原理：Java 基础底层</h1>
+    </nav>
+    <main class="main-content" style="margin-left: 0;">
+        <article class="content">
+            <h2>一、HashMap 底层原理详解</h2>
+
+            <h3>1. JDK 1.7 HashMap 实现</h3>
+            <pre><code>数据结构：数组 + 链表
+
+Entry 结构：
+class Entry&lt;K, V&gt; {
+    K key;
+    V value;
+    Entry&lt;K, V&gt; next;  // 链表下一个节点
+    int hash;          // key 的 hash 值
+}
+
+核心字段：
+Entry[] table;     // 数组
+int size;          // 元素数量
+int threshold;     // 扩容阈值 = capacity * loadFactor
+float loadFactor;  // 负载因子，默认 0.75</code></pre>
+
+            <h4>put 流程（JDK 1.7）</h4>
+            <pre><code>1. 计算 hash
+   int hash = hash(key.hashCode());
+   hash() 函数（扰动函数）：
+   h ^= (h >>> 20) ^ (h >>> 12);
+   return h ^ (h >>> 7) ^ (h >>> 4);
+   目的：让 hash 更分散，减少碰撞
+
+2. 计算位置
+   int index = hash & (table.length - 1);
+   等价于 hash % table.length（但 & 更快）
+
+3. 检查是否已存在
+   遍历链表，找到相同的 key 则覆盖 value
+
+4. 插入新节点（头插法）
+   Entry newEntry = new Entry(key, value, hash);
+   newEntry.next = table[index];  // 新节点指向原头节点
+   table[index] = newEntry;       // 新节点成为头节点
+
+5. 检查是否需要扩容
+   if (size >= threshold) resize();</code></pre>
+
+            <h4>resize 流程（JDK 1.7）</h4>
+            <pre><code>1. 创建新数组
+   Entry[] newTable = new Entry[newCapacity];
+   newCapacity = oldCapacity * 2（必须是 2 的幂次）
+
+2. 数据迁移
+   遍历旧数组的每个位置，遍历链表每个节点：
+   - 重新计算 index = hash & (newCapacity - 1)
+   - 头插法插入到新数组
+
+   问题：头插法导致链表顺序反转
+   - 原链表：A → B → C
+   - 迁移后：C → B → A
+
+3. 并发扩容死循环问题
+   线程1 和线程2 同时扩容：
+   - 线程1：迁移 A，A.next = B（还没迁移 B）
+   - 线程2：完成迁移，链表变成 C → B → A
+   - 线程1：迁移 B，B.next = A
+   - 结果：A → B → A（环形链表）
+   - 后续 get 操作死循环</code></pre>
+
+            <h3>2. JDK 1.8 HashMap 实现</h3>
+            <pre><code>数据结构：数组 + 链表 + 红黑树
+
+Node 结构：
+class Node&lt;K, V&gt; {
+    K key;
+    V value;
+    Node&lt;K, V&gt; next;
+    int hash;
+}
+
+TreeNode 结构（红黑树节点）：
+class TreeNode&lt;K, V&gt; extends Node&lt;K, V&gt; {
+    TreeNode&lt;K, V&gt; parent;
+    TreeNode&lt;K, V&gt; left;
+    TreeNode&lt;K, V&gt; right;
+    boolean red;            // 颜色
+}
+
+核心字段：
+int treeifyThreshold = 8;    // 链表转红黑树阈值
+int untreeifyThreshold = 6;  // 红黑树转链表阈值
+int minTreeifyCapacity = 64; // 转红黑树的最小数组长度</code></pre>
+
+            <h4>resize 流程（JDK 1.8 优化）</h4>
+            <pre><code>数据迁移优化：
+
+链表拆分成两个链表：
+- loHead/loTail：位置不变的节点（hash & oldCap == 0）
+- hiHead/hiTail：位置变为 index + oldCap 的节点（hash & oldCap != 0）
+
+拆分原理：
+- oldCap = 16（二进制 10000）
+- newCap = 32（二进制 100000）
+- 原位置计算：hash & 15（hash & 01111）
+- 新位置计算：hash & 31（hash & 11111）
+- 如果 hash 第 5 位（oldCap 位）是 0：
+  hash & 31 == hash & 15，位置不变
+- 如果 hash 第 5 位是 1：
+  hash & 31 = hash & 15 + 16，新位置 = 旧位置 + oldCap
+
+优点：
+- 不需要重新计算 hash
+- 链表顺序不变（尾插法，不反转）
+- 避免并发扩容死循环</code></pre>
+
+            <h4>链表转红黑树条件</h4>
+            <pre><code>两个条件同时满足：
+
+1. 链表长度 >= 8
+2. 数组长度 >= 64
+
+为什么是 8？
+- 红黑树查询：O(log n)，n=8 时最多 3 次比较
+- 链表查询：O(n)，n=8 时最多 8 次比较
+- Poisson 分布：链表长度达到 8 的概率极低（约 0.00000006）</code></pre>
+
+            <h2>二、ConcurrentHashMap 底层原理</h2>
+
+            <h3>1. JDK 1.7 实现（分段锁）</h3>
+            <pre><code>数据结构：
+Segment[] segments;  // 分段数组，每个 Segment 是一个小 HashMap
+
+Segment 结构：
+class Segment&lt;K, V&gt; extends ReentrantLock {
+    transient volatile HashEntry&lt;K, V&gt;[] table;
+    transient int count;
+    transient int threshold;
+}
+
+默认配置：
+DEFAULT_INITIAL_CAPACITY = 16  // 总容量
+DEFAULT_CONCURRENCY_LEVEL = 16 // Segment 数量</code></pre>
+
+            <h3>2. JDK 1.8 实现（CAS + synchronized）</h3>
+            <pre><code>数据结构：和 HashMap 一样（数组 + 链表 + 红黑树）
+
+核心字段：
+volatile Node&lt;K, V&gt;[] table;
+volatile int sizeCtl;  // 控制标识
+   - -1：正在初始化
+   - -N：正在扩容
+   - 0：默认，未初始化
+   - >0：下次扩容的阈值
+
+Node 结构：
+class Node&lt;K, V&gt; {
+    final K key;
+    final int hash;
+    volatile V val;         // volatile
+    volatile Node&lt;K, V&gt; next; // volatile
+}</code></pre>
+
+            <h4>put 流程（JDK 1.8）</h4>
+            <pre><code>1. 计算 hash
+2. 循环尝试插入（for (;;)）
+
+   a. table 为空
+      调用 initTable() 初始化
+      用 CAS 保证只有一个线程初始化
+
+   b. 位置为空
+      用 CAS 插入新节点
+      if (casTabAt(tab, i, null, new Node&lt;K, V&gt;(hash, key, value)))
+          break;
+
+   c. 位置是 MOVED 节点（forwarding node）
+      说明正在扩容，调用 helpTransfer() 参与扩容
+
+   d. 位置有节点
+      用 synchronized 锁住头节点
+      遍历链表/红黑树，插入或更新</code></pre>
+
+            <h2>三、线程池底层原理</h2>
+
+            <h3>1. ThreadPoolExecutor 核心字段</h3>
+            <pre><code>ctl：原子整数，打包了两个信息
+- workerCount：工作线程数（低 29 位）
+- runState：运行状态（高 3 位）
+
+runState：
+RUNNING    = -1 << 29：接受新任务，处理队列任务
+SHUTDOWN   = 0 << 29：不接受新任务，但处理队列任务
+STOP       = 1 << 29：不接受新任务，中断执行中任务
+TIDYING    = 2 << 29：所有任务终止
+TERMINATED = 3 << 29：terminated() 完成</code></pre>
+
+            <h3>2. Worker 结构</h3>
+            <pre><code>class Worker extends AbstractQueuedSynchronizer implements Runnable {
+    final Thread thread;       // 工作线程
+    Runnable firstTask;        // 第一个任务
+    volatile long completedTasks; // 完成的任务数
+
+    Worker(Runnable firstTask) {
+        setState(-1);  // 初始化时禁止中断
+        this.firstTask = firstTask;
+        this.thread = factory.newThread(this);
+    }
+}</code></pre>
+
+            <h3>3. execute 流程</h3>
+            <pre><code>1. workerCount < corePoolSize
+   创建核心线程执行任务
+
+2. workerCount >= corePoolSize，尝试入队
+   workQueue.offer(command)
+
+3. 入队失败，尝试创建非核心线程
+   addWorker(command, false)
+
+4. 创建失败，执行拒绝策略
+   reject(command)</code></pre>
+
+            <h3>4. getTask 流程（从队列获取任务）</h3>
+            <pre><code>boolean timed = allowCoreThreadTimeOut || wc > corePoolSize;
+
+Runnable r = timed ?
+    workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS) :
+    workQueue.take();
+
+- timed=true：poll 超时等待
+- timed=false：take 无限等待</code></pre>
+
+            <h2>四、synchronized 底层原理</h2>
+
+            <h3>1. 对象头结构</h3>
+            <pre><code>64 位 JVM 对象头 Mark Word：
+
+| 锁状态 | 25 位 | 4 位 | 1 位偏向锁 | 2 位锁标志 |
+|--------|-------|------|-----------|-----------|
+| 无锁   | unused| age  | 0         | 01        |
+| 偏向锁 | threadID| age | 1         | 01        |
+| 轻量级锁 | 指向 Lock Record 的指针 | 00 |
+| 重量级锁 | 指向 Monitor 的指针     | 10 |</code></pre>
+
+            <h3>2. Monitor 结构</h3>
+            <pre><code>ObjectMonitor 结构（C++ 实现）：
+_object：关联的对象
+_owner：当前持有锁的线程
+_count：重入次数
+_WaitSet：等待线程集合（调用 wait()）
+_EntryList：阻塞线程集合（等待获取锁）</code></pre>
+
+            <h3>3. 锁升级流程</h3>
+            <pre><code>无锁 → 偏向锁 → 轻量级锁 → 重量级锁
+
+偏向锁：
+- 对象头记录线程 ID
+- 后续该线程进入无需同步
+- 其他线程竞争时，撤销偏向锁
+
+轻量级锁：
+- 在线程栈帧创建 Lock Record
+- CAS 尝试把对象头指向 Lock Record
+- 自旋尝试获取
+
+重量级锁：
+- Monitor 实现
+- 真正的互斥，线程会阻塞</code></pre>
+
+            <h2>五、volatile 底层原理</h2>
+
+            <h3>1. JMM 内存模型</h3>
+            <pre><code>主内存：所有线程共享的内存区域
+工作内存：每个线程私有的内存区域（CPU 缓存、寄存器）
+
+线程操作流程：
+1. read：从主内存读取变量值
+2. load：将值载入工作内存
+3. use：使用工作内存中的值
+4. assign：将新值赋给工作内存变量
+5. store：将工作内存值写入主内存
+6. write：将 store 的值写入主内存变量</code></pre>
+
+            <h3>2. 内存屏障</h3>
+            <pre><code>四种屏障：
+
+LoadLoad：Load1; LoadLoad; Load2
+- 确保 Load1 先于 Load2 执行
+
+StoreStore：Store1; StoreStore; Store2
+- 确保 Store1 先于 Store2 执行
+
+LoadStore：Load1; LoadStore; Store2
+- 确保 Load1 先于 Store2 执行
+
+StoreLoad：Store1; StoreLoad; Load2
+- 确保 Store1 先于 Load2 执行
+
+volatile 写屏障：
+- StoreStore + StoreLoad
+
+volatile 读屏障：
+- LoadLoad + LoadStore</code></pre>
+
+            <h2>六、CAS 底层原理</h2>
+
+            <h3>Unsafe 类</h3>
+            <pre><code>Unsafe：JDK 内部类，提供底层操作
+
+核心方法：
+compareAndSwapInt(Object o, long offset, int expected, int x)
+
+底层实现：
+- Linux x86：cmpxchg 指令
+- cmpxchg [dest], expected, new
+- 多核：cmpxchg + lock 前缀
+- lock cmpxchg：锁总线或缓存行，保证原子性</code></pre>
+
+            <h3>AtomicInteger 实现</h3>
+            <pre><code>class AtomicInteger {
+    private volatile int value;
+
+    public final int incrementAndGet() {
+        return unsafe.getAndAddInt(this, valueOffset, 1) + 1;
+    }
+}
+
+getAndAddInt：
+do {
+    v = getIntVolatile(o, offset);  // volatile 读
+} while (!compareAndSwapInt(o, offset, v, v + delta));
+
+流程：
+1. volatile 读当前值
+2. CAS 尝试更新
+3. 失败则重试（自旋）</code></pre>
+
+            <h2>七、AQS 底层原理</h2>
+
+            <h3>1. AQS 核心结构</h3>
+            <pre><code>class AbstractQueuedSynchronizer {
+    volatile int state;           // 同步状态
+    transient Node head;          // 队列头节点
+    transient Node tail;          // 队列尾节点
+
+    static final class Node {
+        volatile int waitStatus;  // 等待状态
+        volatile Node prev;       // 前驱节点
+        volatile Node next;       // 后继节点
+        Thread thread;            // 等待线程
+
+        waitStatus：
+        CANCELLED = 1：线程取消等待
+        SIGNAL = -1：后继线程需要唤醒
+        CONDITION = -2：在条件队列等待
+    }
+}</code></pre>
+
+            <h3>2. acquire 流程（获取锁）</h3>
+            <pre><code>public final void acquire(int arg) {
+    if (!tryAcquire(arg) &&  // 尝试获取（子类实现）
+        acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
+        selfInterrupt();
+}
+
+acquireQueued：
+for (;;) {
+    Node p = node.predecessor();
+    if (p == head && tryAcquire(arg)) {  // 前驱是头节点且获取成功
+        setHead(node);
+        return interrupted;
+    }
+    if (shouldParkAfterFailedAcquire(p, node))
+        parkAndCheckInterrupt();  // LockSupport.park() 阻塞
+}</code></pre>
+
+            <h3>3. release 流程（释放锁）</h3>
+            <pre><code>public final boolean release(int arg) {
+    if (tryRelease(arg)) {
+        Node h = head;
+        if (h != null && h.waitStatus != 0)
+            unparkSuccessor(h);  // LockSupport.unpark(thread)
+        return true;
+    }
+    return false;
+}</code></pre>
+
+            <h2>八、ThreadLocal 底层原理</h2>
+
+            <h3>1. ThreadLocalMap 结构</h3>
+            <pre><code>每个 Thread 有一个 ThreadLocalMap：
+class Thread {
+    ThreadLocal.ThreadLocalMap threadLocals;
+}
+
+class ThreadLocalMap {
+    Entry[] table;  // 数组，不是 HashMap
+
+    static class Entry extends WeakReference&lt;ThreadLocal&lt;?&gt;&gt; {
+        Object value;  // 值（强引用）
+    }
+}</code></pre>
+
+            <h3>2. 内存泄漏问题</h3>
+            <pre><code>问题：
+- Entry 的 key（ThreadLocal）是弱引用
+- ThreadLocal 被外部清除后，key 变为 null
+- 但 value 是强引用，无法自动回收
+- 线程池线程复用，value 残留
+
+解决：
+- 使用完 ThreadLocal 后调用 remove()
+- 清除 Entry，value 可回收</code></pre>
+
+            <div class="page-nav">
+                <a href="index.html" class="home-page">返回目录</a>
+                <a href="深入原理_02_JVM底层.html" class="next-page">下一篇：JVM 底层原理 →</a>
+            </div>
+        </article>
+    </main>
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>12. Linux与CI/CD - Java 面试备战</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="back-btn">← 返回目录</a>
+        <h1>12. Linux 与 CI/CD</h1>
+    </nav>
+    <main class="main-content" style="margin-left: 0;">
+        <article class="content">
+            <h2>一、Linux 埸础命令</h2>
+
+            <h3>1. 文件操作</h3>
+            <pre><code># 查看文件内容
+cat file.txt            # 查看全部
+head -n 20 file.txt     # 查看前 20 行
+tail -n 20 file.txt     # 查看后 20 行
+tail -f file.txt        # 实时查看（日志）
+less file.txt           # 分页查看
+
+# 查找
+find /path -name "*.log"         # 查找文件
+grep "error" file.txt            # 查找内容
+grep -r "error" /path            # 递归查找
+grep -i "error" file.txt         # 忽略大小写
+grep -A 5 -B 5 "error" file.txt  # 显示前后 5 行
+
+# 文件操作
+cp source dest          # 复制
+mv source dest          # 移动/重命名
+rm file.txt             # 删除
+rm -rf directory        # 递归删除目录
+mkdir -p /path/to/dir   # 创建目录（含父目录）
+
+# 权限
+chmod 755 file.sh       # 修改权限
+chown user:group file   # 修改所有者
+ls -la                  # 查看权限详情
+
+# 权限数字：
+# 7 = rwx (读写执行)
+# 6 = rw- (读写)
+# 5 = r-x (读执行)
+# 4 = r-- (只读)</code></pre>
+
+            <h3>2. 进程管理</h3>
+            <pre><code># 查看进程
+ps aux                  # 查看所有进程
+ps aux | grep java      # 查找 Java 进程
+pgrep java              # 查找进程 ID
+
+# 进程详情
+top                     # 实时进程监控
+htop                    # 更友好的监控
+
+# 查看线程
+ps -efL | grep java     # 查看线程
+top -H -p &lt;pid&gt;         # 查看进程的线程
+
+# 终止进程
+kill &lt;pid&gt;              # 发送 SIGTERM（正常终止）
+kill -9 &lt;pid&gt;           # 发送 SIGKILL（强制终止）
+killall java            # 终止所有 java 进程
+
+# 后台运行
+nohup java -jar app.jar &amp;   # 后台运行
+nohup java -jar app.jar &gt; log.txt 2&gt;&1 &amp;   # 后台运行+日志</code></pre>
+
+            <h3>3. 系统监控</h3>
+            <pre><code># CPU
+top                     # CPU 使用率
+mpstat                  # 多核 CPU 使用率
+
+# 内存
+free -h                 # 内存使用情况
+cat /proc/meminfo       # 详细内存信息
+
+# 磁盘
+df -h                   # 磁盘使用情况
+du -sh /path            # 目录大小
+du -h --max-depth=1     # 各子目录大小
+
+# 网络
+netstat -tlnp           # 监听端口
+netstat -anp            # 所有连接
+ss -tlnp                # 监听端口（更快）
+lsof -i :8080           # 查看 8080 端口占用
+
+# IO
+iostat                  # IO 统计
+iotop                   # IO 实时监控</code></pre>
+
+            <h3>4. 常用组合命令</h3>
+            <pre><code># 查看占用 CPU 最高的进程
+ps aux --sort=-%cpu | head -n 10
+
+# 查看占用内存最高的进程
+ps aux --sort=-%mem | head -n 10
+
+# 统计日志中错误数量
+grep -c "ERROR" app.log
+
+# 查看最近 1 小时的错误日志
+find /var/log -name "*.log" -mmin -60 | xargs grep "ERROR"
+
+# 统计访问最多的 IP
+awk '{print $1}' access.log | sort | uniq -c | sort -rn | head -n 10
+
+# 实时监控日志中的错误
+tail -f app.log | grep --color "ERROR"</code></pre>
+
+            <h2>二、CI/CD</h2>
+
+            <h3>1. CI/CD 概念</h3>
+            <pre><code>CI（Continuous Integration）：持续集成
+- 代码提交后自动构建、测试
+- 快速发现问题
+- 保证代码质量
+
+CD（Continuous Delivery）：持续交付
+- 构建后自动部署到测试环境
+- 手动决定是否部署生产
+
+CD（Continuous Deployment）：持续部署
+- 构建后自动部署到生产环境
+- 完全自动
+
+流程：
+代码提交 → 自动构建 → 自动测试 → 自动部署（测试环境）
+→ 人工审核 → 自动部署（生产环境）</code></pre>
+
+            <h3>2. Jenkins 流程</h3>
+            <pre><code>Jenkins Pipeline 流程：
+
+1. 拉取代码
+   - 从 Git 拉取最新代码
+
+2. 编译构建
+   - Maven 构建
+   - mvn clean package -DskipTests
+
+3. 单元测试
+   - mvn test
+   - 测试失败则终止
+
+4. 打包镜像
+   - Docker 镜像打包
+   - docker build -t app:version .
+
+5. 推送镜像
+   - 推送到镜像仓库
+   - docker push registry/app:version
+
+6. 部署应用
+   - SSH 到目标服务器
+   - docker pull + docker run
+
+7. 通知
+   - 构建结果通知
+   - 邮件、钉钉、企业微信</code></pre>
+
+            <h3>3. Docker 常用命令</h3>
+            <pre><code># 镜像操作
+docker images                   # 查看本地镜像
+docker pull image:tag           # 拉取镜像
+docker push image:tag           # 推送镜像
+docker rmi image:tag            # 删除镜像
+docker build -t image:tag .     # 构建镜像
+
+# 容器操作
+docker ps                       # 查看运行容器
+docker ps -a                    # 查看所有容器
+docker run -d --name app -p 8080:8080 image:tag  # 运行容器
+docker stop container           # 停止容器
+docker start container          # 启动容器
+docker rm container             # 删除容器
+docker logs container           # 查看日志
+docker logs -f container        # 实时查看日志
+docker exec -it container bash  # 进入容器
+
+# Dockerfile 示例
+FROM openjdk:8-jre
+WORKDIR /app
+COPY target/app.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]</code></pre>
+
+            <h2>三、实战说辞</h2>
+
+            <div class="tips-box">
+                <h4>Linux 使用经验</h4>
+                <p>我熟悉 Linux 常用命令，日常部署和排查问题都用 Linux。</p>
+                <p>常用的命令：查日志（tail -f、grep）、查进程（ps aux、top）、查端口（netstat、lsof）、查资源（df、free）。</p>
+                <p>排查问题的流程：先看日志、看进程状态、看内存、看网络。</p>
+            </div>
+
+            <div class="tips-box">
+                <h4>CI/CD 使用经验</h4>
+                <p>我们项目用 Jenkins 做 CI/CD。</p>
+                <p>流程：代码提交到 Git → Maven 编译打包 → 单元测试 → 构建 Docker 镜像 → 推送到私有镜像仓库 → SSH 到服务器部署。</p>
+                <p>开发环境和测试环境自动部署，生产环境手动触发。构建失败会发钉钉通知。</p>
+            </div>
+
+            <div class="tips-box">
+                <h4>Docker 使用经验</h4>
+                <p>我们用 Docker 部署服务。</p>
+                <p>好处：环境一致、部署简单、扩容方便。</p>
+                <p>常用操作：docker logs 查日志、docker exec 进入容器、docker stop/start。</p>
+                <p>注意事项：容器数据要挂载到宿主机（日志、配置）、资源限制（内存、CPU）。</p>
+            </div>
+
+            <h2>四、可能追问</h2>
+
+            <div class="question-box">
+                <h4>Q: 服务部署后无法启动怎么办？</h4>
+            </div>
+            <blockquote>
+                排查步骤：<br>
+                1. 查日志：docker logs container 看启动日志<br>
+                2. 查端口：netstat -tlnp 看端口是否被占用<br>
+                3. 查资源：df -h 磁盘空间，free -h 内存是否不足<br>
+                4. 查配置：检查配置文件是否正确<br>
+                5. 查依赖：数据库、Redis 等是否可达<br><br>
+                常见原因：端口冲突、内存不足、配置错误、依赖服务不可用
+            </blockquote>
+
+            <div class="question-box">
+                <h4>Q: 生产环境如何安全部署？</h4>
+            </div>
+            <blockquote>
+                安全局署策略：<br><br>
+                1. 蓝绿部署：新版本部署到蓝环境，验证通过后切换流量<br>
+                2. 滚动更新：逐步替换旧版本，每次替换一部分<br>
+                3. 灰度发布：先让部分用户使用新版本，观察没问题再扩大<br><br>
+                我们用的是滚动更新：先部署一个新容器，验证无问题，再逐步替换旧容器。
+            </blockquote>
+
+            <div class="question-box">
+                <h4>Q: 如何监控服务健康？</h4>
+            </div>
+            <blockquote>
+                监控内容：<br>
+                1. 进程监控：检查进程是否存活<br>
+                2. 端口监控：检查端口是否可达<br>
+                3. 资源监控：CPU、内存、磁盘，超过阈值告警<br>
+                4. 业务监控：QPS、响应时间、错误率<br><br>
+                我们用自定义脚本 + Prometheus + Grafana
+            </blockquote>
+
+            <div class="page-nav">
+                <a href="11_消息队列.html" class="prev-page">←上一篇：消息队列</a>
+                <a href="index.html" class="home-page">返回目录</a>
+            </div>
+        </article>
+    </main>
+</body>
+</html>

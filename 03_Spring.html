@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>03. Spring - Java 面试备战</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="back-btn">← 返回目录</a>
+        <h1>03. Spring</h1>
+    </nav>
+    <main class="main-content" style="margin-left: 0;">
+        <article class="content">
+            <h2>一、Spring 核心概念</h2>
+
+            <h3>1. IOC（控制反转）</h3>
+            <pre><code>IOC：对象的创建和依赖注入由容器负责
+
+传统方式：
+A a = new A();
+a.setB(new B());
+
+IOC 方式：
+@Autowired private B b;
+
+好处：
+- 解耦：对象不依赖具体实现，只依赖接口
+- 便于测试：可以注入 mock 对象
+- 便于维护：修改实现无需改动使用方</code></pre>
+
+            <h3>2. DI（依赖注入）</h3>
+            <pre><code>三种注入方式：
+
+1. 构造器注入（推荐）
+@Autowired
+public UserService(UserRepository repo) {
+    this.repo = repo;
+}
+
+2. Setter 注入
+@Autowired
+public void setUserRepository(UserRepository repo) {
+    this.repo = repo;
+}
+
+3. 字段注入
+@Autowired
+private UserRepository repo;</code></pre>
+
+            <h3>3. AOP（面向切面编程）</h3>
+            <pre><code>将横切关注点（日志、事务、权限）与业务逻辑分离
+
+通知类型：
+- @Before：方法执行前
+- @After：方法执行后（无论成功或异常）
+- @AfterReturning：方法成功返回后
+- @AfterThrowing：方法抛出异常后
+- @Around：环绕通知（可控制方法执行）</code></pre>
+
+            <h2>二、Bean 生命周期</h2>
+
+            <h3>完整流程</h3>
+            <pre><code>1. 实例化（Instantiation）
+   - 创建 Bean 对象（反射或工厂方法）
+
+2. 属性赋值（Populate）
+   - 注入依赖（@Autowired、@Value）
+
+3. 初始化（Initialization）
+   3.1 Aware 接口回调
+   3.2 BeanPostProcessor 前置处理
+   3.3 @PostConstruct / InitializingBean
+   3.4 BeanPostProcessor 后置处理（可能生成 AOP 代理）
+
+4. 使用
+   - Bean 处于就绪状态
+
+5. 销毁（Destruction）
+   - @PreDestroy / DisposableBean</code></pre>
+
+            <h3>三级缓存解决循环依赖</h3>
+            <pre><code>三级缓存：
+1. singletonObjects：完整 Bean
+2. earlySingletonObjects：早期单例对象
+3. singletonFactories：单例工厂
+
+流程：
+1. 创建 A，注册 ObjectFactory 到三级缓存
+2. A 注入 B，创建 B
+3. B 注入 A，从三级缓存获取 A
+4. A 放入二级缓存，删除三级缓存
+5. B 完成，放入一级缓存
+6. A 完成，放入一级缓存</code></pre>
+
+            <h2>三、Spring 事务</h2>
+
+            <h3>1. 事务传播机制</h3>
+            <table>
+                <tr><th>传播行为</th><th>说明</th></tr>
+                <tr><td>REQUIRED</td><td>有事务就加入，没有就新建（默认）</td></tr>
+                <tr><td>REQUIRES_NEW</td><td>总是新建事务，挂起当前事务</td></tr>
+                <tr><td>SUPPORTS</td><td>有事务就加入，没有就非事务执行</td></tr>
+                <tr><td>NOT_SUPPORTED</td><td>非事务执行，挂起当前事务</td></tr>
+                <tr><td>MANDATORY</td><td>必须在事务中执行，否则抛异常</td></tr>
+                <tr><td>NEVER</td><td>必须非事务执行，否则抛异常</td></tr>
+                <tr><td>NESTED</td><td>创建嵌套事务（Savepoint）</td></tr>
+            </table>
+
+            <h3>2. 事务失效场景</h3>
+            <pre><code>1. 方法不是 public
+   - Spring AOP 只代理 public 方法
+
+2. 同类方法调用
+   - 方法 A 调用方法 B，不经过代理
+   - 解决：注入自己或用 AopContext.currentProxy()
+
+3. 异常被吞掉
+   - try-catch 捕获异常后没有抛出
+
+4. 异常类型不对
+   - 默认只回滚 RuntimeException
+   - 解决：@Transactional(rollbackFor = Exception.class)
+
+5. 数据库不支持事务
+   - MySQL MyISAM 不支持事务</code></pre>
+
+            <h2>四、实战说辞</h2>
+
+            <div class="tips-box">
+                <h4>Spring Bean 生命周期</h4>
+                <p>我了解 Spring Bean 的完整生命周期，大致分为实例化、属性赋值、初始化、使用、销毁这几个阶段。</p>
+                <p>实例化阶段创建 Bean 对象，然后进行依赖注入。初始化阶段会依次调用 Aware 接口、BeanPostProcessor、初始化方法（@PostConstruct）。BeanPostProcessor 的后置处理阶段可能生成 AOP 代理。</p>
+            </div>
+
+            <div class="tips-box">
+                <h4>事务使用经验</h4>
+                <p>我们项目中事务主要用在涉及多表操作的地方，比如订单创建涉及订单表、库存表、支付记录表。</p>
+                <p>常用的传播行为是 REQUIRED（默认），有事务就加入。有时候需要独立事务，比如日志记录，用 REQUIRES_NEW，即使主事务回滚，日志也会保存。</p>
+                <p>需要注意事务失效的场景。我遇到过一次，方法里 catch 了异常没抛出，结果事务没有回滚。后来改成 catch 后重新抛出。</p>
+            </div>
+
+            <h2>五、可能追问</h2>
+
+            <div class="question-box">
+                <h4>Q: Spring 怎么解决循环依赖？</h4>
+            </div>
+            <blockquote>
+                用三级缓存机制。<br>
+                一级缓存 singletonObjects 存完整的 Bean，二级缓存 earlySingletonObjects 存还没初始化的 Bean，三级缓存 singletonFactories 存创建早期 Bean 的工厂。<br><br>
+                创建 A 时发现依赖 B，先标记 A 正在创建。创建 B 时发现依赖 A，从三级缓存获取 A 的工厂，创建早期 A 放入二级缓存。B 注入 A 后完成创建。A 再注入 B 完成创建。<br><br>
+                但不能解决构造器注入的循环依赖，因为构造器注入在实例化阶段就需要依赖，还没进入缓存阶段。
+            </blockquote>
+
+            <div class="question-box">
+                <h4>Q: @Autowired 和 @Resource 的区别？</h4>
+            </div>
+            <blockquote>
+                @Autowired：<br>
+                - Spring 注解<br>
+                - 默认按类型注入<br>
+                - 有多个同类型 Bean 时，用 @Qualifier 指定名称<br><br>
+                @Resource：<br>
+                - JDK 注解（JSR-250）<br>
+                - 默认按名称注入<br>
+                - 找不到名称时再按类型
+            </blockquote>
+
+            <div class="page-nav">
+                <a href="02_JVM.html" class="prev-page">←上一篇：JVM</a>
+                <a href="index.html" class="home-page">返回目录</a>
+                <a href="04_MySQL.html" class="next-page">下一篇：MySQL →</a>
+            </div>
+        </article>
+    </main>
+</body>
+</html>

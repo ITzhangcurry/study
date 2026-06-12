@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>06. Elasticsearch - Java 面试备战</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="back-btn">← 返回目录</a>
+        <h1>06. Elasticsearch</h1>
+    </nav>
+    <main class="main-content" style="margin-left: 0;">
+        <article class="content">
+            <h2>一、Elasticsearch 基础</h2>
+
+            <h3>1. 核心概念</h3>
+            <table>
+                <tr><th>ES</th><th>数据库</th></tr>
+                <tr><td>Index（索引）</td><td>Database（数据库）</td></tr>
+                <tr><td>Type（类型）</td><td>Table（表）（7.x 后废弃）</td></tr>
+                <tr><td>Document（文档）</td><td>Row（行）</td></tr>
+                <tr><td>Field（字段）</td><td>Column（列）</td></tr>
+                <tr><td>Mapping（映射）</td><td>Schema（表结构）</td></tr>
+                <tr><td>Shard（分片）</td><td>Partition（分区）</td></tr>
+            </table>
+            <pre><code>核心概念：
+
+1. 索引（Index）
+   - 文档的集合
+   - 类似数据库
+
+2. 文档（Document）
+   - JSON 格式的数据
+   - 类似一行数据
+
+3. 映射（Mapping）
+   - 定义字段类型和分析器
+   - 类似表结构
+
+4. 分片（Shard）
+   - 索引分成多个分片存储
+   - 主分片 + 副本分片
+
+5. 节点（Node）
+   - ES 服务实例
+
+6. 集群（Cluster）
+   - 多个节点组成</code></pre>
+
+            <h3>2. 倒排索引</h3>
+            <pre><code>倒排索引原理：
+
+正排索引（传统方式）：
+文档 ID → 文档内容 → 搜索内容
+如：doc1 → "Java is great" → 搜索 "Java" 需扫描所有文档
+
+倒排索引：
+词 → 文档 ID 列表
+如：
+Java → [doc1, doc3, doc5]
+is → [doc1, doc2]
+great → [doc1, doc4]
+
+搜索流程：
+1. 用户搜索 "Java"
+2. 从倒排索引找到 Java → [doc1, doc3, doc5]
+3. 返回这些文档
+
+结构：
+Term Dictionary（词典）：所有词的列表，有序（可二分查找）
+Term Index（词索引）：词典的索引（类似 B+ 树）
+Posting List（倒排表）：每个词对应的文档 ID 列表
+
+压缩优化：
+- Frame of Reference：Posting List 压缩
+- Roaring Bitmaps：文档 ID 集合压缩
+- FST（Finite State Transducer）：词索引压缩</code></pre>
+
+            <h3>3. 分词与分析器</h3>
+            <pre><code>分析器组成：
+1. Character Filters：预处理（如 HTML 标签去除）
+2. Tokenizer：分词（如按空格分）
+3. Token Filters：后处理（如转小写、去停用词）
+
+内置分析器：
+
+1. standard（默认）
+   - 按词分，转小写
+   - 例："The Quick Brown" → [the, quick, brown]
+
+2. simple
+   - 按非字母分，转小写
+   - 例："The2Quick" → [the, quick]
+
+3. whitespace
+   - 按空格分，不转小写
+
+4. stop
+   - standard + 去停用词（the, a, an...）
+
+5. keyword
+   - 不分词，整体作为一个词
+
+6. pattern
+   - 正则分词
+
+IK 中文分词器：
+- ik_smart：智能分词（粗粒度）
+  "中华人民共和国" → [中华人民共和国]
+- ik_max_word：最大化分词（细粒度）
+  "中华人民共和国" → [中华人民共和国, 中华人民, 中华, 华人, 人民共和国, 人民, 人民共和国, 共和国, 共和, 国]</code></pre>
+
+            <h2>二、查询语法</h2>
+
+            <h3>1. DSL 查询</h3>
+            <pre><code>// 埸本结构
+{
+  "query": {
+    "match": {
+      "title": "Java入门"
+    }
+  }
+}
+
+// 常用查询类型
+
+// match：全文搜索（分词后匹配）
+{
+  "query": {
+    "match": {
+      "title": "Java编程"
+    }
+  }
+}
+
+// match_phrase：短语匹配（分词后顺序匹配）
+{
+  "query": {
+    "match_phrase": {
+      "title": "Java编程指南"
+    }
+  }
+}
+
+// term：精确匹配（不分词）
+{
+  "query": {
+    "term": {
+      "status": "published"
+    }
+  }
+}
+
+// terms：多值精确匹配
+{
+  "query": {
+    "terms": {
+      "status": ["published", "draft"]
+    }
+  }
+}
+
+// range：范围查询
+{
+  "query": {
+    "range": {
+      "price": {
+        "gte": 100,
+        "lte": 500
+      }
+    }
+  }
+}
+
+// bool：组合查询
+{
+  "query": {
+    "bool": {
+      "must": [        // 必须匹配
+        {"match": {"title": "Java"}}
+      ],
+      "should": [      // 可选匹配（加分）
+        {"match": {"content": "编程"}}
+      ],
+      "must_not": [    // 不能匹配
+        {"term": {"status": "deleted"}}
+      ],
+      "filter": [      // 过滤（不参与评分）
+        {"range": {"price": {"lte": 100}}}
+      ]
+    }
+  }
+}</code></pre>
+
+            <h3>2. 搜索选项</h3>
+            <pre><code>// 分页
+{
+  "query": {"match_all": {}},
+  "from": 0,
+  "size": 10
+}
+
+// 排序
+{
+  "query": {"match_all": {}},
+  "sort": [
+    {"price": {"order": "desc"}},
+    {"_score": {"order": "desc"}}
+  ]
+}
+
+// 高亮
+{
+  "query": {"match": {"title": "Java"}},
+  "highlight": {
+    "fields": {
+      "title": {}
+    },
+    "pre_tags": ["&lt;em&gt;"],
+    "post_tags": ["&lt;/em&gt;"]
+  }
+}
+
+// 返回字段
+{
+  "query": {"match_all": {}},
+  "_source": ["title", "price"]
+}
+
+// 聚合
+{
+  "query": {"match_all": {}},
+  "aggs": {
+    "avg_price": {
+      "avg": {"field": "price"}
+    },
+    "group_by_status": {
+      "terms": {"field": "status"}
+    }
+  }
+}</code></pre>
+
+            <h2>三、核心机制</h2>
+
+            <h3>1. 写入流程</h3>
+            <pre><code>写入流程：
+
+1. 客户端发送请求到协调节点
+2. 协调节点根据 ID 计算分片：shard = hash(id) % num_shards
+3. 协调节点转发到主分片节点
+4. 主分片写入：
+   - 写入内存 buffer
+   - 写入 translog（持久化保证）
+5. 主分片同步到副本分片
+6. 协调节点收到所有分片确认，返回成功
+
+刷新（Refresh）：
+- 每 1 秒（默认），buffer 内容写入新 segment
+- 新 segment 可被搜索
+- 近实时搜索（写入后约 1 秒可搜到）
+
+刷盘（Flush）：
+- 每 30 分钟或 translog 达 512MB
+- buffer 内容写入磁盘 segment
+- 清空 translog
+- segment 合并
+
+段合并（Segment Merge）：
+- 多个小 segment 合并为大 segment
+- 删除已删除文档
+- 提高查询效率</code></pre>
+
+            <h3>2. 相关性评分</h3>
+            <pre><code>TF-IDF（5.x 之前）：
+TF（词频）：词在文档中出现的频率
+  TF = 词在文档中出现次数 / 文档总词数
+
+IDF（逆文档频率）：词的稀有程度
+  IDF = log(总文档数 / 包含该词的文档数)
+
+评分 = TF * IDF
+词在文档中出现越多，评分越高
+词越稀有（文档中出现少），评分越高
+
+BM25（5.x 之后默认）：
+改进版 TF-IDF
+
+特点：
+- 词频饱和：TF 超过一定值后，贡献不再增加
+- 文档长度惩罚：长文档评分降低
+- 比 TF-IDF 更合理</code></pre>
+
+            <h2>四、实战说辞</h2>
+
+            <div class="tips-box">
+                <h4>ES 使用场景</h4>
+                <p>我们项目用 Elasticsearch 做题目搜索和知识点搜索。</p>
+                <p>原来用 MySQL LIKE 查询，大数据量下性能很差，而且不支持分词搜索。改用 ES 后，配合 IK 分词器，可以支持中文分词搜索，比如搜索"整数加减"能匹配到"整数的加减法"这样的题目。</p>
+                <p>我们还用 ES 做 PV/UV 统计。每次访问记录一条文档，通过聚合查询统计 PV。UV 用 cardinality 聚合（类似 count distinct），虽然有误差，但在可接受范围内。</p>
+            </div>
+
+            <div class="tips-box">
+                <h4>数据同步方案</h4>
+                <p>MySQL 数据同步到 ES，我们用的是 MQ 方案。</p>
+                <p>数据变更时，业务代码发消息到 MQ（我们用的是 ActiveMQ）。消费者收到消息后，调用 ES API 写入/更新数据。</p>
+                <p>这种方案的好处是异步解耦，不影响主业务性能。缺点是需要维护消息消费逻辑，处理失败时需要有重试机制。</p>
+            </div>
+
+            <h2>五、可能追问</h2>
+
+            <div class="question-box">
+                <h4>Q: ES 和 Solr 的区别？</h4>
+            </div>
+            <blockquote>
+                ES 更现代化，分布式支持更好，配置简单。Solr 功能更丰富（如更多分析器），但配置复杂。<br>
+                ES 实时性更好（近实时1秒），分布式内置支持，社区活跃。
+            </blockquote>
+
+            <div class="question-box">
+                <h4>Q: 如何处理深度分页？</h4>
+            </div>
+            <blockquote>
+                ES 的 from + size 最大 10000，因为需要每个分片都返回 from + size 条数据。<br><br>
+                解决方案：<br>
+                1. scroll：类似游标，每次取一批数据，适合批量导出<br>
+                2. search_after：用上一页最后一条数据的排序值作为游标<br>
+                3. 业务限制：不允许翻页太深，限制最大页数
+            </blockquote>
+
+            <div class="page-nav">
+                <a href="05_Redis.html" class="prev-page">←上一篇：Redis</a>
+                <a href="index.html" class="home-page">返回目录</a>
+                <a href="07_Netty.html" class="next-page">下一篇：Netty →</a>
+            </div>
+        </article>
+    </main>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>面试备战指南 - Java 面试备战</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="back-btn">← 返回目录</a>
+        <h1>面试备战指南</h1>
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+    </nav>
+
+    <main class="main-content" style="margin-left: 0;">
+        <article class="content">
+            <h1>面试备战指南</h1>
+
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; margin-bottom: 30px;">
+                <p style="margin: 0;"><strong>候选人：张炜增</strong></p>
+                <p style="margin: 10px 0 0 0;"><strong>工作年限：约 7 年（2018.01 - 至今）</strong></p>
+                <p style="margin: 10px 0 0 0;"><strong>核心定位：中高级 Java 后端开发工程师</strong></p>
+                <p style="margin: 10px 0 0 0;"><strong>行业背景：在线教育（3年）、移动平台（2年）、CRM（1年）</strong></p>
+            </div>
+
+            <h2>一、自我介绍模板</h2>
+
+            <h3>版本 A：标准版（1分钟）</h3>
+            <blockquote>
+                我叫张炜增，有 7 年 Java 后端开发经验。<br><br>
+                目前在广州飞硕信息科技工作，主要负责在线教育平台的后端开发，技术栈是 Spring Boot + Dubbo + Redis + MySQL，项目用户规模大概十几万到几十万。<br><br>
+                我参与过购物车订单模块、学情统计、搜索优化、实时讲解服务等核心功能的开发，也负责过硬件对接（Netty 长连接）和 AI 功能接入。<br><br>
+                技术上我对 Spring 生态比较熟悉，有 JVM 排查和 SQL 优化的实战经验，也接触过 WebFlux 响应式编程和 Netty 网络编程。<br><br>
+                我希望能找到有技术挑战、能持续成长的机会。
+            </blockquote>
+
+            <h3>版本 B：精简版（30秒）</h3>
+            <blockquote>
+                我有 7 年 Java 开发经验，目前在飞硕科技做在线教育平台。主要负责业务模块开发，涉及分布式锁、缓存设计、搜索优化、WebFlux 实时推送等。技术栈是 Spring Boot + Dubbo + Redis + MySQL + Netty。有线上问题排查和性能优化的实战经验。
+            </blockquote>
+
+            <h2>二、高频技术考点备战</h2>
+
+            <h3>【Java 基础】★★★★★ 必问</h3>
+
+            <div class="tips-box">
+                <h4>HashMap 源码阅读经历</h4>
+                <p>我主要看过 HashMap、ConcurrentHashMap、ThreadPoolExecutor 这几个核心源码。</p>
+                <p>HashMap 我关注了它的扩容机制，特别是 1.8 的优化。以前扩容要重新计算每个元素的 hash 值，现在直接用 hash & oldCap 判断，要么位置不变，要么新位置是原索引加旧容量。这个优化减少了 hash 计算开销。</p>
+                <p>另外 1.7 的头插法在并发扩容时可能死循环，1.8 改成尾插法解决这个问题。这个让我理解了为什么不能在多线程环境下用 HashMap。</p>
+                <p>ConcurrentHashMap 我看过 1.8 的实现，用 CAS + synchronized 替代了 1.7 的分段锁。锁粒度更细，只锁链表头节点，并发度更高。这个设计思路很值得学习。</p>
+            </div>
+
+            <h3>【JVM】★★★★★ 必问</h3>
+
+            <div class="tips-box">
+                <h4>JVM 调优经验</h4>
+                <p>有过线上排查问题的经验。我们有个服务高峰期响应变慢，我通过 jstat 发现 Full GC 比较频繁。</p>
+                <p>进一步用 jmap -histo 分析对象分布，发现有个报表导出功能创建了大量大对象。这些对象直接进了老年代，导致老年代快速填满，触发 Full GC。</p>
+                <p>解决方案是把导出改成流式处理，分批查询写入，不再一次性加载所有数据到内存。改完后 Full GC 频率明显下降。</p>
+            </div>
+
+            <h3>【Spring】★★★★★ 必问</h3>
+
+            <div class="tips-box">
+                <h4>Spring Bean 生命周期</h4>
+                <p>我了解 Spring Bean 的完整生命周期，大致分为实例化、属性赋值、初始化、使用、销毁这几个阶段。</p>
+                <p>实例化阶段创建 Bean 对象，然后进行依赖注入。初始化阶段会依次调用 Aware 接口、BeanPostProcessor、初始化方法（@PostConstruct）。BeanPostProcessor 的后置处理阶段可能生成 AOP 代理。销毁阶段调用 @PreDestroy 等方法。</p>
+            </div>
+
+            <h3>【MySQL】★★★★★ 必问</h3>
+
+            <div class="tips-box">
+                <h4>慢 SQL 优化案例</h4>
+                <p>有次有个学情统计查询很慢，执行要好几秒。</p>
+                <p>我用 EXPLAIN 分析，发现 type 是 ALL，全表扫描。原因是 WHERE 条件用了一个日期格式化函数 YEAR(create_time)，导致索引失效。</p>
+                <p>我改了 SQL，把日期计算移到代码里，改成 WHERE create_time >= '2023-01-01' AND create_time < '2024-01-01'，这样就走了日期索引。改完后查询时间降到了几百毫秒。</p>
+            </div>
+
+            <h3>【Redis】★★★★★ 必问</h3>
+
+            <div class="tips-box">
+                <h4>分布式锁实现</h4>
+                <p>我们购物车结算用 Redis 分布式锁。</p>
+                <p>加锁用 SET lock_key unique_value NX PX 30000，NX 保证不存在才设置，PX 设置过期时间防止死锁。</p>
+                <p>解锁用 Lua 脚本：先检查 value 是否是自己设置的，再删除。这样防止误删别人的锁。</p>
+                <p>我们没用 Redisson，是自己实现的。主要考虑业务场景相对简单，自研够用。如果要支持自动续期、可重入，用 Redisson 更方便。</p>
+            </div>
+
+            <h3>【Netty】★★★ 亮点（区分度高）</h3>
+
+            <div class="tips-box">
+                <h4>Netty 使用场景</h4>
+                <p>我们项目用 Netty 做考勤设备的长连接通信。</p>
+                <p>设备通过 TCP 连接到服务器，上报考勤数据。用 Netty 的原因是：设备数量多，需要高并发处理；长连接需要心跳保活；原生 NIO 编程太复杂。</p>
+                <p>我们配置了 Boss Group（1个线程）和 Worker Group（4个线程）。Boss 负责接收设备连接，Worker 负责处理设备上报数据。还加了 IdleStateHandler 做心跳检测，30秒没收到数据就断开连接。</p>
+            </div>
+
+            <h3>【WebFlux】★★★ 亮点</h3>
+
+            <div class="tips-box">
+                <h4>为什么用 WebFlux？</h4>
+                <p>我们用 WebFlux 做实时讲解服务，主要有几个原因：</p>
+                <ol>
+                    <li>需要实时推送（SSE）：学生平板端实时收到讲解内容，WebFlux 天然支持 SSE。</li>
+                    <li>调用外部 AI 接口：AI 接口响应慢（几秒），传统 Servlet 会阻塞线程等待。WebFlux 异步非阻塞，线程不用等，可以处理其他请求。</li>
+                    <li>需要合并多个数据流：讲解内容来自 AI（SSE），音频来自 TTS 服务，需要合并后推送。Flux.merge 很方便实现。</li>
+                </ol>
+                <p>但我们只在这个特定场景用 WebFlux，其他业务模块还是用 Spring MVC。因为 WebFlux 编程模型复杂，调试难，团队学习成本高，不是所有场景都需要。</p>
+            </div>
+
+            <h2>三、项目经验备战</h2>
+
+            <h3>项目一：智学堂 / 口语易（重点准备）</h3>
+            <blockquote>
+                这是一个面向中小学生的在线学习平台，有智能组题、作业批改、学情分析、错题册等功能。用户规模十几万到几十万，主要是学生和老师使用。<br><br>
+                技术栈是 Spring Boot + Dubbo + Redis + MySQL + Elasticsearch + Netty + WebFlux。<br><br>
+                我主要负责购物车订单模块、学情统计、搜索优化、实时讲解服务、硬件对接等。
+            </blockquote>
+
+            <div class="question-box">
+                <h4>高频追问准备</h4>
+                <table>
+                    <tr><th>问题</th><th>回答要点</th></tr>
+                    <tr><td>购物车怎么设计的？</td><td>Redis 缓存购物车数据，结算时用分布式锁保证幂等，优惠券组合用算法计算最优方案</td></tr>
+                    <tr><td>学情统计怎么做的？</td><td>异步处理，Redis 队列 + 线程池，批量计算班级/年级数据</td></tr>
+                    <tr><td>ES 怎么用的？</td><td>题目搜索，IK 分词，数据通过 MQ 同步</td></tr>
+                    <tr><td>实时讲解怎么实现？</td><td>WebFlux + SSE，调用 AI 接口 + TTS，两个数据流合并推送</td></tr>
+                    <tr><td>Netty 用在哪？</td><td>考勤设备长连接，Boss/Worker 线程模型，心跳保活</td></tr>
+                    <tr><td>遇到过什么难点？</td><td>实时讲解的流合并和背压处理、设备断线重连</td></tr>
+                </table>
+            </div>
+
+            <h2>四、行为面试问题准备</h2>
+
+            <div class="question-box">
+                <h4>你的优势是什么？</h4>
+                <blockquote>
+                    技术上，我有 7 年 Java 开发经验，技术栈比较全面，从传统 Spring 到响应式 WebFlux、网络编程 Netty 都有实践经验。<br><br>
+                    业务上，我在在线教育行业做了 3 年，对教育信息化、智能批改、学情分析等业务比较熟悉。<br><br>
+                    工作风格上，我对负责的模块有 owner 意识，能从设计到上线独立负责，有问题会主动沟通解决。
+                </blockquote>
+            </div>
+
+            <div class="question-box">
+                <h4>你的不足是什么？</h4>
+                <blockquote>
+                    我在架构设计层面参与较多，但独立主导大型架构设计的经验还不够多。<br><br>
+                    另外，前端技术我只停留在能用的层面，没有深入。
+                </blockquote>
+            </div>
+
+            <div class="question-box">
+                <h4>为什么离职？</h4>
+                <blockquote>
+                    公司业务发展进入平稳期，技术挑战相对减少。我希望找到一个有更多技术挑战、能持续成长的机会。
+                </blockquote>
+            </div>
+
+            <h2>五、面试策略建议</h2>
+
+            <h3>自我定位</h3>
+            <ul>
+                <li><strong>7 年经验</strong>属于中高级水平</li>
+                <li><strong>核心竞争力</strong>：在线教育行业经验 + 分布式系统实战 + Netty/WebFlux 亮点</li>
+                <li><strong>面试重点展示</strong>：业务理解 + 技术深度 + 解决问题的能力</li>
+            </ul>
+
+            <h3>面试节奏</h3>
+            <pre><code>1. 自我介绍（1分钟）
+2. 项目深挖（10-15分钟）← 重点准备
+3. 技术八股（15-20分钟）
+4. 场景设计题（10分钟）
+5. 行为问题 + 反问（5分钟）</code></pre>
+
+            <h3>反问环节建议</h3>
+            <p><strong>可以问：</strong></p>
+            <ul>
+                <li>团队规模和技术栈是什么？</li>
+                <li>目前主要的技术挑战是什么？</li>
+                <li>这个岗位主要负责哪些模块？</li>
+                <li>团队的晋升和发展机制是怎样的？</li>
+            </ul>
+
+            <p><strong>不要问：</strong></p>
+            <ul>
+                <li>加班多吗？（可以在其他渠道了解）</li>
+                <li>薪资具体多少？（HR 阶段聊）</li>
+            </ul>
+
+            <h2>六、面试前 Checklist</h2>
+
+            <h3>前一天</h3>
+            <ul>
+                <li>过一遍这份备战指南</li>
+                <li>准备好项目介绍（能流畅说出）</li>
+                <li>准备好 2-3 个技术亮点的故事</li>
+                <li>准备好 1-2 个遇到问题解决的故事</li>
+            </ul>
+
+            <h3>面试当天</h3>
+            <ul>
+                <li>提前 10 分钟到场/上线</li>
+                <li>准备好简历 PDF</li>
+                <li>准备好笔和纸（画架构图）</li>
+                <li>手机静音</li>
+            </ul>
+
+            <div style="background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%); padding: 20px; border-radius: 10px; border-left: 4px solid #f9a825; margin-top: 30px;">
+                <h3 style="color: #f57f17; margin: 0 0 10px 0;">心态提醒</h3>
+                <ul style="margin-left: 20px;">
+                    <li>不要背答案，用自己的话表达</li>
+                    <li>不会的问题诚实说"了解但没深入"，然后说自己的理解</li>
+                    <li>被追问细节时，不要慌，一步步解释思路</li>
+                    <li>适当展示思考过程，比直接给答案更好</li>
+                </ul>
+            </div>
+
+            <div class="page-nav">
+                <a href="index.html" class="home-page">返回目录</a>
+                <a href="面试说辞.html" class="next-page">下一篇：面试说辞 →</a>
+            </div>
+        </article>
+    </main>
+
+    <script>
+        function toggleSidebar() {
+            // 移动端菜单切换
+        }
+    </script>
+</body>
+</html>

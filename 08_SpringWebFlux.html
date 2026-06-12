@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>08. Spring WebFlux - Java 面试备战</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="back-btn">← 返回目录</a>
+        <h1>08. Spring WebFlux</h1>
+    </nav>
+    <main class="main-content" style="margin-left: 0;">
+        <article class="content">
+            <h2>一、WebFlux 基础</h2>
+
+            <h3>1. 什么是响应式编程？</h3>
+            <pre><code>响应式编程（Reactive Programming）：
+
+核心思想：
+- 数据流（Stream）：数据以流的形式处理
+- 异步非阻塞：操作不阻塞线程，异步完成
+- 事件驱动：数据变化触发事件，处理事件
+
+对比传统编程：
+传统（命令式）：
+- 同步阻塞
+- 线程等待结果
+result = database.query();  // 线程阻塞等待
+process(result);
+
+响应式：
+- 异步非阻塞
+- 线程不等待，回调处理
+database.queryAsync()
+    .subscribe(result -> process(result));  // 结果就绪时回调
+// 线程继续做其他事
+
+好处：
+- 更少的线程处理更多的并发
+- 资源利用率高
+- 适合 IO 密集型场景</code></pre>
+
+            <h3>2. WebFlux vs Spring MVC</h3>
+            <table>
+                <tr><th>方面</th><th>Spring MVC</th><th>Spring WebFlux</th></tr>
+                <tr><td>模型</td><td>同步阻塞</td><td>异步非阻塞</td></tr>
+                <tr><td>线程</td><td>每个请求占用一个线程</td><td>少量线程处理大量请求</td></tr>
+                <tr><td>容器</td><td>Servlet 容器</td><td>Servlet 容器 或 Netty</td></tr>
+                <tr><td>适用</td><td>计算+传统业务</td><td>IO 密集+高并发</td></tr>
+                <tr><td>数据类型</td><td>普通 POJO</td><td>Mono/Flux</td></tr>
+            </table>
+
+            <h3>3. Reactor 核心概念</h3>
+            <pre><code>Reactor 是 WebFlux 的响应式库
+
+两种核心类型：
+
+Mono：0 或 1 个元素的异步序列
+- 类似 Optional 或 Future
+- 例：查询一个用户、保存一个订单
+
+Flux：0 到 N 个元素的异步序列
+- 类似 List 或 Stream
+- 例：查询用户列表、实时推送多个消息
+
+创建方式：
+// Mono
+Mono.just(value)              // 单个值
+Mono.empty()                  // 空
+Mono.error(exception)         // 错误
+Mono.fromCallable(() -> ...)  // Callable 包装
+
+// Flux
+Flux.just(a, b, c)            // 多个值
+Flux.fromIterable(list)       // 集合
+Flux.range(1, 10)             // 范围
+Flux.interval(Duration.ofSeconds(1))  // 定时发射</code></pre>
+
+            <h2>二、Reactor 操作符</h2>
+
+            <h3>1. 转换操作符</h3>
+            <pre><code>// map：转换元素
+Flux.just(1, 2, 3)
+    .map(i -> i * 2)  // [2, 4, 6]
+
+// flatMap：转换 + 扁平化
+Flux.just(1, 2, 3)
+    .flatMap(i -> Flux.just(i, i * 2))  // [1, 2, 2, 4, 3, 6]
+
+// filter：过滤
+Flux.just(1, 2, 3, 4, 5)
+    .filter(i -> i % 2 == 0)  // [2, 4]
+
+// take：取前 N 个
+Flux.range(1, 10)
+    .take(3)  // [1, 2, 3]
+
+// buffer：分组
+Flux.range(1, 10)
+    .buffer(3)  // [[1,2,3], [4,5,6], [7,8,9], [10]]</code></pre>
+
+            <h3>2. 组合操作符</h3>
+            <pre><code>// merge：合并（按时间顺序）
+Flux.merge(flux1, flux2)
+
+// concat：连接（按流顺序）
+Flux.concat(Flux.just(1, 2), Flux.just(3, 4))  // [1, 2, 3, 4]
+
+// zip：组合（配对）
+Flux.zip(Flux.just("a", "b"), Flux.just(1, 2))  // [("a",1), ("b",2)]
+
+// then：顺序执行（忽略前面的值）
+mono1.then(mono2)
+
+// when：并行执行
+Mono.when(mono1, mono2)</code></pre>
+
+            <h3>3. 错误处理操作符</h3>
+            <pre><code>// onErrorReturn：出错返回默认值
+Flux.just(1, 2, 3)
+    .onErrorReturn(0)
+
+// onErrorResume：出错切换到另一个流
+Flux.just(1, 2, 3)
+    .onErrorResume(e -> Flux.just(0))
+
+// retry：重试
+Flux.just(1, 2, 3)
+    .retry(3)
+
+// retryWhen：条件重试
+Flux.just(1, 2, 3)
+    .retryWhen(Retry.backoff(3, Duration.ofSeconds(1)))
+
+// timeout：超时
+Flux.just(1, 2, 3)
+    .timeout(Duration.ofSeconds(5))</code></pre>
+
+            <h3>4. 调度操作符</h3>
+            <pre><code>// subscribeOn：指定订阅线程（源执行线程）
+Flux.just(1, 2, 3)
+    .subscribeOn(Schedulers.parallel())
+
+// publishOn：指定发布线程（后续操作线程）
+Flux.just(1, 2, 3)
+    .publishOn(Schedulers.parallel())
+
+调度器类型：
+Schedulers.immediate()：当前线程
+Schedulers.single()：单线程
+Schedulers.parallel()：并行线程池（CPU 密集）
+Schedulers.boundedElastic()：弹性线程池（IO 密集）</code></pre>
+
+            <h2>三、背压（Backpressure）</h2>
+
+            <h3>背压机制</h3>
+            <pre><code>背压问题：
+- 上游生产数据速度快
+- 下游消费速度慢
+- 数据积压，可能导致内存溢出
+
+背压机制：
+- 下游通知上游自己的处理能力
+- 上游根据下游能力调整生产速度
+
+Reactor 背压策略：
+- onBackpressureBuffer：缓存（超出缓存则报错）
+- onBackpressureDrop：丢弃（超出则丢弃）
+- onBackpressureLatest：保留最新（丢弃旧的）
+- onBackpressureError：报错（超出则报错）</code></pre>
+
+            <h2>四、Sinks（手动推送）</h2>
+
+            <h3>Sinks 类型</h3>
+            <pre><code>Sinks：手动向 Flux/Mono 推送数据
+
+类型：
+- Sinks.One：类似 Mono，推送单个数据
+- Sinks.Many：类似 Flux，推送多个数据
+
+Sinks.Many 分类：
+- Unicast：单消费者
+- Multicast：多消费者（广播）
+- Replay：重放历史数据
+
+溢出策略：
+- BUFFER：缓存
+- DROP：丢弃新数据
+- FAIL：抛异常
+- LATEST：保留最新，丢弃旧</code></pre>
+
+            <h2>五、实战说辞</h2>
+
+            <div class="tips-box">
+                <h4>为什么用 WebFlux？</h4>
+                <p>我们用 WebFlux 做实时讲解服务，主要有几个原因：</p>
+                <ol>
+                    <li><strong>需要实时推送（SSE）</strong>：学生平板端实时收到讲解内容，WebFlux 天然支持 SSE。</li>
+                    <li><strong>调用外部 AI 接口</strong>：AI 接口响应慢（几秒），传统 Servlet 会阻塞线程等待。WebFlux 异步非阻塞，线程不用等，可以处理其他请求。</li>
+                    <li><strong>需要合并多个数据流</strong>：讲解内容来自 AI（SSE），音频来自 TTS 服务，需要合并后推送。Flux.merge 很方便实现。</li>
+                </ol>
+                <p>但我们只在这个特定场景用 WebFlux，其他业务模块还是用 Spring MVC。因为 WebFlux 编程模型复杂，调试难，团队学习成本高。</p>
+            </div>
+
+            <div class="tips-box">
+                <h4>Sinks 使用场景</h4>
+                <p>我们用 Sinks.Many 来管理音频数据流。</p>
+                <p>AI 讲解是 SSE 流式返回，每收到一段文本，调用 TTS 转成音频。音频数据通过 Sinks.tryEmitNext 推送。</p>
+                <p>前端通过 SSE 订阅 Sinks.asFlux()，实时收到音频数据。</p>
+                <p>用 multicast().onBackpressureBuffer()，支持多消费者，背压处理用缓存策略。</p>
+            </div>
+
+            <h2>六、可能追问</h2>
+
+            <div class="question-box">
+                <h4>Q: WebFlux 和传统 MVC 怎么选择？</h4>
+            </div>
+            <blockquote>
+                大多数业务（CRUD）：MVC（简单成熟）<br>
+                高并发 IO 密集：WebFlux（非阻塞）<br>
+                实时推送（SSE、WebSocket）：WebFlux（原生支持）<br>
+                调用慢速外部服务：WebFlux（异步等待）<br><br>
+                WebFlux 优势在 IO 密集型场景。如果代码有很多阻塞操作，WebFlux 优势不明显。
+            </blockquote>
+
+            <div class="question-box">
+                <h4>Q: Mono 和 Flux 的区别？</h4>
+            </div>
+            <blockquote>
+                Mono：0 或 1 个元素<br>
+                - 类似 Optional 或 Future<br>
+                - 例：查询单个用户、保存数据<br><br>
+                Flux：0 到 N 个元素<br>
+                - 类似 List 或 Stream<br>
+                - 例：查询列表、实时推送多个消息
+            </blockquote>
+
+            <div class="question-box">
+                <h4>Q: subscribeOn 和 publishOn 的区别？</h4>
+            </div>
+            <blockquote>
+                subscribeOn：改变源执行的线程（影响整个链的起点）<br>
+                publishOn：改变后续操作执行的线程（影响它后面的操作）<br><br>
+                subscribeOn 只能用一次（第一次生效），publishOn 可以多次。
+            </blockquote>
+
+            <div class="page-nav">
+                <a href="07_Netty.html" class="prev-page">←上一篇：Netty</a>
+                <a href="index.html" class="home-page">返回目录</a>
+                <a href="09_分布式系统.html" class="next-page">下一篇：分布式系统 →</a>
+            </div>
+        </article>
+    </main>
+</body>
+</html>

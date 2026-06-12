@@ -1,0 +1,487 @@
+/* 全局样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    line-height: 1.8;
+    color: #333;
+    background: #f8f9fa;
+}
+
+/* 导航栏 */
+.navbar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 25px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    height: 60px;
+}
+
+.navbar h1 {
+    font-size: 18px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60%;
+}
+
+.back-btn {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 8px 15px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 6px;
+    transition: background 0.3s;
+}
+
+.back-btn:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+.menu-toggle {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    font-size: 20px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: none;
+}
+
+/* 侧边栏 */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 60px;
+    bottom: 0;
+    width: 280px;
+    background: white;
+    border-right: 1px solid #eee;
+    overflow-y: auto;
+    z-index: 900;
+    transition: transform 0.3s ease;
+}
+
+.sidebar-header {
+    padding: 20px;
+    font-weight: 600;
+    color: #667eea;
+    border-bottom: 1px solid #eee;
+}
+
+.toc {
+    padding: 15px;
+}
+
+.toc ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.toc li {
+    margin: 5px 0;
+}
+
+.toc a {
+    display: block;
+    color: #555;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.toc a:hover {
+    background: #f0f0f0;
+    color: #667eea;
+}
+
+.toc a.active {
+    background: #667eea;
+    color: white;
+}
+
+.toc .level-2 {
+    padding-left: 0;
+}
+
+.toc .level-3 {
+    padding-left: 15px;
+}
+
+.toc .level-3 a {
+    font-size: 13px;
+    color: #777;
+}
+
+/* 主内容区 */
+.main-content {
+    margin-left: 280px;
+    margin-top: 60px;
+    padding: 40px;
+    min-height: calc(100vh - 60px);
+}
+
+.content {
+    max-width: 900px;
+    margin: 0 auto;
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* 内容样式 */
+.content h1 {
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 3px solid #667eea;
+}
+
+.content h2 {
+    font-size: 22px;
+    color: #667eea;
+    margin: 40px 0 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.content h3 {
+    font-size: 18px;
+    color: #333;
+    margin: 30px 0 15px;
+}
+
+.content h4 {
+    font-size: 16px;
+    color: #333;
+    margin: 20px 0 10px;
+}
+
+.content p {
+    margin: 15px 0;
+    color: #555;
+}
+
+.content ul, .content ol {
+    margin: 15px 0;
+    padding-left: 30px;
+}
+
+.content li {
+    margin: 8px 0;
+    color: #555;
+}
+
+/* 代码块 */
+.content pre {
+    background: #2d3748;
+    color: #e2e8f0;
+    padding: 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 20px 0;
+    font-family: 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.content code {
+    font-family: 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace;
+}
+
+.content p code, .content li code {
+    background: #f1f5f9;
+    color: #e53e3e;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* 表格 */
+.content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 14px;
+}
+
+.content th {
+    background: #667eea;
+    color: white;
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: 500;
+}
+
+.content td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.content tr:hover td {
+    background: #f8f9fa;
+}
+
+/* 引用块 */
+.content blockquote {
+    border-left: 4px solid #667eea;
+    padding: 15px 20px;
+    margin: 20px 0;
+    background: #f8f9fa;
+    color: #555;
+}
+
+/* 强调 */
+.content strong {
+    color: #333;
+    font-weight: 600;
+}
+
+.content em {
+    color: #667eea;
+}
+
+/* 分隔线 */
+.content hr {
+    border: none;
+    height: 2px;
+    background: #eee;
+    margin: 40px 0;
+}
+
+/* 实战说辞样式 */
+.content .tips-box {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    border: 1px solid #81c784;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 25px 0;
+}
+
+.content .tips-box h4 {
+    color: #2e7d32;
+    margin-top: 0;
+}
+
+/* 追问样式 */
+.content .question-box {
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+    border: 1px solid #ffb74d;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 25px 0;
+}
+
+.content .question-box h4 {
+    color: #e65100;
+    margin-top: 0;
+}
+
+/* 页面导航 */
+.page-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 1px solid #eee;
+}
+
+.page-nav a {
+    color: #667eea;
+    text-decoration: none;
+    font-size: 14px;
+    padding: 10px 20px;
+    border-radius: 6px;
+    transition: all 0.3s;
+}
+
+.page-nav a:hover {
+    background: #667eea;
+    color: white;
+}
+
+/* 移动端遮罩 */
+.sidebar-overlay {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 850;
+    display: none;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+/* 响应式设计 - 移动端 */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 12px 15px;
+    }
+
+    .navbar h1 {
+        font-size: 16px;
+        max-width: 50%;
+    }
+
+    .back-btn {
+        padding: 6px 10px;
+        font-size: 14px;
+    }
+
+    .menu-toggle {
+        display: block;
+    }
+
+    .sidebar {
+        width: 280px;
+        transform: translateX(-100%);
+        top: 60px;
+    }
+
+    .sidebar.active {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 20px 15px;
+    }
+
+    .content {
+        padding: 25px 20px;
+        border-radius: 8px;
+    }
+
+    .content h1 {
+        font-size: 22px;
+    }
+
+    .content h2 {
+        font-size: 18px;
+    }
+
+    .content h3 {
+        font-size: 16px;
+    }
+
+    .content pre {
+        padding: 15px;
+        font-size: 13px;
+    }
+
+    .content table {
+        display: block;
+        overflow-x: auto;
+        font-size: 13px;
+    }
+
+    .content th, .content td {
+        padding: 10px 12px;
+    }
+
+    .page-nav {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .page-nav a {
+        text-align: center;
+    }
+}
+
+/* 平板适配 */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .sidebar {
+        width: 240px;
+    }
+
+    .main-content {
+        margin-left: 240px;
+        padding: 30px;
+    }
+
+    .content {
+        padding: 30px;
+    }
+}
+
+/* 打印样式 */
+@media print {
+    .navbar, .sidebar, .sidebar-overlay, .page-nav, .menu-toggle {
+        display: none !important;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 0;
+    }
+
+    .content {
+        box-shadow: none;
+        padding: 20px;
+    }
+
+    .content pre {
+        background: #f5f5f5;
+        color: #333;
+        border: 1px solid #ddd;
+    }
+}
+
+/* 滚动条美化 */
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
+/* 代码高亮 - 基础样式 */
+pre .keyword {
+    color: #c792ea;
+}
+
+pre .string {
+    color: #c3e88d;
+}
+
+pre .number {
+    color: #f78c6c;
+}
+
+pre .comment {
+    color: #637777;
+}
+
+pre .function {
+    color: #82aaff;
+}

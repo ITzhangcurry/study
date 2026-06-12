@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>02. JVM - Java 面试备战</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="back-btn">← 返回目录</a>
+        <h1>02. JVM</h1>
+    </nav>
+    <main class="main-content" style="margin-left: 0;">
+        <article class="content">
+            <h2>一、JVM 内存结构</h2>
+            <h3>1. 内存区域划分</h3>
+            <p><strong>线程共享区域：</strong></p>
+            <ul>
+                <li><strong>方法区（Metaspace）</strong>：类信息、常量、静态变量</li>
+                <li><strong>堆（Heap）</strong>：对象实例、数组，GC 主要区域</li>
+            </ul>
+            <p><strong>线程私有区域：</strong></p>
+            <ul>
+                <li><strong>程序计数器</strong>：当前执行的字节码指令地址</li>
+                <li><strong>虚拟机栈</strong>：方法调用的栈帧</li>
+                <li><strong>本地方法栈</strong>：Native 方法调用</li>
+            </ul>
+
+            <h3>2. 堆内存结构</h3>
+            <pre><code>堆 = 新生代 + 老年代
+
+新生代：
+- Eden 区（80%）
+- Survivor 0 / From 区（10%）
+- Survivor 1 / To 区（10%）
+
+老年代：
+- 存放长期存活的对象
+- 默认占堆的 2/3
+
+对象晋升规则：
+- Eden → Survivor：Eden 满时，存活对象复制到 Survivor
+- Survivor → 老年代：年龄达到阈值（默认 15），晋升到老年代</code></pre>
+
+            <h2>二、垃圾回收机制</h2>
+
+            <h3>1. 判断对象可回收</h3>
+            <p><strong>可达性分析法：</strong></p>
+            <pre><code>从 GC Roots 开始向下搜索
+不在引用链上的对象可回收
+
+GC Roots 包括：
+1. 虚拟机栈中的引用对象（方法中的局部变量）
+2. 方法区中静态属性引用的对象
+3. 方法区中常量引用的对象
+4. 本地方法栈中 JNI 引用的对象
+5. 同步锁持有的对象</code></pre>
+
+            <h3>2. 四种引用类型</h3>
+            <table>
+                <tr><th>类型</th><th>特点</th><th>场景</th></tr>
+                <tr><td>强引用</td><td>永不回收</td><td>普通对象</td></tr>
+                <tr><td>软引用</td><td>内存不足时回收</td><td>缓存</td></tr>
+                <tr><td>弱引用</td><td>下次 GC 时回收</td><td>ThreadLocal</td></tr>
+                <tr><td>虚引用</td><td>跟踪对象回收</td><td>ReferenceQueue</td></tr>
+            </table>
+
+            <h3>3. 常见垃圾收集器</h3>
+
+            <h4>Serial 收集器</h4>
+            <pre><code>特点：
+- 单线程收集
+- 收集时暂停所有工作线程（STW）
+- 新生代用复制算法，老年代用标记-整理
+
+适用：单核 CPU 或小内存</code></pre>
+
+            <h4>CMS 收集器</h4>
+            <pre><code>特点：
+- 关注低停顿时间
+- 老年代收集器，基于标记-清除
+- 并发收集（GC 线程和用户线程同时运行）
+
+流程：
+1. 初始标记（STW）
+2. 并发标记
+3. 重新标记（STW）
+4. 并发清除
+
+问题：
+- 内存碎片
+- 浮动垃圾
+- Concurrent Mode Failure</code></pre>
+
+            <h4>G1 收集器</h4>
+            <pre><code>特点：
+- JDK 9 默认收集器
+- 区域化收集（Region）
+- 可预测停顿时间
+
+优点：
+- 无碎片（Region 内用复制算法）
+- 可预测停顿
+- 大对象处理优化</code></pre>
+
+            <h2>三、JVM 调优</h2>
+
+            <h3>1. 常用 JVM 参数</h3>
+            <pre><code>内存参数：
+-Xms：初始堆大小
+-Xmx：最大堆大小
+-Xmn：新生代大小
+-Xss：线程栈大小（默认 1M）
+
+GC 参数：
+-XX:+UseG1GC：G1 收集器
+-XX:MaxGCPauseMillis=N：最大 GC 停顿时间</code></pre>
+
+            <h3>2. 常用诊断工具</h3>
+            <pre><code>jstat -gcutil <pid> 1000 10  # 查看 GC 统计
+jmap -histo <pid>           # 对象统计
+jmap -dump:file=heap.hprof  # 导出堆转储
+jstack <pid>                # 线程栈</code></pre>
+
+            <h2>四、实战说辞</h2>
+            <div class="tips-box">
+                <h4>JVM 调优经验</h4>
+                <p>有过线上排查问题的经验。我们有个服务高峰期响应变慢，我通过 jstat 发现 Full GC 比较频繁。</p>
+                <p>进一步用 jmap -histo 分析对象分布，发现有个报表导出功能创建了大量大对象。这些对象直接进了老年代，导致老年代快速填满，触发 Full GC。</p>
+                <p>解决方案是把导出改成流式处理，分批查询写入，不再一次性加载所有数据到内存。改完后 Full GC 频率明显下降。</p>
+            </div>
+
+            <h2>五、可能追问</h2>
+            <div class="question-box">
+                <h4>Q: 对象什么时候进老年代？</h4>
+            </div>
+            <blockquote>
+                1. 年龄达到阈值：在 Survivor 区经历一定次数 GC（默认 15），晋升到老年代<br>
+                2. 大对象直接进老年代：超过 -XX:PretenureSizeThreshold 设置的大小<br>
+                3. Survivor 空间不足：Survivor 区放不下 Eden 区存活对象时，直接晋升
+            </blockquote>
+
+            <div class="question-box">
+                <h4>Q: 什么是内存泄漏？怎么排查？</h4>
+            </div>
+            <blockquote>
+                内存泄漏：对象无法被回收，持续占用内存，最终可能 OOM。<br><br>
+                排查步骤：<br>
+                1. 导出堆转储：jmap -dump:file=heap.hprof<br>
+                2. 用 MAT 分析，看哪些对象占用最多<br>
+                3. 查看 GC Roots 引用链，找出是谁引用了这些对象<br>
+                4. 定位代码，找出为什么这些对象没有被释放
+            </blockquote>
+
+            <div class="page-nav">
+                <a href="01_Java基础.html" class="prev-page">←上一篇：Java基础</a>
+                <a href="index.html" class="home-page">返回目录</a>
+                <a href="03_Spring.html" class="next-page">下一篇：Spring →</a>
+            </div>
+        </article>
+    </main>
+</body>
+</html>

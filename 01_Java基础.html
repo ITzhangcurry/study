@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>01. Java基础 - Java 面试备战</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="back-btn">← 返回目录</a>
+        <h1>01. Java 基础</h1>
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+    </nav>
+
+    <main class="main-content" style="margin-left: 0;">
+        <article class="content">
+
+            <h2>一、集合框架</h2>
+
+            <h3>1. HashMap 核心知识</h3>
+
+            <h4>底层结构</h4>
+            <pre><code>JDK 1.7：数组 + 链表
+JDK 1.8：数组 + 铿表 + 红黑树</code></pre>
+
+            <p><strong>详细结构：</strong></p>
+            <pre><code>HashMap 内部维护一个 Node[] table 数组
+
+Node 结构：
+- hash：key 的 hash 值
+- key：键
+- value：值
+- next：指向下一个节点（链表）
+
+当链表长度 ≥ 8 且 table.length ≥ 64 时，链表转为红黑树
+当红黑树节点数 ≤ 6 时，红黑树退化为链表</code></pre>
+
+            <h4>扩容机制</h4>
+            <pre><code>默认初始容量：16
+默认负载因子：0.75
+扩容阈值：capacity * loadFactor = 16 * 0.75 = 12
+
+扩容时机：元素数量达到阈值时扩容为 2 倍
+
+扩容过程：
+1. 新建一个 2 倍大小的数组
+2. 遍历旧数组的每个位置
+3. 对于每个位置的链表/红黑树，重新计算位置
+4. JDK 1.8 优化：不需要重新计算 hash，直接用 hash & oldCap 判断
+   - 结果为 0：位置不变（原索引）
+   - 结果不为 0：新位置 = 原索引 + oldCap</code></pre>
+
+            <h4>为什么扩容是 2 的 n 次幂？</h4>
+            <pre><code>计算位置的公式：(n - 1) & hash
+
+n 为 2 的幂次时，n-1 的二进制全是 1（如 16-1=15=1111）
+这样 & 运算能充分利用 hash 的每一位，分布更均匀
+
+如果不是 2 的幂次，比如 10（二进制 1010），高位可能永远参与不了运算</code></pre>
+
+            <h4>JDK 1.7 vs 1.8 区别</h4>
+            <table>
+                <tr><th>方面</th><th>JDK 1.7</th><th>JDK 1.8</th></tr>
+                <tr><td>结构</td><td>数组 + 链表</td><td>数组 + 铿表 + 红黑树</td></tr>
+                <tr><td>插入方式</td><td>头插法（扩容时可能死循环）</td><td>尾插法（保持顺序）</td></tr>
+                <tr><td>扩容计算</td><td>重新计算 hash</td><td>hash & oldCap 判断</td></tr>
+                <tr><td>红黑树</td><td>无</td><td>链表长度 ≥8 时转换</td></tr>
+            </table>
+
+            <h4>HashMap 为什么线程不安全？</h4>
+            <pre><code>1. JDK 1.7 死循环问题：
+   - 扩容时用头插法，并发扩容可能导致链表形成环形结构
+   - 后续 get 操作会死循环
+
+2. JDK 1.8 数据覆盖问题：
+   - 并发 put 时，多个线程可能同时判断同一位置为空
+   - 后面的线程会覆盖前面的数据
+
+3. size 计数问题：
+   - ++size 不是原子操作，并发时计数不准确</code></pre>
+
+            <h4>为什么链表长度是 8 时转红黑树？</h4>
+            <pre><code>红黑树查询效率：O(log n)
+链表查询效率：O(n)
+
+当 n=8 时：
+- 链表：8 次
+- 红黑树：3 次
+
+但红黑树节点占用更多空间（TreeNode 比 Node 大），所以：
+- 铿表长度 ≥ 8 且数组长度 ≥ 64 时才转红黑树
+- 如果数组长度 < 64，先扩容而不是转红黑树</code></pre>
+
+            <h3>2. ConcurrentHashMap 核心知识</h3>
+
+            <h4>JDK 1.7 实现（分段锁）</h4>
+            <pre><code>结构：Segment[] + HashEntry[] + 铿表
+
+每个 Segment 是一个小的 HashMap，有独立的锁
+默认 16 个 Segment，并发度最大 16
+
+操作流程：
+- put：先定位 Segment，对该 Segment 加锁，再定位 HashEntry
+- get：不需要加锁，用 volatile 保证可见性
+
+缺点：
+- Segment 数量固定，并发度受限
+- 锁粒度是 Segment 级别，同一 Segment 内仍会竞争</code></pre>
+
+            <h4>JDK 1.8 实现（CAS + synchronized）</h4>
+            <pre><code>结构：Node[] + 铿表 + 红黑树（和 HashMap 一样）
+
+锁粒度：只锁链表头节点（更细）
+
+put 流程：
+1. 计算 hash，定位数组位置
+2. 如果该位置为空：
+   - 用 CAS 尝试插入，失败则重试
+3. 如果该位置不为空：
+   - 用 synchronized 锁住头节点
+   - 遍历链表/红黑树，插入或更新
+4. 如果链表长度 ≥ 8，转为红黑树
+
+get 流程：
+- 不加锁，用 volatile 保证可见性
+- Node 的 val 和 next 都用 volatile 修饰</code></pre>
+
+            <h4>JDK 1.7 vs 1.8 对比</h4>
+            <table>
+                <tr><th>方面</th><th>JDK 1.7</th><th>JDK 1.8</th></tr>
+                <tr><td>结构</td><td>Segment 分段</td><td>和 HashMap 一样</td></tr>
+                <tr><td>锁</td><td>ReentrantLock（Segment 级）</td><td>synchronized + CAS（节点级）</td></tr>
+                <tr><td>并发度</td><td>固定（默认 16）</td><td>更高（每个节点独立）</td></tr>
+                <tr><td>查询效率</td><td>get 无锁，volatile</td><td>get 无锁，volatile</td></tr>
+            </table>
+
+            <h3>3. ArrayList vs LinkedList</h3>
+
+            <h4>底层结构</h4>
+            <pre><code>ArrayList：
+- Object[] 数组
+- 连续内存空间
+- 默认容量 10，扩容时增长 1.5 倍
+
+LinkedList：
+- 双向链表
+- Node 节点（prev、item、next）
+- 不需要连续内存</code></pre>
+
+            <h4>性能对比</h4>
+            <table>
+                <tr><th>操作</th><th>ArrayList</th><th>LinkedList</th></tr>
+                <tr><td>随机访问 get(index)</td><td>O(1)</td><td>O(n)</td></tr>
+                <tr><td>尾部添加 add(e)</td><td>O(1)（不考虑扩容）</td><td>O(1)</td></tr>
+                <tr><td>指定位置添加 add(index, e)</td><td>O(n)（移动元素）</td><td>O(n)（遍历定位）</td></tr>
+                <tr><td>删除 remove(index)</td><td>O(n)</td><td>O(n)</td></tr>
+            </table>
+
+            <h4>实际使用建议</h4>
+            <pre><code>大多数场景用 ArrayList：
+- 随机访问多
+- 尾部添加多
+- 内存更紧凑
+
+LinkedList 适用场景：
+- 需要在头部频繁插入删除
+- 不需要随机访问
+
+ArrayList 扩容优化：
+- 如果知道大概大小，new ArrayList(100) 预设容量
+- 避免频繁扩容（扩容要复制数组）</code></pre>
+
+            <h2>二、多线程编程</h2>
+
+            <h3>1. 线程的生命周期</h3>
+            <pre><code>NEW（新建）：线程被创建，还没调用 start()
+RUNNABLE（可运行）：调用 start() 后，等待 CPU 调度
+BLOCKED（阻塞）：等待获取锁
+WAITING（等待）：wait()、join()、park()，等待其他线程唤醒
+TIMED_WAITING（限时等待）：sleep()、wait(timeout)，有超时时间
+TERMINATED（终止）：线程执行完毕</code></pre>
+
+            <h3>2. synchronized 关键字</h3>
+
+            <h4>使用方式</h4>
+            <pre><code>// 1. 同步方法
+public synchronized void method() {
+    // 锁的是当前对象实例
+}
+
+// 2. 同步静态方法
+public static synchronized void method() {
+    // 锁的是 Class 对象
+}
+
+// 3. 同步代码块
+synchronized (object) {
+    // 锁的是指定的 object
+}</code></pre>
+
+            <h4>锁升级（JDK 1.6 优化）</h4>
+            <pre><code>无锁 → 偏向锁 → 轻量级锁 → 重量级锁
+
+偏向锁：
+- 大多数情况下，锁不仅不存在多线程竞争，而且总是同一线程多次获得
+- 在对象头中记录线程 ID，后续该线程进入时无需加锁
+- 有竞争时升级为轻量级锁
+
+轻量级锁：
+- 用 CAS 在对象头中设置锁记录指针
+- 多线程交替执行时，无需真正的互斥
+- 自旋获取锁（多次 CAS 尝试）
+- 自旋次数过多或竞争激烈时升级为重量级锁
+
+重量级锁：
+- 基于 Monitor 实现
+- 真正的互斥，线程会阻塞
+- 性能开销大</code></pre>
+
+            <h4>synchronized vs ReentrantLock</h4>
+            <table>
+                <tr><th>方面</th><th>synchronized</th><th>ReentrantLock</th></tr>
+                <tr><td>实现层级</td><td>JVM 层</td><td>Java API 层</td></tr>
+                <tr><td>锁释放</td><td>自动释放</td><td>手动 unlock()</td></tr>
+                <tr><td>等待可中断</td><td>不可中断</td><td>lockInterruptibly() 可中断</td></tr>
+                <tr><td>公平锁</td><td>只支持非公平</td><td>可选公平/非公平</td></tr>
+                <tr><td>条件变量</td><td>单一条件</td><td>多条件（Condition）</td></tr>
+            </table>
+
+            <h3>3. volatile 关键字</h3>
+
+            <h4>两大特性</h4>
+            <pre><code>1. 可见性：
+   - 一个线程修改后，其他线程能立即看到
+   - 基于 MESI 缓存一致性协议
+
+2. 禁止指令重排序：
+   - 通过内存屏障（Memory Barrier）实现
+   - 保证有序性</code></pre>
+
+            <h4>volatile 不保证原子性</h4>
+            <pre><code>volatile int count = 0;
+
+// 多线程执行 count++，结果可能不正确
+// count++ 不是原子操作：读取 → 加1 → 写入
+// 三个步骤之间可能被其他线程打断
+
+// 解决方案：
+// 1. synchronized
+// 2. AtomicInteger（CAS）</code></pre>
+
+            <h3>4. CAS（Compare And Swap）</h3>
+
+            <h4>原理</h4>
+            <pre><code>CAS 是乐观锁的实现方式
+
+流程：
+1. 读取当前值 V
+2. 计算新值 N
+3. 比较 V 和预期值 E
+4. 如果相等，更新为 N
+5. 如果不等，重试（自旋）
+
+底层依赖 CPU 的 cmpxchg 指令（原子操作）</code></pre>
+
+            <h4>CAS 的问题</h4>
+            <pre><code>1. ABA 问题：
+   - 线程1：读取 A → 准备改成 C
+   - 线程2：读取 A → 改成 B → 又改回 A
+   - 线程1：CAS 成功（值是 A），但中间发生过变化
+   - 解决：AtomicStampedReference（带版本号）
+
+2. 自旋开销：
+   - CAS 失败时会自旋重试
+   - 竞争激烈时，大量 CPU 消耗在自旋上
+
+3. 只能保证一个变量：
+   - 多变量原子操作需要用锁</code></pre>
+
+            <h3>5. 线程池</h3>
+
+            <h4>ThreadPoolExecutor 核心参数</h4>
+            <pre><code>public ThreadPoolExecutor(
+    int corePoolSize,      // 核心线程数（常驻）
+    int maximumPoolSize,   // 最大线程数
+    long keepAliveTime,    // 非核心线程空闲存活时间
+    TimeUnit unit,         // 时间单位
+    BlockingQueue&lt;Runnable&gt; workQueue,  // 工作队列
+    ThreadFactory threadFactory,        // 线程工厂
+    RejectedExecutionHandler handler    // 拒绝策略
+)</code></pre>
+
+            <h4>任务执行流程</h4>
+            <pre><code>1. 任务提交
+2. 当前线程数 < corePoolSize？
+   → 是：创建新线程执行任务
+   → 否：进入下一步
+
+3. 工作队列未满？
+   → 是：任务放入队列
+   → 否：进入下一步
+
+4. 当前线程数 < maximumPoolSize？
+   → 是：创建新线程执行任务
+   → 否：执行拒绝策略</code></pre>
+
+            <h4>四种拒绝策略</h4>
+            <pre><code>// 1. AbortPolicy（默认）：抛出 RejectedExecutionException
+new ThreadPoolExecutor.AbortPolicy();
+
+// 2. CallerRunsPolicy：由提交任务的线程执行
+new ThreadPoolExecutor.CallerRunsPolicy();
+
+// 3. DiscardPolicy：直接丢弃，不抛异常
+new ThreadPoolExecutor.DiscardPolicy();
+
+// 4. DiscardOldestPolicy：丢弃队列中最老的任务，再尝试提交
+new ThreadPoolExecutor.DiscardOldestPolicy();</code></pre>
+
+            <h4>参数设置建议</h4>
+            <pre><code>CPU 密集型任务（计算多）：
+- corePoolSize = CPU 核数 + 1
+- 比如 4 核服务器：corePoolSize = 5
+
+IO 密集型任务（等待多）：
+- corePoolSize = CPU 核数 * 2
+- 因为线程在 IO 时会阻塞，需要更多线程
+
+混合型任务：
+- 根据任务比例调整
+- 建议压测确定最佳参数</code></pre>
+
+            <h2>三、实战说辞</h2>
+
+            <div class="tips-box">
+                <h4>HashMap 源码阅读经历</h4>
+                <p>我主要看过 HashMap、ConcurrentHashMap、ThreadPoolExecutor 这几个核心源码。</p>
+                <p>HashMap 我关注了它的扩容机制，特别是 1.8 的优化。以前扩容要重新计算每个元素的 hash 值，现在直接用 hash & oldCap 判断，要么位置不变，要么新位置是原索引加旧容量。这个优化减少了 hash 计算开销。</p>
+                <p>另外 1.7 的头插法在并发扩容时可能死循环，1.8 改成尾插法解决这个问题。这个让我理解了为什么不能在多线程环境下用 HashMap。</p>
+                <p>ConcurrentHashMap 我看过 1.8 的实现，用 CAS + synchronized 替代了 1.7 的分段锁。锁粒度更细，只锁链表头节点，并发度更高。这个设计思路很值得学习。</p>
+            </div>
+
+            <div class="tips-box">
+                <h4>线程池实际使用经验</h4>
+                <p>我们项目里用线程池做学情统计的批量计算。</p>
+                <p>我创建的是 ThreadPoolExecutor，核心线程数 8（服务器 4 核），队列用 LinkedBlockingQueue 设置大小 500。因为统计任务是 IO 密集型，要查数据库、调接口，线程会阻塞，所以线程数设得比核数大一些。</p>
+                <p>拒绝策略用 CallerRunsPolicy，任务太多时让提交任务的线程自己执行，这样能减缓提交速度，形成反馈。</p>
+                <p>我们还监控线程池的队列长度，超过阈值会报警，避免任务堆积。</p>
+            </div>
+
+            <h2>四、可能追问</h2>
+
+            <div class="question-box">
+                <h4>Q: ConcurrentHashMap 的 get 为什么不需要加锁？</h4>
+            </div>
+            <blockquote>
+                Node 的 val 和 next 用 volatile 修饰，保证可见性。一个线程修改后，其他线程能立即看到。<br>
+                另外，ConcurrentHashMap 在 put 时，如果位置为空用 CAS 插入，不为空用 synchronized 锁头节点。这个过程不会影响其他位置的 get 操作。
+            </blockquote>
+
+            <div class="question-box">
+                <h4>Q: ThreadLocal 有什么问题？</h4>
+            </div>
+            <blockquote>
+                ThreadLocal 是线程私有的变量副本，每个线程有自己的存储。<br><br>
+                问题：ThreadLocal 和线程绑定，如果线程是线程池里的线程（会被复用），ThreadLocal 的值可能残留。下次这个线程执行其他任务时，还能读到上次遗留的值。<br><br>
+                解决：用完之后调用 remove() 清除。<br><br>
+                另外内存泄漏问题：ThreadLocal 的 key 是弱引用，但 value 是强引用。key 被 GC 后，value 还存在，需要手动 remove。
+            </blockquote>
+
+            <div class="question-box">
+                <h4>Q: sleep() 和 wait() 有什么区别？</h4>
+            </div>
+            <blockquote>
+                sleep()：<br>
+                - Thread 的静态方法<br>
+                - 不释放锁<br>
+                - 超时后自动唤醒<br><br>
+                wait()：<br>
+                - Object 的方法<br>
+                - 必须在 synchronized 代码块中调用<br>
+                - 释放锁，其他线程可以获取锁<br>
+                - 需要 notify() 或 notifyAll() 唤醒，或者用 wait(timeout) 超时唤醒
+            </blockquote>
+
+            <div class="page-nav">
+                <a href="index.html" class="home-page">返回目录</a>
+                <a href="02_JVM.html" class="next-page">下一篇：JVM →</a>
+            </div>
+        </article>
+    </main>
+
+    <script>
+        function toggleSidebar() {}
+    </script>
+</body>
+</html>

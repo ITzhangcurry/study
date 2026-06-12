@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深入原理_04. Redis底层 - Java 面试备战</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="back-btn">← 返回目录</a>
+        <h1>深入原理：Redis 底层</h1>
+    </nav>
+    <main class="main-content" style="margin-left: 0;">
+        <article class="content">
+            <h2>一、数据结构底层实现</h2>
+
+            <h3>1. SDS（Simple Dynamic String）</h3>
+            <pre><code>SDS：Redis 字符串底层实现
+
+结构：
+struct sdshdr {
+    int len;      // 已使用长度
+    int free;     // 未使用长度
+    char buf[];   // 字节数组（包含 '\0'）
+}
+
+C 字符串 vs SDS：
+
+| 方面 | C 字符串 | SDS |
+|------|---------|------|
+| 获取长度 | O(n) 遍历 | O(1) 直接读取 |
+| 缓冲区溢出 | 可能 | 不会（自动扩容）|
+| 内存重分配 | 每次 | 按需（预分配）|
+| 二进制安全 | 不 | 是（len 决定长度）|
+
+扩容策略：
+- 新长度 < 1MB：分配 len + free = 新长度 * 2
+- 新长度 >= 1MB：分配 len + free = 新长度 + 1MB</code></pre>
+
+            <h3>2. 字典（Dict）</h3>
+            <pre><code>字典结构：
+typedef struct dict {
+    dictType *type;     // 类型特定函数
+    void *privdata;     // 私有数据
+    dictht ht[2];       // 两个哈希表（渐进式 rehash）
+    int trehashidx;     // rehash 进度（-1 表示未 rehash）
+}
+
+typedef struct dictht {
+    dictEntry **table;      // 哈希表数组
+    unsigned long size;     // 哈希表大小
+    unsigned long sizemask; // 哈希表大小掩码（size-1）
+    unsigned long used;     // 已用节点数
+}
+
+typedef struct dictEntry {
+    void *key;
+    union {
+        void *val;
+        uint64_t u64;
+        int64_t s64;
+    } v;
+    struct dictEntry *next;  // 链表（解决冲突）
+}
+
+哈希算法：
+- CRC16 或 MurmurHash2
+- index = hash & sizemask
+
+冲突解决：
+- 链表法（头插法）</code></pre>
+
+            <h3>3. 渐进式 Rehash</h3>
+            <pre><code>Rehash 触发：
+- used / size >= 1 且 can_resize 为真
+- used / size >= dict_force_resize_ratio（默认 5）
+
+Rehash 流程：
+1. 为 ht[1] 分配空间
+   - 扩展：size = 第一个 >= used * 2 的 2^n
+
+2. trehashidx = 0，开始渐进式 rehash
+
+3. 每次操作（增删改查）：
+   - 执行一个桶的迁移（从 ht[0] 到 ht[1]）
+   - trehashidx++
+   - 直到 ht[0] 全部迁移完成
+
+4. ht[0] 释放，ht[1] 变为 ht[0]
+
+查找：
+- rehash 期间，先查 ht[0]，再查 ht[1]
+
+新增：
+- rehash 期间，只加到 ht[1]
+
+优点：
+- 分摊 rehash 成本，避免一次性大迁移阻塞</code></pre>
+
+            <h3>4. 跳跃表（Skip List）</h3>
+            <pre><code>跳跃表：有序数据结构，替代平衡树
+
+结构：
+typedef struct zskiplist {
+    struct zskiplistNode *header, *tail;
+    unsigned long length;  // 节点数
+    int level;             // 最大层数
+}
+
+typedef struct zskiplistNode {
+    sds ele;                      // 成员对象
+    double score;                 // 分值
+    struct zskiplistNode *backward; // 后退指针
+    struct zskiplistLevel {
+        struct zskiplistNode *forward; // 前进指针
+        unsigned long span;            // 跨度（计算排名）
+    } level[];  // 层数组（最多 32 层）
+}
+
+查找：
+- 从最高层开始
+- 当前节点 score < 目标：向前移动
+- 当前节点 score > 目标：下降一层
+- 直到找到或到达底层
+
+层数生成：
+- 随机算法
+- 第 i 层概率 = 1/2^i
+
+时间复杂度：
+- 查找/插入/删除：O(log n)</code></pre>
+
+            <h3>5. 整数集合（Intset）</h3>
+            <pre><code>整数集合：存储整数的小集合
+
+结构：
+typedef struct intset {
+    uint32_t encoding;  // 编码方式（INT16/INT32/INT64）
+    uint32_t length;    // 元素数量
+    int8_t contents[];  // 数组（实际类型由 encoding 决定）
+}
+
+升级：
+- 新元素类型 > 当前 encoding
+- 数组升级为更大类型
+- 例：INT16 升级为 INT32
+
+不降级：
+- 升级后不降级
+- 即使删除大元素</code></pre>
+
+            <h3>6. 压缩列表（ZipList）</h3>
+            <pre><code>压缩列表：紧凑内存存储小数据
+
+结构：
+| zlbytes | zltail | zllen | entry1 | entry2 | ... | zlend |
+
+zlbytes：列表字节数
+zltail：尾节点偏移量
+zllen：节点数量
+zlend：结束标记（0xFF）
+
+entry 结构：
+| previous_entry_length | encoding | content |
+
+previous_entry_length：
+- 前节点长度（1或5字节）
+- < 254：1字节
+- >= 254：5字节
+
+连锁更新问题：
+- 前节点长度变化，可能触发后续节点变化
+- 例：插入大节点，后续多个节点需从1字节改为5字节</code></pre>
+
+            <h2>二、对象系统底层</h2>
+
+            <h3>1. Redis 对象结构</h3>
+            <pre><code>typedef struct redisObject {
+    unsigned type:4;      // 类型
+    unsigned encoding:4;  // 编码
+    unsigned lru:LRU_BITS;// LRU 时间
+    int refcount;         // 引用计数
+    void *ptr;            // 指向底层数据结构
+}
+
+类型与编码对应：
+
+String：
+- int：整数
+- embstr：短字符串（<=44字节）
+- raw：长字符串（SDS）
+
+List：
+- ziplist：元素少、小
+- linkedlist：元素多、大
+- quicklist（3.2+）：ziplist 组成的链表
+
+Hash：
+- ziplist：元素少、小
+- hashtable：元素多、大
+
+Set：
+- intset：全是整数、少
+- hashtable：有非整数或多
+
+ZSet：
+- ziplist：元素少、小
+- skiplist + hashtable：元素多、大</code></pre>
+
+            <h2>三、持久化底层原理</h2>
+
+            <h3>1. RDB 实现</h3>
+            <pre><code>RDB 生成：
+
+SAVE：
+- 阻塞主进程
+- 遍历所有数据库，写入临时文件
+- 替换旧 RDB 文件
+
+BGSAVE：
+- fork 子进程
+- 子进程生成 RDB
+- 主进程继续服务
+
+fork 实现：
+- Linux fork + copy-on-write（写时复制）
+- fork 时父子进程共享内存页
+- 父进程写某页，复制该页给父进程
+- 子进程读原页（快照）
+
+RDB 文件结构：
+| REDIS | RDB_VERSION | SELECTDB | db_number | key_value_pairs | EOF | checksum |</code></pre>
+
+            <h3>2. AOF 实现</h3>
+            <pre><code>AOF 写入流程：
+
+1. 命令执行后，追加到 AOF 缓冲区
+2. 根据策略写入 AOF 文件
+3. 根据策略刷盘
+
+appendfsync：
+- always：每次命令刷盘（最安全）
+- everysec：每秒刷盘（默认）
+- no：由 OS 决定
+
+AOF 重写：
+- fork 子进程
+- 子进程遍历数据库，生成最小命令集
+- 例：多次 INCR key 合并为 SET key 最终值
+
+流程：
+1. fork 子进程
+2. 子进程写临时 AOF 文件
+3. 主进程继续服务，新命令写 AOF 重写缓冲区
+4. 子进程完成，主进程追加重写缓冲区内容
+5. 替换旧 AOF 文件</code></pre>
+
+            <h2>四、事件机制底层</h2>
+
+            <h3>1. 文件事件</h3>
+            <pre><code>Redis 基于 Reactor 模式：
+
+IO 多路复用：
+- epoll（Linux）
+- kqueue（macOS）
+- select（通用）
+
+事件处理器：
+- 连接应答处理器：acceptTcpHandler
+- 命令请求处理器：readQueryFromClient
+- 命令回复处理器：sendReplyToClient
+
+流程：
+1. IO 多路复用监听 socket
+2. socket 产生事件，放入队列
+3. 事件分派器分发事件
+4. 调用对应处理器</code></pre>
+
+            <h3>2. 时间事件</h3>
+            <pre><code>时间事件结构：
+typedef struct timeEvent {
+    long id;
+    long when_sec;        // 秒
+    long when_ms;         // 毫秒
+    timeProc *timeProc;   // 处理函数
+    void *clientData;     // 参数
+    struct timeEvent *next; // 下一个事件
+}
+
+serverCron：
+- 定期执行的时间事件
+- 每秒执行多次（hz 配置）
+- 功能：
+  - 更新统计信息
+  - 清理过期 key
+  - 处理客户端超时
+  - 触发 BGSAVE/BGREWRITEAOF
+  - 主从复制心跳</code></pre>
+
+            <h2>五、过期删除底层</h2>
+
+            <pre><code>过期 key 存储：
+- redisDb.expires 字典存储过期时间
+- expires[key] = 过期时间戳
+
+删除策略：
+
+惰性删除：
+- 读/写 key 时检查 expires
+- 过期则删除
+- 代码：expireIfNeeded()
+
+定期删除：
+- serverCron 执行
+- 随机抽查 expires 字典
+- 抽查数量：ACTIVE_EXPIRE_CYCLE_LOOKUPS_PER_LOOP（默认 20）
+- 时间限制：ACTIVE_EXPIRE_CYCLE_SLOW_TIME_LIMIT（默认 25ms）
+- 删除过期 key
+
+流程：
+1. 随机选 20 个 key
+2. 删除过期的
+3. 如果 > 25% 过期，继续抽查
+4. 时间限制内循环</code></pre>
+
+            <h2>六、主从复制底层</h2>
+
+            <pre><code>复制流程：
+
+1. SYNC 命令
+   - 从库发送 SYNC
+   - 主库执行 BGSAVE
+   - 主库记录期间写命令到缓冲区
+
+2. RDB 发送
+   - BGSAVE 完成
+   - 主库发送 RDB
+   - 从库加载 RDB
+
+3. 缓冲区发送
+   - 主库发送期间缓冲区命令
+   - 从库执行
+
+4. 增量同步
+   - 主库持续发送写命令
+   - 从库执行
+
+断线重连：
+- 部分重同步（PSYNC）
+- repl_backlog_buffer：环形缓冲区
+- 从库发送偏移量
+- 主库判断偏移量是否在缓冲区范围
+- 在：发送偏移量后数据
+- 不在：全量同步</code></pre>
+
+            <div class="page-nav">
+                <a href="深入原理_03_MySQL底层.html" class="prev-page">←上一篇：MySQL 底层</a>
+                <a href="index.html" class="home-page">返回目录</a>
+                <a href="深入原理_05_Spring底层.html" class="next-page">下一篇：Spring 底层原理 →</a>
+            </div>
+        </article>
+    </main>
+</body>
+</html>

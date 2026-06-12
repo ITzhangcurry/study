@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>11. 消息队列 - Java 面试备战</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="back-btn">← 返回目录</a>
+        <h1>11. 消息队列</h1>
+    </nav>
+    <main class="main-content" style="margin-left: 0;">
+        <article class="content">
+            <h2>一、消息队列基础</h2>
+
+            <h3>1. 为什么用消息队列？</h3>
+            <pre><code>消息队列作用：
+
+1. 解耦
+   - 生产者和消费者不需要直接交互
+   - 各自独立变化
+
+2. 异步
+   - 生产者发送消息后立即返回
+   - 消费者异步处理
+   - 提高响应速度
+
+3. 削峰
+   - 高峰期请求先入队
+   - 消费者按自己的速度处理
+   - 保护下游系统
+
+4. 可靠
+   - 消息持久化，不丢失
+   - 消费失败可重试
+
+适用场景：
+- 异步通知（如订单支付后发消息）
+- 数据同步（如 MySQL → ES）
+- 任务处理（如学情统计）
+- 日志收集
+- 流量削峰（如秒杀）</code></pre>
+
+            <h3>2. 消息队列对比</h3>
+            <table>
+                <tr><th>方面</th><th>ActiveMQ</th><th>RabbitMQ</th><th>Kafka</th><th>RocketMQ</th></tr>
+                <tr><td>性能</td><td>低</td><td>中</td><td>高</td><td>高</td></tr>
+                <tr><td>吞吐量</td><td>万级</td><td>万级</td><td>百万级</td><td>十万级</td></tr>
+                <tr><td>延迟</td><td>高</td><td>低</td><td>低</td><td>低</td></tr>
+                <tr><td>可靠性</td><td>一般</td><td>高</td><td>高</td><td>高</td></tr>
+                <tr><td>功能</td><td>基础</td><td>丰富</td><td>一般</td><td>丰富</td></tr>
+                <tr><td>适用</td><td>小规模</td><td>企业级</td><td>大数据</td><td>金融/电商</td></tr>
+            </table>
+
+            <h3>3. 消息模型</h3>
+            <pre><code>两种基本模型：
+
+1. 点对点（Queue）
+   - 一条消息只有一个消费者
+   - 消费后消息删除
+
+2. 发布订阅（Topic）
+   - 一条消息可被多个消费者
+   - 每个消费者都收到一份
+
+ActiveMQ 支持：
+- Queue：点对点
+- Topic：发布订阅</code></pre>
+
+            <h2>二、消息可靠性</h2>
+
+            <h3>1. 生产者确认</h3>
+            <pre><code>消息丢失风险：
+- 生产者发送失败
+- MQ 服务宕机
+- 消费者消费失败
+
+生产者确认机制：
+
+RabbitMQ：
+- Confirm 模式：发送后等待 MQ 确认
+- 事务模式：发送失败回滚（性能差）
+
+Kafka：
+- acks=0：不等待确认（可能丢）
+- acks=1：Leader 确认
+- acks=all：所有 ISR 确认（最安全）
+
+ActiveMQ：
+- 持久化消息：发送后等待确认
+- 非持久化：不等待（可能丢）
+
+推荐：
+- 重要消息：同步发送 + 持久化 + 消费确认</code></pre>
+
+            <h3>2. 消费者确认</h3>
+            <pre><code>消费确认机制：
+
+自动确认（Auto ACK）：
+- 消息推送给消费者，立即确认
+- 消费者处理失败，消息丢失
+- 不推荐
+
+手动确认（Manual ACK）：
+- 消费者处理完成，手动确认
+- 处理失败不确认，消息重新投递
+- 推荐
+
+ActiveMQ：
+session.commit();           // 确认
+session.rollback();         // 回滚（消息重新投递）
+
+Kafka：
+enable.auto.commit=false;   // 手动提交
+consumer.commitSync();      // 同步提交</code></pre>
+
+            <h3>3. 消息重试与死信队列</h3>
+            <pre><code>消费失败后重试：
+
+ActiveMQ：
+- 重投到队列
+- 配置最大重试次数
+- 超过次数进入死信队列
+
+RocketMQ：
+- 内置重试机制
+- 默认重试 16 次
+- 超过进入死信队列
+
+死信队列（DLQ）：
+- 重试失败的消息
+- 需要人工处理或特殊处理</code></pre>
+
+            <h2>三、消息顺序</h2>
+
+            <h3>顺序消息解决方案</h3>
+            <pre><code>顺序问题：
+- 同一主题/队列，多个消费者
+- 消息 A、B 顺序发送
+- 消费者1 处理 A，消费者2 处理 B
+- B 可能先完成（并发处理）
+
+方案一：单消费者
+- 一个队列只有一个消费者
+- 保证顺序
+- 缺点：吞吐量低
+
+方案二：分区/分片
+- Kafka：同一 key 的消息发到同一 Partition
+- 同一 Partition 内顺序
+- 每个 Partition 一个消费者
+
+示例（Kafka）：
+// 生产者：订单 ID 作为 key
+producer.send(new ProducerRecord("order", orderId, message));
+
+// Partition 1：订单1的所有消息（顺序）
+// Partition 2：订单2的所有消息（顺序）</code></pre>
+
+            <h2>四、消息重复与幂等</h2>
+
+            <h3>幂等消费方案</h3>
+            <pre><code>重复原因：
+1. 生产者重试：发送超时，重试发送
+2. 消费者重试：消费失败，消息重投
+3. 网络问题：确认丢失，MQ 认为未消费
+
+幂等消费：多次消费同一消息，结果相同
+
+方案一：数据库唯一索引
+- 消息有唯一 message_id
+- 消费时插入记录（message_id 唯一）
+- 重复插入失败
+
+方案二：状态检查
+- 消费前检查业务状态
+- 已处理则返回 ACK
+- 未处理则执行业务
+
+示例：
+public void consume(Message message) {
+    Order order = orderRepository.findById(message.getOrderId());
+    if (order.getStatus() == PAID) {
+        return;  // 已处理，直接 ACK
+    }
+    order.pay();
+    orderRepository.save(order);
+}</code></pre>
+
+            <h2>五、消息积压</h2>
+
+            <h3>积压处理</h3>
+            <pre><code>积压原因：
+1. 消费者处理慢
+2. 消费者故障
+3. 消费者数量不足
+
+处理方案：
+1. 增加消费者
+   - 多个消费者并行消费
+
+2. 扩容消费者
+   - 提升消费者处理能力
+   - 增加线程池大小
+
+3. 临时扩容
+   - 积压严重时，临时增加消费者
+   - 快速消费积压消息
+
+4. 批量消费
+   - 消费者批量拉取消息
+   - 批量处理提高效率</code></pre>
+
+            <h2>六、实战说辞</h2>
+
+            <div class="tips-box">
+                <h4>ActiveMQ 使用场景</h4>
+                <p>我们项目用 ActiveMQ 主要做异步处理。</p>
+                <p>场景1：账号流水记录 - 账户变动后，异步记录流水，不阻塞主业务。</p>
+                <p>场景2：日志写入 - 操作日志异步写入，降低主业务延迟。</p>
+                <p>我们用的是 Queue 模式（点对点），消息持久化。消费者处理完成后手动确认，失败时消息重投。</p>
+            </div>
+
+            <div class="tips-box">
+                <h4>消息可靠性保证</h4>
+                <p>我们保证消息可靠性的措施：</p>
+                <ol>
+                    <li><strong>生产者</strong>：同步发送 + 持久化，发送失败会抛异常</li>
+                    <li><strong>MQ 服务</strong>：消息持久化到磁盘，宕机后可恢复</li>
+                    <li><strong>消费者</strong>：手动确认，处理完成才确认。失败时消息重投</li>
+                    <li><strong>死信队列</strong>：重试多次失败后进入死信队列，监控人工处理</li>
+                </ol>
+            </div>
+
+            <h2>七、可能追问</h2>
+
+            <div class="question-box">
+                <h4>Q: ActiveMQ 和 Kafka 的区别？</h4>
+            </div>
+            <blockquote>
+                ActiveMQ：<br>
+                - 传统消息队列<br>
+                - 吞吐量万级<br>
+                - 消息消费后删除<br>
+                - 适合小规模异步处理<br><br>
+                Kafka：<br>
+                - 分布式日志<br>
+                - 吞吐量百万级<br>
+                - 消息按时间/大小保留<br>
+                - 适合大数据、日志、流处理
+            </blockquote>
+
+            <div class="question-box">
+                <h4>Q: 如何保证消息顺序？</h4>
+            </div>
+            <blockquote>
+                我们用的方案是分片 + 单消费者：<br>
+                - 消息的 key 设为订单 ID<br>
+                - 同一订单的消息发到同一队列/分片<br>
+                - 同一队列只有一个消费者<br><br>
+                这样同一订单的消息顺序处理，不同订单可以并行。
+            </blockquote>
+
+            <div class="question-box">
+                <h4>Q: 消息积压怎么处理？</h4>
+            </div>
+            <blockquote>
+                如果发现消息积压：<br>
+                1. 分析原因：消费者处理慢，还是消费者数量不够<br>
+                2. 临时扩容：增加消费者实例<br>
+                3. 批量处理：批量拉取消息，批量写入数据库<br>
+                4. 监控预警：监控队列深度，超过阈值报警
+            </blockquote>
+
+            <div class="page-nav">
+                <a href="10_DDD.html" class="prev-page">←上一篇：DDD</a>
+                <a href="index.html" class="home-page">返回目录</a>
+                <a href="12_Linux与CI_CD.html" class="next-page">下一篇：Linux与CI/CD →</a>
+            </div>
+        </article>
+    </main>
+</body>
+</html>
