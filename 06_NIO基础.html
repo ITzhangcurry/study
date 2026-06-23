@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>06. NIO 基础 - Java 面试备战</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="back-btn">← 返回目录</a>
+        <h1>06. NIO 基础</h1>
+    </nav>
+    <main class="main-content" style="margin-left: 0;">
+        <article class="content">
+            <h2>一、NIO 概述</h2>
+
+            <h3>1. 什么是 NIO？</h3>
+            <pre><code>NIO（Non-blocking I/O）：非阻塞 I/O
+
+Java NIO：JDK 1.4 引入
+Java NIO.2：JDK 7 引入（AIO、文件系统增强）
+
+核心特点：
+1. 面向缓冲区（Buffer）
+2. 非阻塞 I/O
+3. 选择器（Selector）多路复用</code></pre>
+
+            <h3>2. 与 BIO 对比</h3>
+            <table class="compare-table">
+                <thead>
+                    <tr>
+                        <th>特性</th>
+                        <th>BIO</th>
+                        <th>NIO</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>模式</td><td>阻塞 I/O</td><td>非阻塞 I/O</td></tr>
+                    <tr><td>处理方式</td><td>一个线程处理一个连接</td><td>一个线程处理多个连接</td></tr>
+                    <tr><td>数据流</td><td>面向流</td><td>面向缓冲区</td></tr>
+                    <tr><td>选择器</td><td>无</td><td>Selector 多路复用</td></tr>
+                    <tr><td>适用场景</td><td>连接数少且固定</td><td>连接数多且短</td></tr>
+                    <tr><td>编程复杂度</td><td>简单</td><td>复杂</td></tr>
+                </tbody>
+            </table>
+
+            <h3>3. NIO 三大核心组件</h3>
+            <pre><code>┌─────────────────────────────────────────────────────────┐
+│                      NIO 核心                           │
+├─────────────┬─────────────┬─────────────────────────────┤
+│   Buffer    │   Channel   │         Selector            │
+│  缓冲区      │    通道     │          选择器             │
+│             │             │                             │
+│ 存储数据     │ 双向传输    │ 多路复用，监控多个 Channel  │
+└─────────────┴─────────────┴─────────────────────────────┘
+
+关系：
+Selector 监控多个 Channel 的 I/O 事件
+Channel 传输数据到 Buffer 或从 Buffer 读取数据
+Buffer 存储实际数据
+
+工作流程：
+1. Channel 注册到 Selector，关注特定事件
+2. Selector 轮询 Channel，发现就绪的事件
+3. 获取就绪的 SelectionKey
+4. 从 SelectionKey 获取 Channel
+5. 从 Channel 读取数据到 Buffer 或从 Buffer 写入数据</code></pre>
+
+            <h2>二、Buffer 缓冲区</h2>
+
+            <h3>1. Buffer 基本概念</h3>
+            <pre><code>Buffer：数据的容器，底层是数组
+
+核心属性：
+capacity：容量，缓冲区大小
+limit：界限，第一个不可读写的位置
+position：位置，下一个读写的位置
+mark：标记，记录 position 的位置，可 reset 回来
+
+关系：
+0 <= mark <= position <= limit <= capacity
+
+操作方法：
+flip()：切换写模式→读模式（limit=position, position=0）
+clear()：清空缓冲区（limit=capacity, position=0）
+rewind()：重绕（position=0, mark=-1）
+mark()：标记当前 position
+reset()：恢复到 mark 位置
+compact()：压缩（将未读数据移到开头）</code></pre>
+
+            <h3>2. Buffer 类图</h3>
+            <pre><code>                    Buffer (抽象类)
+                        │
+    ┌───────┬───────┬───┴───┬───────┬───────┐
+    │       │       │       │       │       |
+ ByteBuffer CharBuffer IntBuffer LongBuffer ... (其他类型)
+    │
+ ┌──┴──┐
+ │     │
+Heap  Direct
+Buffer Buffer
+(堆)  (直接内存)</code></pre>
+
+            <h3>3. ByteBuffer 详解</h3>
+            <pre><code>// 创建 ByteBuffer
+
+// 1. 堆内存 Buffer
+ByteBuffer heapBuffer = ByteBuffer.allocate(1024);
+
+// 2. 直接内存 Buffer（堆外内存）
+ByteBuffer directBuffer = ByteBuffer.allocateDirect(1024);
+
+// 3. 包装已有数组
+byte[] data = new byte[1024];
+ByteBuffer wrapBuffer = ByteBuffer.wrap(data);
+
+// 基本操作
+ByteBuffer buffer = ByteBuffer.allocate(1024);
+
+// 写入数据
+buffer.put((byte) 1);
+buffer.put(new byte[]{2, 3, 4});
+buffer.putInt(100);  // 放入 int
+
+// 切换读模式
+buffer.flip();
+
+// 读取数据
+byte b = buffer.get();
+byte[] dst = new byte[3];
+buffer.get(dst);
+
+// 清空（可重新写入）
+buffer.clear();
+
+// compact：保留未读数据，准备继续写入
+buffer.compact();</code></pre>
+
+            <h3>4. Heap Buffer vs Direct Buffer</h3>
+            <pre><code>Heap Buffer（堆内存）：
+┌─────────┐
+│  JVM 堆  │ ← ByteBuffer.allocate()
+│         │
+│  byte[] │ ← 底层数组
+└─────────┘
+     ↓ copy
+┌─────────┐
+│ OS 内核  │
+│ 缓冲区   │
+└─────────┘
+
+特点：
+- 在 JVM 堆上分配
+- 受 GC 管理
+- 写入/读取需要复制到堆外
+- 适合小数据量、频繁访问
+
+
+Direct Buffer（直接内存）：
+┌─────────┐
+│  JVM 堆  │
+│         │
+│ ByteBuffer│ ← 仅引用，无实际数据
+└─────────┘
+     ↓ 直接访问
+┌─────────┐
+│ 堆外内存 │ ← ByteBuffer.allocateDirect()
+│         │
+│  byte[] │ ← 底层数据
+└─────────┘
+     ↓ 零拷贝
+┌─────────┐
+│ OS 内核  │
+│ 缓冲区   │
+└─────────┘
+
+特点：
+- 在堆外分配（直接内存）
+- 不受 GC 管理，需要手动释放或等待 Cleaner
+- 网络传输时无需复制到堆外
+- 适合大数据量、网络传输
+
+性能对比：
+- 网络传输：Direct Buffer 更快（减少一次复制）
+- 内存访问：Heap Buffer 更快（JVM 优化）
+- 分配/释放：Heap Buffer 更快（Direct 分配开销大）
+
+选择建议：
+- 短生命周期、小数据：Heap Buffer
+- 长生命周期、网络传输、大文件：Direct Buffer
+- 频繁使用：池化管理</code></pre>
+
+            <h2>三、Channel 通道</h2>
+
+            <h3>1. Channel 概念</h3>
+            <pre><code>Channel：双向通道，可读可写
+
+特点：
+1. 双向：可读可写（不像 Stream 单向）
+2. 异步：支持非阻塞 I/O
+3. 可选：支持 Selector 多路复用
+
+常用 Channel：
+FileChannel：文件通道（阻塞式）
+SocketChannel：TCP 客户端通道
+ServerSocketChannel：TCP 服务端通道
+DatagramChannel：UDP 通道</code></pre>
+
+            <h3>2. FileChannel 文件通道</h3>
+            <pre><code>// 获取 FileChannel
+FileChannel channel = new FileInputStream("test.txt").getChannel();
+FileChannel channel = new FileOutputStream("test.txt").getChannel();
+FileChannel channel = new RandomAccessFile("test.txt", "rw").getChannel();
+
+// 读取文件到 Buffer
+ByteBuffer buffer = ByteBuffer.allocate(1024);
+int bytesRead = channel.read(buffer);
+while (bytesRead != -1) {
+    buffer.flip();
+    while (buffer.hasRemaining()) {
+        System.out.print((char) buffer.get());
+    }
+    buffer.clear();
+    bytesRead = channel.read(buffer);
+}
+
+// 从 Buffer 写入文件
+ByteBuffer buffer = ByteBuffer.allocate(1024);
+buffer.put("Hello".getBytes());
+buffer.flip();
+channel.write(buffer);
+
+// 文件位置操作
+long position = channel.position();  // 当前位置
+channel.position(0);  // 移动到开头
+
+// 文件大小
+long size = channel.size();
+
+// 截断文件
+channel.truncate(1024);
+
+// 强制写入磁盘（强制刷盘）
+channel.force(true);  // true = 包含元数据
+
+// 关闭
+channel.close();</code></pre>
+
+            <h3>3. FileChannel 数据传输</h3>
+            <pre><code>// transferTo：从当前通道传输到目标通道
+FileChannel fromChannel = new FileInputStream("from.txt").getChannel();
+FileChannel toChannel = new FileOutputStream("to.txt").getChannel();
+
+long transferred = fromChannel.transferTo(0, fromChannel.size(), toChannel);
+// 参数：起始位置、传输字节数、目标通道
+
+// transferFrom：从源通道传输到当前通道
+FileChannel destChannel = new FileOutputStream("dest.txt").getChannel();
+FileChannel srcChannel = new FileInputStream("src.txt").getChannel();
+
+destChannel.transferFrom(srcChannel, 0, srcChannel.size());
+// 参数：源通道、起始位置、传输字节数
+
+// 优势：
+// - 底层使用 OS 的零拷贝（sendfile）
+// - 无需在用户空间复制数据
+// - 性能更高</code></pre>
+
+            <h2>四、Selector 选择器</h2>
+
+            <h3>1. Selector 概念</h3>
+            <pre><code>Selector：多路复用器，监控多个 Channel 的 I/O 事件
+
+作用：
+- 一个线程管理多个 Channel
+- 减少 线程数量
+- 减少 线程上下文切换开销
+
+适用场景：
+- 连接数多但连接时间短
+- 需要高性能网络编程</code></pre>
+
+            <h3>2. SelectionKey 四种事件</h3>
+            <pre><code>SelectionKey.OP_ACCEPT  = 1 << 0 = 1   // 接受连接就绪
+SelectionKey.OP_CONNECT = 1 << 1 = 8   // 连接就绪
+SelectionKey.OP_READ    = 1 << 2 = 4   // 读就绪
+SelectionKey.OP_WRITE   = 1 << 3 = 16  // 写就绪
+
+// 可以用位运算组合
+int interestSet = SelectionKey.OP_READ | SelectionKey.OP_WRITE;
+
+// 判断事件
+selectionKey.isAcceptable();
+selectionKey.isConnectable();
+selectionKey.isReadable();
+selectionKey.isWritable();</code></pre>
+
+            <h3>3. Selector 使用流程</h3>
+            <pre><code>// 1. 创建 Selector
+Selector selector = Selector.open();
+
+// 2. 创建 Channel 并设置非阻塞
+ServerSocketChannel serverChannel = ServerSocketChannel.open();
+serverChannel.configureBlocking(false);  // 必须非阻塞
+
+// 3. 绑定端口
+serverChannel.socket().bind(new InetSocketAddress(8080));
+
+// 4. 注册 Channel 到 Selector
+SelectionKey key = serverChannel.register(selector, SelectionKey.OP_ACCEPT);
+
+// 5. 事件循环
+while (true) {
+    int readyChannels = selector.select();  // 阻塞
+
+    if (readyChannels == 0) continue;
+
+    Set&lt;SelectionKey&gt; selectedKeys = selector.selectedKeys();
+    Iterator&lt;SelectionKey&gt; keyIterator = selectedKeys.iterator();
+
+    while (keyIterator.hasNext()) {
+        SelectionKey key = keyIterator.next();
+
+        if (key.isAcceptable()) {
+            // 接受连接
+        }
+
+        if (key.isReadable()) {
+            // 读取数据
+        }
+
+        keyIterator.remove();  // 重要！移除已处理的 key
+    }
+}
+
+// 6. 关闭
+selector.close();</code></pre>
+
+            <h3>4. select() 方法详解</h3>
+            <pre><code>// select()：阻塞，直到至少有一个 Channel 就绪
+int readyChannels = selector.select();
+
+// select(long timeout)：阻塞最多 timeout 毫秒
+int readyChannels = selector.select(1000);
+
+// selectNow()：非阻塞，立即返回
+int readyChannels = selector.selectNow();
+
+// wakeup()：唤醒阻塞的 select()
+selector.wakeup();
+
+// 获取就绪的 SelectionKey
+Set&lt;SelectionKey&gt; selectedKeys = selector.selectedKeys();
+
+// 获取所有注册的 SelectionKey
+Set&lt;SelectionKey&gt; allKeys = selector.keys();
+
+// 注意：处理完 selectedKeys 后必须移除！
+// 否则下次 select() 还会返回已处理的 key</code></pre>
+
+            <h2>五、NIO 编程完整示例</h2>
+
+            <h3>1. NIO 服务端</h3>
+            <pre><code>public class NioServer {
+    public static void main(String[] args) throws IOException {
+        // 1. 创建 Selector
+        Selector selector = Selector.open();
+
+        // 2. 创建 ServerSocketChannel
+        ServerSocketChannel serverChannel = ServerSocketChannel.open();
+        serverChannel.configureBlocking(false);
+        serverChannel.socket().bind(new InetSocketAddress(8080));
+
+        // 3. 注册 ACCEPT 事件
+        serverChannel.register(selector, SelectionKey.OP_ACCEPT);
+
+        System.out.println("Server started on port 8080");
+
+        // 4. 事件循环
+        while (true) {
+            int ready = selector.select();
+            if (ready == 0) continue;
+
+            Iterator&lt;SelectionKey&gt; iter = selector.selectedKeys().iterator();
+            while (iter.hasNext()) {
+                SelectionKey key = iter.next();
+                iter.remove();
+
+                try {
+                    if (key.isAcceptable()) {
+                        handleAccept(key);
+                    } else if (key.isReadable()) {
+                        handleRead(key);
+                    }
+                } catch (IOException e) {
+                    key.cancel();
+                    key.channel().close();
+                }
+            }
+        }
+    }
+
+    private static void handleAccept(SelectionKey key) throws IOException {
+        ServerSocketChannel serverChannel = (ServerSocketChannel) key.channel();
+        SocketChannel clientChannel = serverChannel.accept();
+        clientChannel.configureBlocking(false);
+        clientChannel.register(key.selector(), SelectionKey.OP_READ);
+        System.out.println("Client connected: " + clientChannel.getRemoteAddress());
+    }
+
+    private static void handleRead(SelectionKey key) throws IOException {
+        SocketChannel clientChannel = (SocketChannel) key.channel();
+        ByteBuffer buffer = ByteBuffer.allocate(1024);
+
+        int bytesRead = clientChannel.read(buffer);
+        if (bytesRead == -1) {
+            System.out.println("Client disconnected");
+            clientChannel.close();
+            return;
+        }
+
+        buffer.flip();
+        byte[] data = new byte[buffer.remaining()];
+        buffer.get(data);
+        String message = new String(data);
+        System.out.println("Received: " + message);
+
+        // Echo 回去
+        buffer.flip();
+        clientChannel.write(buffer);
+    }
+}</code></pre>
+
+            <h3>2. NIO 客户端</h3>
+            <pre><code>public class NioClient {
+    public static void main(String[] args) throws IOException {
+        Selector selector = Selector.open();
+
+        SocketChannel clientChannel = SocketChannel.open();
+        clientChannel.configureBlocking(false);
+        clientChannel.connect(new InetSocketAddress("localhost", 8080));
+        clientChannel.register(selector, SelectionKey.OP_CONNECT);
+
+        while (true) {
+            selector.select();
+
+            Iterator&lt;SelectionKey&gt; iter = selector.selectedKeys().iterator();
+            while (iter.hasNext()) {
+                SelectionKey key = iter.next();
+                iter.remove();
+
+                if (key.isConnectable()) {
+                    SocketChannel channel = (SocketChannel) key.channel();
+                    if (channel.isConnectionPending()) {
+                        channel.finishConnect();
+                    }
+                    channel.register(selector, SelectionKey.OP_WRITE);
+                }
+
+                if (key.isWritable()) {
+                    SocketChannel channel = (SocketChannel) key.channel();
+                    ByteBuffer buffer = ByteBuffer.wrap("Hello Server".getBytes());
+                    channel.write(buffer);
+                    channel.register(selector, SelectionKey.OP_READ);
+                }
+
+                if (key.isReadable()) {
+                    SocketChannel channel = (SocketChannel) key.channel();
+                    ByteBuffer buffer = ByteBuffer.allocate(1024);
+                    int bytesRead = channel.read(buffer);
+                    if (bytesRead > 0) {
+                        buffer.flip();
+                        byte[] data = new byte[buffer.remaining()];
+                        buffer.get(data);
+                        System.out.println("Received: " + new String(data));
+                    }
+                    channel.close();
+                    return;
+                }
+            }
+        }
+    }
+}</code></pre>
+
+            <h2>六、NIO.2 (AIO)</h2>
+
+            <h3>1. 异步 I/O (AIO)</h3>
+            <pre><code>// AIO：真正的异步 I/O
+// NIO 是非阻塞，但仍需轮询
+// AIO 是异步，操作系统完成后回调
+
+// ========== AIO 服务端 ==========
+
+AsynchronousServerSocketChannel serverChannel =
+    AsynchronousServerSocketChannel.open()
+        .bind(new InetSocketAddress(8080));
+
+// 异步接受连接
+serverChannel.accept(null, new CompletionHandler&lt;AsynchronousSocketChannel, Void&gt;() {
+    @Override
+    public void completed(AsynchronousSocketChannel clientChannel, Void attachment) {
+        // 接受下一个连接
+        serverChannel.accept(null, this);
+
+        // 读取数据
+        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        clientChannel.read(buffer, buffer, new CompletionHandler&lt;Integer, ByteBuffer&gt;() {
+            @Override
+            public void completed(Integer bytesRead, ByteBuffer buffer) {
+                if (bytesRead == -1) {
+                    try {
+                        clientChannel.close();
+                    } catch (IOException e) {}
+                    return;
+                }
+
+                buffer.flip();
+                // 回写
+                clientChannel.write(buffer, buffer, this);
+            }
+
+            @Override
+            public void failed(Throwable exc, ByteBuffer buffer) {
+                exc.printStackTrace();
+            }
+        });
+    }
+
+    @Override
+    public void failed(Throwable exc, Void attachment) {
+        exc.printStackTrace();
+    }
+});
+
+// 阻塞主线程
+Thread.sleep(Long.MAX_VALUE);</code></pre>
+
+            <h3>2. 文件 NIO 增强</h3>
+            <pre><code>// Path 接口
+Path path = Paths.get("/home/user/test.txt");
+Path path = Paths.get("/home", "user", "test.txt");
+
+// Files 工具类
+// 创建文件
+Files.createFile(path);
+Files.createDirectory(Paths.get("/home/user/newdir"));
+Files.createDirectories(Paths.get("/home/user/a/b/c"));  // 创建多级目录
+
+// 删除
+Files.delete(path);
+Files.deleteIfExists(path);
+
+// 复制
+Files.copy(source, target);
+Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+
+// 移动
+Files.move(source, target);
+
+// 读取
+List&lt;String&gt; lines = Files.readAllLines(path);
+byte[] bytes = Files.readAllBytes(path);
+
+// 写入
+Files.write(path, "Hello".getBytes());
+Files.write(path, Arrays.asList("line1", "line2"));
+
+// 判断
+boolean exists = Files.exists(path);
+boolean isDir = Files.isDirectory(path);
+boolean isFile = Files.isRegularFile(path);
+
+// 遍历目录
+try (DirectoryStream&lt;Path&gt; stream = Files.newDirectoryStream(path, "*.java")) {
+    for (Path entry : stream) {
+        System.out.println(entry.getFileName());
+    }
+}
+
+// 递归遍历
+Files.walk(path).forEach(p -> System.out.println(p));</code></pre>
+
+            <h2>七、零拷贝</h2>
+
+            <h3>1. 传统 I/O 数据传输</h3>
+            <pre><code>传统方式读取文件并发送网络：
+
+应用程序          内核空间              硬件
+   │                │                   │
+   │  read()        │                   │
+   │───────────────>│  DMA 拷贝         │
+   │                │<──────────────────│ 磁盘
+   │                │  内核缓冲区        │
+   │                │                   │
+   │  拷贝到用户     │                   │
+   │<───────────────│  CPU 拷贝         │
+   │  用户缓冲区     │                   │
+   │                │                   │
+   │  write()       │                   │
+   │───────────────>│  CPU 拷贝         │
+   │                │  Socket 缓冲区     │
+   │                │                   │
+   │                │  DMA 拷贝         │
+   │                │──────────────────>│ 网卡
+   │                │                   │
+
+4 次数据拷贝：
+1. DMA：磁盘 → 内核读缓冲区
+2. CPU：内核读缓冲区 → 用户缓冲区
+3. CPU：用户缓冲区 → Socket 缓冲区
+4. DMA：Socket 缓冲区 → 网卡
+
+4 次上下文切换：
+read()：用户态 → 内核态 → 用户态
+write()：用户态 → 内核态 → 用户态</code></pre>
+
+            <h3>2. mmap 零拷贝</h3>
+            <pre><code>// mmap：内存映射文件
+// 文件映射到用户空间，减少一次内核到用户的拷贝
+
+FileChannel channel = new RandomAccessFile("test.txt", "r").getChannel();
+MappedByteBuffer buffer = channel.map(
+    FileChannel.MapMode.READ_ONLY,  // 只读
+    0,                              // 起始位置
+    channel.size()                  // 大小
+);
+
+// 直接操作 buffer，无需 read()
+// 数据在内核缓冲区和用户空间共享
+
+3 次数据拷贝：
+1. DMA：磁盘 → 内核缓冲区（共享）
+2. CPU：内核缓冲区 → Socket 缓冲区
+3. DMA：Socket 缓冲区 → 网卡</code></pre>
+
+            <h3>3. sendfile 零拷贝</h3>
+            <pre><code>// sendfile：内核态直接传输，无需用户态参与
+
+FileChannel fromChannel = new FileInputStream("test.txt").getChannel();
+FileChannel toChannel = new FileOutputStream("copy.txt").getChannel();
+
+// transferTo / transferFrom
+fromChannel.transferTo(0, fromChannel.size(), toChannel);
+
+2 次数据拷贝（甚至 0 次 CPU 拷贝）：
+1. DMA：磁盘 → 内核缓冲区
+2. DMA：内核缓冲区 → 网卡
+
+2 次上下文切换：
+sendfile()：用户态 → 内核态 → 用户态
+
+// Linux 2.4+ 支持真正的零拷贝
+// 内核缓冲区直接 DMA 到网卡，CPU 不参与</code></pre>
+
+            <h3>4. 零拷贝应用场景</h3>
+            <pre><code>适用场景：
+1. 大文件传输
+2. 高性能 Web 服务器（静态文件）
+3. 消息队列（日志文件传输）
+4. 分布式文件系统
+
+Kafka：使用 sendfile 零拷贝
+- 日志文件直接传输到网络
+- 大幅提高吞吐量
+
+Nginx：启用 sendfile
+sendfile on;
+tcp_nopush on;
+
+Netty：
+- FileRegion：文件传输零拷贝
+- Direct Buffer：堆外内存零拷贝</code></pre>
+
+            <h2>八、NIO vs BIO vs AIO 对比</h2>
+
+            <table class="compare-table">
+                <thead>
+                    <tr>
+                        <th>特性</th>
+                        <th>BIO</th>
+                        <th>NIO</th>
+                        <th>AIO</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>阻塞性</td><td>阻塞</td><td>非阻塞</td><td>非阻塞</td></tr>
+                    <tr><td>同步/异步</td><td>同步</td><td>同步</td><td>异步</td></tr>
+                    <tr><td>线程模型</td><td>一连接一线程</td><td>一线程多连接</td><td>回调驱动</td></tr>
+                    <tr><td>复杂度</td><td>简单</td><td>复杂</td><td>中等</td></tr>
+                    <tr><td>可靠性</td><td>差</td><td>好</td><td>好</td></tr>
+                    <tr><td>吞吐量</td><td>低</td><td>高</td><td>高</td></tr>
+                    <tr><td>适用场景</td><td>连接少且固定</td><td>连接多且短</td><td>连接多且长</td></tr>
+                </tbody>
+            </table>
+
+            <h3>选择建议</h3>
+            <pre><code>BIO 适用：
+- 连接数少且固定
+- 编程简单，快速开发
+- 示例：管理后台、内部系统
+
+NIO 适用：
+- 连接数多（万级以上）
+- 短连接多
+- 需要高性能
+- 示例：聊天服务器、即时通讯、网关
+
+AIO 适用：
+- 连接数多且长
+- 需要更高性能
+- 示例：高性能服务器
+
+实际选择：
+- Java 通常选择 NIO（Netty）
+- AIO 在 Linux 上性能提升不明显
+- Netty 封装了 NIO 的复杂性</code></pre>
+
+            <h2>九、实战说辞</h2>
+
+            <div class="tips-box">
+                <h4>为什么用 NIO？</h4>
+                <p>我们项目用 Netty 做 WebSocket 推送服务，底层就是 NIO。</p>
+                <p>选择 NIO 的原因是：</p>
+                <ul>
+                    <li>用户连接数多，可能有几万甚至几十万</li>
+                    <li>BIO 一个连接一个线程，线程资源消耗太大</li>
+                    <li>NIO 一个线程可以管理多个连接，用 Selector 多路复用</li>
+                </ul>
+                <p>我们配置了 2 个 Boss 线程接收连接，8 个 Worker 线程处理 IO，总共 10 个线程就能处理几十万连接。</p>
+            </div>
+
+            <div class="tips-box">
+                <h4>NIO 和 BIO 区别？</h4>
+                <p>BIO 是阻塞 I/O，一个连接对应一个线程，读写操作会阻塞线程。适合连接数少的场景。</p>
+                <p>NIO 是非阻塞 I/O，一个线程可以管理多个连接，通过 Selector 多路复用。当连接没有数据时，线程可以去处理其他连接。适合连接数多、连接时间短的场景。</p>
+                <p>核心区别：</p>
+                <ul>
+                    <li>BIO 面向流，NIO 面向缓冲区</li>
+                    <li>BIO 阻塞，NIO 非阻塞</li>
+                    <li>BIO 无选择器，NIO 有 Selector</li>
+                </ul>
+            </div>
+
+            <div class="tips-box">
+                <h4>Selector 工作原理？</h4>
+                <p>Selector 是 NIO 的核心，负责多路复用。</p>
+                <p>工作流程：</p>
+                <ul>
+                    <li>Channel 注册到 Selector，指定感兴趣的事件（ACCEPT、READ、WRITE）</li>
+                    <li>Selector 调用 select() 方法阻塞，等待事件就绪</li>
+                    <li>当有事件就绪，select() 返回就绪的 Channel 数量</li>
+                    <li>遍历就绪的 SelectionKey，处理对应的事件</li>
+                </ul>
+                <p>底层实现：Linux 用 epoll，macOS 用 kqueue。epoll 相比 select/poll 的优势是没有连接数限制，只返回就绪的连接，使用 mmap 共享内存。</p>
+            </div>
+
+            <h2>十、可能追问</h2>
+
+            <div class="question-box">
+                <h4>Q: NIO 的 Epoll Bug 是什么？</h4>
+            </div>
+            <blockquote>
+                JDK NIO 在 Linux 下有 Epoll Bug，Selector 会空轮询，导致 CPU 100%。<br><br>
+                原因：<br>
+                - epoll_wait 返回时，如果被中断，可能返回 0 但实际有事件<br>
+                - 导致 select() 立即返回 0<br>
+                - 循环不断执行，CPU 空转<br><br>
+                Netty 的解决：<br>
+                - 检测空轮询次数<br>
+                - 超过阈值（512次）重建 Selector<br>
+                - 把 Channel 重新注册到新 Selector
+            </blockquote>
+
+            <div class="question-box">
+                <h4>Q: ByteBuffer flip() 作用？</h4>
+            </div>
+            <blockquote>
+                flip() 用于切换写模式到读模式。<br><br>
+                写数据后：<br>
+                - position 指向下一个写入位置<br>
+                - limit = capacity<br><br>
+                调用 flip() 后：<br>
+                - limit = position（设置界限为已写入的数据量）<br>
+                - position = 0（从头开始读）<br><br>
+                这样就知道从 0 读到 limit，不会读到未写入的数据。
+            </blockquote>
+
+            <div class="question-box">
+                <h4>Q: Direct Buffer 什么时候用？</h4>
+            </div>
+            <blockquote>
+                Direct Buffer（直接内存）在堆外分配，网络传输时少一次拷贝。<br><br>
+                适用场景：<br>
+                - 大文件传输<br>
+                - 网络通信<br>
+                - 需要长期持有的缓冲区<br><br>
+                不适用：<br>
+                - 小数据、短生命周期（分配开销大）<br>
+                - 频繁 GC 的场景（Direct Buffer 不受 GC 管理）<br><br>
+                注意：Direct Buffer 需要手动释放或等 Cleaner 回收，否则可能内存泄漏。
+            </blockquote>
+
+            <div class="question-box">
+                <h4>Q: 零拷贝是什么？</h4>
+            </div>
+            <blockquote>
+                零拷贝指减少数据在内核空间和用户空间之间的拷贝。<br><br>
+                传统方式：磁盘 → 内核 → 用户 → 内核 → 网卡，4 次拷贝<br><br>
+                零拷贝方式：<br>
+                1. mmap：内存映射，用户空间和内核共享内存，减少 1 次拷贝<br>
+                2. sendfile：内核态直接传输，用户态不参与，只有 2 次 DMA 拷贝<br><br>
+                Java 实现：<br>
+                - FileChannel.map()：mmap<br>
+                - FileChannel.transferTo()：sendfile<br><br>
+                应用：Kafka 用 sendfile 传输日志，Nginx 开启 sendfile 加速静态文件传输。
+            </blockquote>
+
+            <div class="page-nav">
+                <a href="05_Redis.html" class="prev-page">←上一篇：Redis</a>
+                <a href="index.html" class="home-page">返回目录</a>
+                <a href="07_Netty.html" class="next-page">下一篇：Netty →</a>
+            </div>
+        </article>
+    </main>
+</body>
+</html>

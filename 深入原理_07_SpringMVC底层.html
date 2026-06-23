@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深入原理_07. SpringMVC底层 - Java 面试备战</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* 流程图样式 */
+        .flow-diagram {
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            overflow-x: auto;
+        }
+
+        .flow-title {
+            font-size: 16px;
+            color: #667eea;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 600px;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .flow-box {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            min-width: 180px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .flow-box:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .flow-box.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .flow-box.secondary {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .flow-box.important {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .flow-box.normal {
+            background: white;
+            color: #333;
+            border: 2px solid #667eea;
+        }
+
+        .flow-box.detail {
+            background: #f8f9fa;
+            color: #555;
+            border: 1px solid #ddd;
+            font-size: 12px;
+        }
+
+        .flow-arrow {
+            color: #667eea;
+            font-size: 20px;
+            text-align: center;
+            padding: 5px 0;
+        }
+
+        .flow-arrow-down::before {
+            content: "▼";
+        }
+
+        .flow-label {
+            font-size: 11px;
+            color: #888;
+            padding: 2px 8px;
+            background: #eee;
+            border-radius: 4px;
+        }
+
+        .flow-horizontal {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* 架构图 */
+        .architecture-diagram {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin: 20px 0;
+            padding: 25px;
+            background: white;
+            border-radius: 12px;
+        }
+
+        .arch-layer {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .arch-layer.frontend {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+        }
+
+        .arch-layer.dispatcher {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .arch-layer.mapping {
+            background: #fff3e0;
+            border: 2px solid #ff9800;
+        }
+
+        .arch-layer.handler {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+        }
+
+        .arch-layer.view {
+            background: #fce4ec;
+            border: 2px solid #e91e63;
+        }
+
+        .arch-component {
+            padding: 12px 20px;
+            background: white;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+            border: 2px solid #ddd;
+        }
+
+        .arch-component.core {
+            background: white;
+            color: #667eea;
+            border: 2px solid white;
+        }
+
+        .arch-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .arch-arrow {
+            text-align: center;
+            font-size: 24px;
+            color: #667eea;
+            padding: 5px 0;
+        }
+
+        /* 拦截器链 */
+        .interceptor-chain {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .chain-item {
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .chain-item.pre {
+            background: #e8f5e9;
+            border: 1px solid #4caf50;
+            color: #2e7d32;
+        }
+
+        .chain-item.handler {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+        }
+
+        .chain-item.post {
+            background: #fff3e0;
+            border: 1px solid #ff9800;
+            color: #e65100;
+        }
+
+        .chain-item.after {
+            background: #f3e5f5;
+            border: 1px solid #9c27b0;
+            color: #6a1b9a;
+        }
+
+        .chain-arrow {
+            color: #999;
+            font-size: 16px;
+        }
+
+        /* 参数解析表格 */
+        .param-table {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .param-header {
+            background: #667eea;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .param-row {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #eee;
+        }
+
+        /* 请求流程详细 */
+        .request-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+        }
+
+        .request-step {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .request-num {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .request-num.num1 { background: #2196f3; }
+        .request-num.num2 { background: #ff9800; }
+        .request-num.num3 { background: #4caf50; }
+        .request-num.num4 { background: #9c27b0; }
+        .request-num.num5 { background: #e91e63; }
+        .request-num.num6 { background: #00bcd4; }
+        .request-num.num7 { background: #ff5722; }
+        .request-num.num8 { background: #607d8b; }
+        .request-num.num9 { background: #795548; }
+
+        .request-content {
+            flex: 1;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .request-content h4 {
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .request-content p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .request-detail {
+            font-size: 11px;
+            color: #888;
+            background: #eee;
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+
+        /* 九大组件 */
+        .nine-components {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .component-box {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            transition: all 0.2s;
+        }
+
+        .component-box:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .component-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .component-desc {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .component-impl {
+            font-size: 11px;
+            color: #999;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #eee;
+        }
+
+        /* 异步处理 */
+        .async-flow {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .async-column {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .async-column.sync {
+            border: 2px solid #2196f3;
+        }
+
+        .async-column.async {
+            border: 2px solid #ff9800;
+        }
+
+        .async-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .async-title.sync-title { color: #2196f3; }
+        .async-title.async-title { color: #ff9800; }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .flow-container {
+                min-width: auto;
+            }
+            .flow-box {
+                min-width: 120px;
+                font-size: 12px;
+            }
+            .nine-components {
+                grid-template-columns: 1fr;
+            }
+            .async-flow {
+                grid-template-columns: 1fr;
+            }
+            .param-table {
+                grid-template-columns: 1fr;
+            }
+            .interceptor-chain {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="back-btn">← 返回目录</a>
+        <h1>深入原理：SpringMVC 底层</h1>
+    </nav>
+    <main class="main-content" style="margin-left: 0;">
+        <article class="content">
+            <h2>一、SpringMVC 整体架构</h2>
+
+            <h3>1. 核心架构图</h3>
+            <div class="architecture-diagram">
+                <div class="arch-label">前端</div>
+                <div class="arch-layer frontend">
+                    <div class="arch-component">HTTP请求</div>
+                </div>
+                <div class="arch-arrow">↓</div>
+
+                <div class="arch-label">核心控制器</div>
+                <div class="arch-layer dispatcher">
+                    <div class="arch-component core">DispatcherServlet</div>
+                </div>
+                <div class="arch-arrow">↓</div>
+
+                <div class="arch-label">映射与适配</div>
+                <div class="arch-layer mapping">
+                    <div class="arch-component">HandlerMapping</div>
+                    <div class="arch-component">HandlerAdapter</div>
+                    <div class="arch-component">HandlerExceptionResolver</div>
+                </div>
+                <div class="arch-arrow">↓</div>
+
+                <div class="arch-label">业务处理</div>
+                <div class="arch-layer handler">
+                    <div class="arch-component">Controller</div>
+                    <div class="arch-component">Service</div>
+                    <div class="arch-component">Repository</div>
+                </div>
+                <div class="arch-arrow">↓</div>
+
+                <div class="arch-label">视图渲染</div>
+                <div class="arch-layer view">
+                    <div class="arch-component">ViewResolver</div>
+                    <div class="arch-component">View</div>
+                </div>
+            </div>
+
+            <h3>2. 九大核心组件</h3>
+            <div class="nine-components">
+                <div class="component-box">
+                    <div class="component-title">1. MultipartResolver</div>
+                    <div class="component-desc">处理文件上传请求</div>
+                    <div class="component-impl">实现：StandardServletMultipartResolver</div>
+                </div>
+                <div class="component-box">
+                    <div class="component-title">2. LocaleResolver</div>
+                    <div class="component-desc">国际化区域解析</div>
+                    <div class="component-impl">实现：AcceptHeaderLocaleResolver</div>
+                </div>
+                <div class="component-box">
+                    <div class="component-title">3. ThemeResolver</div>
+                    <div class="component-desc">主题样式解析</div>
+                    <div class="component-impl">实现：FixedThemeResolver</div>
+                </div>
+                <div class="component-box">
+                    <div class="component-title">4. HandlerMapping</div>
+                    <div class="component-desc">请求映射到Handler</div>
+                    <div class="component-impl">实现：RequestMappingHandlerMapping</div>
+                </div>
+                <div class="component-box">
+                    <div class="component-title">5. HandlerAdapter</div>
+                    <div class="component-desc">执行Handler方法</div>
+                    <div class="component-impl">实现：RequestMappingHandlerAdapter</div>
+                </div>
+                <div class="component-box">
+                    <div class="component-title">6. HandlerExceptionResolver</div>
+                    <div class="component-desc">异常处理解析</div>
+                    <div class="component-impl">实现：ExceptionHandlerExceptionResolver</div>
+                </div>
+                <div class="component-box">
+                    <div class="component-title">7. RequestToViewNameTranslator</div>
+                    <div class="component-desc">请求转视图名</div>
+                    <div class="component-impl">实现：DefaultRequestToViewNameTranslator</div>
+                </div>
+                <div class="component-box">
+                    <div class="component-title">8. ViewResolver</div>
+                    <div class="component-desc">解析View对象</div>
+                    <div class="component-impl">实现：InternalResourceViewResolver</div>
+                </div>
+                <div class="component-box">
+                    <div class="component-title">9. FlashMapManager</div>
+                    <div class="component-desc">重定向参数传递</div>
+                    <div class="component-impl">实现：SessionFlashMapManager</div>
+                </div>
+            </div>
+
+            <h2>二、DispatcherServlet 请求处理流程</h2>
+
+            <h3>1. doDispatch() 完整流程</h3>
+            <div class="request-flow">
+                <div class="request-step">
+                    <div class="request-num num1">1</div>
+                    <div class="request-content">
+                        <h4>检查文件上传</h4>
+                        <p>checkMultipart() → 如果是multipart请求，包装为MultipartHttpServletRequest</p>
+                    </div>
+                </div>
+                <div class="request-step">
+                    <div class="request-num num2">2</div>
+                    <div class="request-content">
+                        <h4>获取Handler</h4>
+                        <p>getHandler() → 通过HandlerMapping找到HandlerExecutionChain</p>
+                        <div class="request-detail">包含：Handler + Interceptor链</div>
+                    </div>
+                </div>
+                <div class="request-step">
+                    <div class="request-num num3">3</div>
+                    <div class="request-content">
+                        <h4>获取HandlerAdapter</h4>
+                        <p>getHandlerAdapter() → 找到能执行该Handler的Adapter</p>
+                        <div class="request-detail">支持：RequestMapping、HttpRequestHandler、SimpleController</div>
+                    </div>
+                </div>
+                <div class="request-step">
+                    <div class="request-num num4">4</div>
+                    <div class="request-content">
+                        <h4>执行拦截器前置处理</h4>
+                        <p>applyPreHandle() → 遍历执行所有Interceptor.preHandle()</p>
+                        <div class="request-detail">任意一个返回false则终止请求</div>
+                    </div>
+                </div>
+                <div class="request-step">
+                    <div class="request-num num5">5</div>
+                    <div class="request-content">
+                        <h4>执行Handler</h4>
+                        <p>ha.handle() → HandlerAdapter执行Controller方法</p>
+                        <div class="request-detail">参数解析 → 方法执行 → 返回值处理</div>
+                    </div>
+                </div>
+                <div class="request-step">
+                    <div class="request-num num6">6</div>
+                    <div class="request-content">
+                        <h4>执行拦截器后置处理</h4>
+                        <p>applyPostHandle() → 遍历执行所有Interceptor.postHandle()</p>
+                        <div class="request-detail">逆序执行（从最后一个Interceptor开始）</div>
+                    </div>
+                </div>
+                <div class="request-step">
+                    <div class="request-num num7">7</div>
+                    <div class="request-content">
+                        <h4>处理结果</h4>
+                        <p>processDispatchResult() → 视图渲染或异常处理</p>
+                        <div class="request-detail">ModelAndView → ViewResolver → View.render()</div>
+                    </div>
+                </div>
+                <div class="request-step">
+                    <div class="request-num num8">8</div>
+                    <div class="request-content">
+                        <h4>执行拦截器完成后处理</h4>
+                        <p>triggerAfterCompletion() → 无论成功或异常都会执行</p>
+                        <div class="request-detail">逆序执行，用于资源清理</div>
+                    </div>
+                </div>
+                <div class="request-step">
+                    <div class="request-num num9">9</div>
+                    <div class="request-content">
+                        <h4>清理资源</h4>
+                        <p>cleanupMultipart() → 清理文件上传临时资源</p>
+                    </div>
+                </div>
+            </div>
+
+            <h3>2. 请求处理流程图</h3>
+            <div class="flow-diagram">
+                <div class="flow-title">doDispatch() 核心流程</div>
+                <div class="flow-container">
+                    <div class="flow-step">
+                        <div class="flow-box primary">HTTP请求到达</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">DispatcherServlet.doDispatch()</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">getHandler()</div>
+                        <div class="flow-label">HandlerMapping查找</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">getHandlerAdapter()</div>
+                        <div class="flow-label">获取适配器</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box important">applyPreHandle()</div>
+                        <div class="flow-label">拦截器前置</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box primary">ha.handle()</div>
+                        <div class="flow-label">执行Controller</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box important">applyPostHandle()</div>
+                        <div class="flow-label">拦截器后置</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">processDispatchResult()</div>
+                        <div class="flow-label">处理结果/视图渲染</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">triggerAfterCompletion()</div>
+                        <div class="flow-label">拦截器完成回调</div>
+                    </div>
+                </div>
+            </div>
+
+            <h2>三、HandlerMapping 底层原理</h2>
+
+            <h3>1. RequestMappingHandlerMapping 初始化</h3>
+            <div class="flow-diagram">
+                <div class="flow-title">HandlerMapping初始化流程</div>
+                <div class="flow-container">
+                    <div class="flow-step">
+                        <div class="flow-box primary">afterPropertiesSet()</div>
+                        <div class="flow-label">Bean初始化时调用</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">initHandlerMethods()</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">扫描所有Bean</div>
+                        <div class="flow-label">detectHandlerMethods(beanName)</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box important">遍历所有方法</div>
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">@RequestMapping</div>
+                            <div class="flow-box detail">@GetMapping</div>
+                            <div class="flow-box detail">@PostMapping</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">创建RequestMappingInfo</div>
+                        <div class="flow-label">解析注解信息</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">注册到mappingRegistry</div>
+                        <div class="flow-label">Map&lt;RequestMappingInfo, HandlerMethod&gt;</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>2. getHandler() 查找流程</h3>
+            <div class="flow-diagram">
+                <div class="flow-title">请求映射查找流程</div>
+                <div class="flow-container">
+                    <div class="flow-step">
+                        <div class="flow-box primary">getHandler(request)</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">遍历所有HandlerMapping</div>
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">RequestMappingHandlerMapping</div>
+                            <div class="flow-box detail">SimpleUrlHandlerMapping</div>
+                            <div class="flow-box detail">BeanNameUrlHandlerMapping</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box important">getHandlerInternal(request)</div>
+                        <div class="flow-label">核心查找方法</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">lookupHandlerMethod()</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">匹配URL</div>
+                            <div class="flow-box detail">匹配Method</div>
+                            <div class="flow-box detail">匹配Params</div>
+                            <div class="flow-box detail">匹配Headers</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">返回HandlerExecutionChain</div>
+                        <div class="flow-label">Handler + Interceptor链</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>3. RequestMappingInfo 结构</h3>
+            <pre><code>RequestMappingInfo 包含的匹配条件：
+
+┌─────────────────────────────────────────┐
+│  PatternsCondition                       │
+│  - URL路径匹配                            │
+│  - 支持Ant风格 (*, ?, **)                 │
+│  - /users/{id} 路径变量                   │
+├─────────────────────────────────────────┤
+│  MethodsCondition                        │
+│  - HTTP方法匹配                           │
+│  - GET/POST/PUT/DELETE                   │
+├─────────────────────────────────────────┤
+│  ParamsCondition                         │
+│  - 参数条件匹配                           │
+│  - params="action=view"                  │
+├─────────────────────────────────────────┤
+│  HeadersCondition                        │
+│  - Header条件匹配                         │
+│  - headers="Content-Type=json"           │
+├─────────────────────────────────────────┤
+│  ConsumesCondition                       │
+│  - 请求Content-Type                       │
+│  - consumes="application/json"           │
+├─────────────────────────────────────────┤
+│  ProducesCondition                       │
+│  - 响应Content-Type                       │
+│  - produces="application/json"           │
+└─────────────────────────────────────────┘</code></pre>
+
+            <h2>四、HandlerAdapter 底层原理</h2>
+
+            <h3>1. RequestMappingHandlerAdapter 执行流程</h3>
+            <div class="flow-diagram">
+                <div class="flow-title">HandlerAdapter.handle() 执行流程</div>
+                <div class="flow-container">
+                    <div class="flow-step">
+                        <div class="flow-box primary">handle(request, response, handler)</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">handleInternal()</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box important">invokeHandlerMethod()</div>
+                        <div class="flow-label">核心方法调用</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">创建ServletInvocableHandlerMethod</div>
+                        <div class="flow-label">封装HandlerMethod</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">setArgumentResolvers()</div>
+                        <div class="flow-label">设置参数解析器</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">setReturnValueHandlers()</div>
+                        <div class="flow-label">设置返回值处理器</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box primary">invokeAndHandle()</div>
+                        <div class="flow-label">执行方法并处理返回值</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>2. 参数解析流程</h3>
+            <div class="flow-diagram">
+                <div class="flow-title">方法参数解析流程</div>
+                <div class="flow-container">
+                    <div class="flow-step">
+                        <div class="flow-box primary">invokeForRequest()</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">getMethodParameters()</div>
+                        <div class="flow-label">获取方法参数数组</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box important">遍历每个参数</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">resolveArgument()</div>
+                        <div class="flow-label">找到对应的ArgumentResolver</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">执行解析逻辑</div>
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">@RequestParam</div>
+                            <div class="flow-box detail">@PathVariable</div>
+                            <div class="flow-box detail">@RequestBody</div>
+                            <div class="flow-box detail">@ModelAttribute</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">返回参数值数组</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box primary">反射调用方法</div>
+                        <div class="flow-label">method.invoke(bean, args)</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>3. 参数解析器一览</h3>
+            <div class="param-table">
+                <div class="param-header">注解/类型</div>
+                <div class="param-header">解析器 + 原理</div>
+                <div class="param-row">@RequestParam</div>
+                <div class="param-row">RequestParamMethodArgumentResolver<br>从request.getParameter()获取</div>
+                <div class="param-row">@PathVariable</div>
+                <div class="param-row">PathVariableMethodArgumentResolver<br>从URI模板变量解析</div>
+                <div class="param-row">@RequestBody</div>
+                <div class="param-row">RequestResponseBodyMethodProcessor<br>HttpMessageConverter反序列化</div>
+                <div class="param-row">@RequestHeader</div>
+                <div class="param-row">RequestHeaderMethodArgumentResolver<br>从request.getHeader()获取</div>
+                <div class="param-row">@CookieValue</div>
+                <div class="param-row">CookieValueMethodArgumentResolver<br>从request.getCookies()获取</div>
+                <div class="param-row">@ModelAttribute</div>
+                <div class="param-row">ModelAttributeMethodProcessor<br>创建对象 + 属性绑定</div>
+                <div class="param-row">HttpServletRequest</div>
+                <div class="param-row">ServletRequestMethodArgumentResolver<br>直接注入request对象</div>
+                <div class="param-row">HttpSession</div>
+                <div class="param-row">直接注入session对象</div>
+                <div class="param-row">Model</div>
+                <div class="param-row">直接注入BindingAwareModelMap</div>
+                <div class="param-row">Principal</div>
+                <div class="param-row">从request.getUserPrincipal()获取</div>
+            </div>
+
+            <h3>4. 返回值处理流程</h3>
+            <div class="flow-diagram">
+                <div class="flow-title">返回值处理流程</div>
+                <div class="flow-container">
+                    <div class="flow-step">
+                        <div class="flow-box primary">方法执行返回结果</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">handleReturnValue()</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box important">找到ReturnValueHandler</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">ModelAndView</div>
+                            <div class="flow-box detail">String</div>
+                            <div class="flow-box detail">@ResponseBody</div>
+                            <div class="flow-box detail">void</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">执行处理逻辑</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">设置Model</div>
+                            <div class="flow-box detail">设置ViewName</div>
+                            <div class="flow-box detail">写入Response</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>5. HttpMessageConverter 工作原理</h3>
+            <div class="flow-diagram">
+                <div class="flow-title">@RequestBody/@ResponseBody 序列化流程</div>
+                <div class="flow-container">
+                    <div class="flow-step">
+                        <div class="flow-box primary">HTTP请求/响应</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">判断Content-Type</div>
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">application/json</div>
+                            <div class="flow-box detail">text/xml</div>
+                            <div class="flow-box detail">form-data</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box important">选择合适的MessageConverter</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">MappingJackson2HttpMessageConverter</div>
+                            <div class="flow-box detail">StringHttpMessageConverter</div>
+                            <div class="flow-box detail">Jaxb2RootElementHttpMessageConverter</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">canRead()/canWrite()</div>
+                        <div class="flow-label">判断是否支持该类型</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box primary">read()/write()</div>
+                        <div class="flow-label">执行序列化/反序列化</div>
+                    </div>
+                </div>
+            </div>
+
+            <h2>五、拦截器链原理</h2>
+
+            <h3>1. 拦截器执行顺序</h3>
+            <div class="interceptor-chain">
+                <div class="chain-item pre">Interceptor1<br>preHandle()</div>
+                <div class="chain-arrow">→</div>
+                <div class="chain-item pre">Interceptor2<br>preHandle()</div>
+                <div class="chain-arrow">→</div>
+                <div class="chain-item handler">Handler<br>执行Controller</div>
+                <div class="chain-arrow">→</div>
+                <div class="chain-item post">Interceptor2<br>postHandle()</div>
+                <div class="chain-arrow">→</div>
+                <div class="chain-item post">Interceptor1<br>postHandle()</div>
+                <div class="chain-arrow">→</div>
+                <div class="chain-item after">视图渲染</div>
+                <div class="chain-arrow">→</div>
+                <div class="chain-item after">Interceptor2<br>afterCompletion()</div>
+                <div class="chain-arrow">→</div>
+                <div class="chain-item after">Interceptor1<br>afterCompletion()</div>
+            </div>
+
+            <div class="flow-diagram">
+                <div class="flow-title">拦截器三个方法执行时机</div>
+                <div class="flow-container">
+                    <div class="flow-step">
+                        <div class="flow-box primary">preHandle()</div>
+                        <div class="flow-label">Controller执行前</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">返回true：继续执行</div>
+                            <div class="flow-box detail">返回false：终止请求</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">Handler执行</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box important">postHandle()</div>
+                        <div class="flow-label">Controller执行后、视图渲染前</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-box detail">可修改ModelAndView</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">视图渲染</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box primary">afterCompletion()</div>
+                        <div class="flow-label">视图渲染后（总是执行）</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-box detail">用于资源清理、异常处理</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>2. 源码实现</h3>
+            <pre><code>// applyPreHandle() - 正序执行
+boolean applyPreHandle(HttpServletRequest request, HttpServletResponse response) {
+    HandlerInterceptor[] interceptors = getInterceptors();
+    for (int i = 0; i < interceptors.length; i++) {
+        HandlerInterceptor interceptor = interceptors[i];
+        if (!interceptor.preHandle(request, response, this.handler)) {
+            triggerAfterCompletion(request, response, null);
+            return false;  // 终止请求
+        }
+        this.interceptorIndex = i;  // 记录执行到的位置
+    }
+    return true;
+}
+
+// applyPostHandle() - 逆序执行
+void applyPostHandle(HttpServletRequest request, HttpServletResponse response, ModelAndView mv) {
+    HandlerInterceptor[] interceptors = getInterceptors();
+    for (int i = interceptors.length - 1; i >= 0; i--) {
+        interceptors[i].postHandle(request, response, this.handler, mv);
+    }
+}
+
+// triggerAfterCompletion() - 逆序执行（只执行已通过的）
+void triggerAfterCompletion(HttpServletRequest request, HttpServletResponse response, Exception ex) {
+    HandlerInterceptor[] interceptors = getInterceptors();
+    for (int i = this.interceptorIndex; i >= 0; i--) {
+        interceptors[i].afterCompletion(request, response, this.handler, ex);
+    }
+}</code></pre>
+
+            <h2>六、异常处理原理</h2>
+
+            <h3>1. HandlerExceptionResolver 执行流程</h3>
+            <div class="flow-diagram">
+                <div class="flow-title">异常处理流程</div>
+                <div class="flow-container">
+                    <div class="flow-step">
+                        <div class="flow-box primary">Handler执行抛出异常</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">processHandlerException()</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">遍历HandlerExceptionResolver</div>
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">ExceptionHandlerExceptionResolver</div>
+                            <div class="flow-box detail">ResponseStatusExceptionResolver</div>
+                            <div class="flow-box detail">DefaultHandlerExceptionResolver</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box important">resolveException()</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">返回ModelAndView</div>
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">不为null → 使用该视图</div>
+                            <div class="flow-box detail">为null → 继续下一个Resolver</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">渲染错误视图</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>2. @ExceptionHandler 原理</h3>
+            <div class="flow-diagram">
+                <div class="flow-title">@ExceptionHandler 处理机制</div>
+                <div class="flow-container">
+                    <div class="flow-step">
+                        <div class="flow-box primary">ExceptionHandlerExceptionResolver</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">afterPropertiesSet()</div>
+                        <div class="flow-label">初始化时扫描</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">detectExceptionHandlers()</div>
+                        <div class="flow-label">查找@ExceptionHandler方法</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box important">缓存映射关系</div>
+                        <div class="flow-label">Map&lt;ExceptionClass, HandlerMethod&gt;</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">异常发生时</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box primary">找到对应方法执行</div>
+                        <div class="flow-label">反射调用ExceptionHandler方法</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>3. @ControllerAdvice 原理</h3>
+            <pre><code>@ControllerAdvice 是全局异常处理的核心：
+
+初始化扫描：
+1. 扫描所有标注@ControllerAdvice的Bean
+2. 提取basePackages、annotations等限定条件
+3. 检查是否匹配当前Controller
+4. 缓存ExceptionHandler方法
+
+匹配逻辑：
+- basePackages：只处理指定包下的Controller
+- annotations：只处理带指定注解的Controller
+- assignableTypes：只处理指定类型的Controller
+- 无限定：处理所有Controller
+
+执行顺序：
+1. Controller自身的@ExceptionHandler（优先）
+2. ControllerAdvice的@ExceptionHandler（其次）
+3. 默认异常处理（最后）</code></pre>
+
+            <h2>七、视图渲染原理</h2>
+
+            <h3>1. ViewResolver 解析流程</h3>
+            <div class="flow-diagram">
+                <div class="flow-title">ViewResolver工作流程</div>
+                <div class="flow-container">
+                    <div class="flow-step">
+                        <div class="flow-box primary">ModelAndView + viewName</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">resolveViewName()</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">遍历所有ViewResolver</div>
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">InternalResourceViewResolver</div>
+                            <div class="flow-box detail">ContentNegotiatingViewResolver</div>
+                            <div class="flow-box detail">BeanNameViewResolver</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box important">拼接前后缀</div>
+                        <div class="flow-label">prefix + viewName + suffix</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">创建View对象</div>
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">JstlView</div>
+                            <div class="flow-box detail">ThymeleafView</div>
+                            <div class="flow-box detail">RedirectView</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>2. View.render() 渲染流程</h3>
+            <div class="flow-diagram">
+                <div class="flow-title">视图渲染流程</div>
+                <div class="flow-container">
+                    <div class="flow-step">
+                        <div class="flow-box primary">View.render(model, request, response)</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">合并Model数据</div>
+                        <div class="flow-label">静态Model + 动态Model</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">暴露模型到请求域</div>
+                        <div class="flow-label">request.setAttribute()</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box important">解析视图模板</div>
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">JSP → forward</div>
+                            <div class="flow-box detail">Thymeleaf → 模板引擎</div>
+                            <div class="flow-box detail">Redirect → sendRedirect</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box primary">输出响应内容</div>
+                    </div>
+                </div>
+            </div>
+
+            <h2>八、异步请求处理</h2>
+
+            <h3>1. 同步 vs 异步处理对比</h3>
+            <div class="async-flow">
+                <div class="async-column sync">
+                    <div class="async-title sync-title">同步处理</div>
+                    <div class="flow-container">
+                        <div class="flow-step">
+                            <div class="flow-box normal">请求到达</div>
+                        </div>
+                        <div class="flow-arrow-down"></div>
+                        <div class="flow-step">
+                            <div class="flow-box primary">Tomcat线程阻塞等待</div>
+                            <div class="flow-label">线程被占用</div>
+                        </div>
+                        <div class="flow-arrow-down"></div>
+                        <div class="flow-step">
+                            <div class="flow-box secondary">业务处理完成</div>
+                        </div>
+                        <div class="flow-arrow-down"></div>
+                        <div class="flow-step">
+                            <div class="flow-box normal">返回响应</div>
+                        </div>
+                        <div class="flow-arrow-down"></div>
+                        <div class="flow-step">
+                            <div class="flow-box important">线程释放</div>
+                            <div class="flow-label">线程数限制了并发</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="async-column async">
+                    <div class="async-title async-title">异步处理 (@Async/Callable)</div>
+                    <div class="flow-container">
+                        <div class="flow-step">
+                            <div class="flow-box normal">请求到达</div>
+                        </div>
+                        <div class="flow-arrow-down"></div>
+                        <div class="flow-step">
+                            <div class="flow-box primary">返回Callable/DeferredResult</div>
+                            <div class="flow-label">立即释放Tomcat线程</div>
+                        </div>
+                        <div class="flow-arrow-down"></div>
+                        <div class="flow-step">
+                            <div class="flow-box secondary">异步线程处理业务</div>
+                            <div class="flow-label">Tomcat线程处理其他请求</div>
+                        </div>
+                        <div class="flow-arrow-down"></div>
+                        <div class="flow-step">
+                            <div class="flow-box normal">处理完成回调</div>
+                        </div>
+                        <div class="flow-arrow-down"></div>
+                        <div class="flow-step">
+                            <div class="flow-box important">重新分配线程响应</div>
+                            <div class="flow-label">高并发支持</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>2. Callable 处理流程</h3>
+            <div class="flow-diagram">
+                <div class="flow-title">Callable异步处理源码流程</div>
+                <div class="flow-container">
+                    <div class="flow-step">
+                        <div class="flow-box primary">Controller返回Callable</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">WebAsyncManager.startCallableProcessing()</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">创建AsyncWebRequest</div>
+                        <div class="flow-label">异步请求包装</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box important">调用request.startAsync()</div>
+                        <div class="flow-label">Servlet 3.0异步开启</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">提交Callable到线程池</div>
+                        <div class="flow-label">异步执行</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">Tomcat线程释放</div>
+                        <div class="flow-label">可处理其他请求</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box primary">Callable完成回调</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">dispatch()重新分发</div>
+                        <div class="flow-label">重新进入doDispatch()</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">返回响应</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>3. DeferredResult 处理流程</h3>
+            <div class="flow-diagram">
+                <div class="flow-title">DeferredResult异步处理流程</div>
+                <div class="flow-container">
+                    <div class="flow-step">
+                        <div class="flow-box primary">Controller返回DeferredResult</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">创建并注册</div>
+                        <div class="flow-label">等待外部触发</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">Tomcat线程释放</div>
+                        <div class="flow-label">等待中可处理其他请求</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box important">外部事件触发</div>
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">消息队列回调</div>
+                            <div class="flow-box detail">定时任务完成</div>
+                            <div class="flow-box detail">手动调用setResult()</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box primary">deferredResult.setResult(value)</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">触发dispatch()</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">返回响应</div>
+                    </div>
+                </div>
+            </div>
+
+            <h2>九、面试高频问题</h2>
+
+            <h3>Q1: SpringMVC请求处理完整流程？</h3>
+            <pre><code>回答要点：
+
+1. 用户发送请求到DispatcherServlet
+2. DispatcherServlet调用getHandler()获取HandlerExecutionChain
+   - 包含Handler + Interceptor链
+3. getHandlerAdapter()获取能执行Handler的Adapter
+4. 执行Interceptor.preHandle()（正序）
+5. HandlerAdapter.handle()执行Controller方法
+   - 参数解析：ArgumentResolver
+   - 方法执行：反射调用
+   - 返回值处理：ReturnValueHandler
+6. 执行Interceptor.postHandle()（逆序）
+7. processDispatchResult()处理结果
+   - ViewResolver解析视图
+   - View.render()渲染
+8. Interceptor.afterCompletion()（逆序，总是执行）
+
+核心组件：
+- DispatcherServlet：中央控制器
+- HandlerMapping：请求映射
+- HandlerAdapter：方法执行
+- ViewResolver：视图解析</code></pre>
+
+            <h3>Q2: HandlerMapping如何找到对应的Handler？</h3>
+            <pre><code>回答要点：
+
+1. RequestMappingHandlerMapping初始化
+   - 扫描所有@Controller/@RestController
+   - 提取@RequestMapping信息
+   - 创建RequestMappingInfo（URL、Method、Params等）
+   - 注册到MappingRegistry
+
+2. 请求到达时
+   - 遍历所有HandlerMapping
+   - 调用getHandlerInternal()
+   - lookupHandlerMethod()匹配条件
+   - 返回HandlerExecutionChain
+
+3. 匹配优先级
+   - 精确匹配 > 通配符匹配
+   - HTTP方法匹配
+   - 参数/Header匹配</code></pre>
+
+            <h3>Q3: 参数是如何解析的？</h3>
+            <pre><code>回答要点：
+
+1. HandlerAdapter执行时
+   - 获取方法参数数组
+   - 遍历每个参数
+
+2. 找到对应的ArgumentResolver
+   - supportsParameter()判断是否支持
+   - resolveArgument()解析参数值
+
+3. 常见解析器
+   - @RequestParam：request.getParameter()
+   - @PathVariable：URI模板变量
+   - @RequestBody：HttpMessageConverter反序列化
+   - @ModelAttribute：创建对象+属性绑定
+
+4. 参数绑定流程
+   - 创建目标对象
+   - 获取请求参数
+   - 通过setter方法注入
+   - 类型转换（String→目标类型）</code></pre>
+
+            <h3>Q4: @ResponseBody如何工作？</h3>
+            <pre><code>回答要点：
+
+1. 返回值处理器
+   - RequestResponseBodyMethodProcessor
+
+2. 选择MessageConverter
+   - 根据Content-Type判断
+   - 根据返回值类型判断
+   - canWrite()确认支持
+
+3. 序列化输出
+   - write()方法执行
+   - Jackson将对象转JSON
+   - 写入Response body
+
+4. 流程
+   方法返回 → handleReturnValue() →
+   选择Converter → write() → 输出到响应</code></pre>
+
+            <h3>Q5: 拦截器和过滤器的区别？</h3>
+            <pre><code>回答要点：
+
+| 特性 | Filter | Interceptor |
+|------|--------|-------------|
+| 所属 | Servlet容器 | SpringMVC |
+| 作用范围 | 所有请求 | 只处理进入DispatcherServlet的请求 |
+| 执行时机 | DispatcherServlet之前 | Handler执行前后 |
+| 依赖注入 | 不支持（需手动） | 支持Spring注入 |
+| 获取信息 | 只有Request/Response | 可获取Handler、ModelAndView |
+
+执行顺序：
+Filter.before → Interceptor.preHandle → Handler →
+Interceptor.postHandle → View.render →
+Interceptor.afterCompletion → Filter.after
+
+应用场景：
+Filter：编码转换、安全校验、日志记录
+Interceptor：权限校验、日志、性能监控</code></pre>
+
+            <div class="page-nav">
+                <a href="深入原理_06_SpringBoot底层.html" class="prev-page">←上一篇：SpringBoot 底层</a>
+                <span style="flex-grow:1"></span>
+                <a href="index.html" class="home-page">返回目录</a>
+                <span style="flex-grow:1"></span>
+                <a href="深入原理_08_代理模式详解.html" class="next-page">下一篇：代理模式详解→</a>
+            </div>
+        </article>
+    </main>
+</body>
+</html>

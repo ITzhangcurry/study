@@ -5,6 +5,378 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>深入原理_05. Spring底层 - Java 面试备战</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* 流程图样式 */
+        .flow-diagram {
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            overflow-x: auto;
+        }
+
+        .flow-title {
+            font-size: 16px;
+            color: #667eea;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 600px;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .flow-box {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            min-width: 180px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .flow-box:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .flow-box.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .flow-box.secondary {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .flow-box.important {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .flow-box.normal {
+            background: white;
+            color: #333;
+            border: 2px solid #667eea;
+        }
+
+        .flow-box.detail {
+            background: #f8f9fa;
+            color: #555;
+            border: 1px solid #ddd;
+            font-size: 12px;
+        }
+
+        .flow-arrow {
+            color: #667eea;
+            font-size: 20px;
+            text-align: center;
+            padding: 5px 0;
+        }
+
+        .flow-arrow-down::before {
+            content: "▼";
+        }
+
+        .flow-arrow-right::before {
+            content: "→";
+        }
+
+        .flow-label {
+            font-size: 11px;
+            color: #888;
+            padding: 2px 8px;
+            background: #eee;
+            border-radius: 4px;
+        }
+
+        /* 横向流程 */
+        .flow-horizontal {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* 三级缓存图 */
+        .cache-diagram {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .cache-box {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .cache-box.level1 {
+            border-color: #28a745;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        }
+
+        .cache-box.level2 {
+            border-color: #ffc107;
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        }
+
+        .cache-box.level3 {
+            border-color: #dc3545;
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        }
+
+        .cache-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .cache-desc {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* 循环依赖流程 */
+        .cycle-flow {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .cycle-column {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            border: 2px solid #ddd;
+        }
+
+        .cycle-column.bean-a {
+            border-color: #667eea;
+        }
+
+        .cycle-column.bean-b {
+            border-color: #38ef7d;
+        }
+
+        .cycle-step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .cycle-step-item:last-child {
+            border-bottom: none;
+        }
+
+        .step-num {
+            background: #667eea;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .step-content {
+            font-size: 13px;
+            color: #333;
+        }
+
+        /* AOP拦截器链 */
+        .chain-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .chain-box {
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .chain-box.before {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            color: #1565c0;
+        }
+
+        .chain-box.after {
+            background: #f3e5f5;
+            border: 1px solid #9c27b0;
+            color: #7b1fa2;
+        }
+
+        .chain-box.throwing {
+            background: #ffebee;
+            border: 1px solid #f44336;
+            color: #c62828;
+        }
+
+        .chain-box.target {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+        }
+
+        .chain-arrow {
+            color: #999;
+            font-size: 16px;
+        }
+
+        /* Bean生命周期 */
+        .lifecycle-diagram {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+        }
+
+        .lifecycle-phase {
+            padding: 15px 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .lifecycle-phase.create {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+        }
+
+        .lifecycle-phase.populate {
+            background: #fff3e0;
+            border: 2px solid #ff9800;
+        }
+
+        .lifecycle-phase.initialize {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+        }
+
+        .lifecycle-phase.complete {
+            background: #f3e5f5;
+            border: 2px solid #9c27b0;
+        }
+
+        .lifecycle-phase.destroy {
+            background: #ffebee;
+            border: 2px solid #f44336;
+        }
+
+        .phase-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .phase-detail {
+            font-size: 11px;
+            color: #666;
+        }
+
+        /* 事务流程 */
+        .tx-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .tx-step {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .tx-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: white;
+        }
+
+        .tx-icon.begin { background: #28a745; }
+        .tx-icon.exec { background: #667eea; }
+        .tx-icon.commit { background: #17a2b8; }
+        .tx-icon.rollback { background: #dc3545; }
+        .tx-icon.end { background: #6c757d; }
+
+        .tx-content {
+            flex: 1;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .tx-content h4 {
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .tx-content p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .flow-container {
+                min-width: auto;
+            }
+            .flow-box {
+                min-width: 120px;
+                font-size: 12px;
+            }
+            .cache-diagram {
+                grid-template-columns: 1fr;
+            }
+            .cycle-flow {
+                grid-template-columns: 1fr;
+            }
+            .lifecycle-diagram {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .chain-diagram {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -15,342 +387,604 @@
         <article class="content">
             <h2>一、Spring Bean 生命周期底层</h2>
 
-            <h3>1. AbstractApplicationContext.refresh() 流程</h3>
-            <pre><code>refresh() 是 Spring 启动核心方法：
+            <h3>1. Bean 生命周期全景图</h3>
+            <div class="lifecycle-diagram">
+                <div class="lifecycle-phase create">
+                    <div class="phase-title">1. 实例化</div>
+                    <div class="phase-detail">createBeanInstance()</div>
+                    <div class="phase-detail">工厂方法/构造器</div>
+                </div>
+                <div class="lifecycle-phase populate">
+                    <div class="phase-title">2. 属性注入</div>
+                    <div class="phase-detail">populateBean()</div>
+                    <div class="phase-detail">@Autowired/@Resource</div>
+                </div>
+                <div class="lifecycle-phase initialize">
+                    <div class="phase-title">3. 初始化</div>
+                    <div class="phase-detail">initializeBean()</div>
+                    <div class="phase-detail">Aware/PostProcessor</div>
+                </div>
+                <div class="lifecycle-phase complete">
+                    <div class="phase-title">4. 就绪状态</div>
+                    <div class="phase-detail">Bean可使用</div>
+                    <div class="phase-detail">放入singletonObjects</div>
+                </div>
+                <div class="lifecycle-phase destroy">
+                    <div class="phase-title">5. 销毁</div>
+                    <div class="phase-detail">destroy()</div>
+                    <div class="phase-detail">@PreDestroy</div>
+                </div>
+            </div>
 
-1. prepareRefresh()
-   - 初始化前置处理
-   - 验证必要属性
+            <h3>2. AbstractApplicationContext.refresh() 流程图</h3>
+            <div class="flow-diagram">
+                <div class="flow-title">refresh() - Spring容器启动核心方法（12步）</div>
+                <div class="flow-container">
+                    <div class="flow-step">
+                        <div class="flow-box normal">1. prepareRefresh()</div>
+                        <div class="flow-label">准备阶段</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">2. obtainFreshBeanFactory()</div>
+                        <div class="flow-label">创建BeanFactory</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">3. prepareBeanFactory()</div>
+                        <div class="flow-label">配置BeanFactory</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box important">4. invokeBeanFactoryPostProcessors()</div>
+                        <div class="flow-label">执行BFPP（关键）</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">5. registerBeanPostProcessors()</div>
+                        <div class="flow-label">注册BPP</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">6. initMessageSource()</div>
+                        <div class="flow-label">国际化</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">7. initApplicationEventMulticaster()</div>
+                        <div class="flow-label">事件广播器</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">8. onRefresh()</div>
+                        <div class="flow-label">子类扩展</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">9. registerListeners()</div>
+                        <div class="flow-label">注册监听器</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box primary">10. finishBeanFactoryInitialization()</div>
+                        <div class="flow-label">初始化所有Bean（核心）</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">11. finishRefresh()</div>
+                        <div class="flow-label">完成刷新</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">12. 发布 ContextRefreshedEvent</div>
+                        <div class="flow-label">容器就绪</div>
+                    </div>
+                </div>
+            </div>
 
-2. obtainFreshBeanFactory()
-   - 创建/获取 BeanFactory
-   - 加载 BeanDefinition
+            <h3>3. getBean() 流程图</h3>
+            <div class="flow-diagram">
+                <div class="flow-title">AbstractBeanFactory.getBean() - 获取Bean完整流程</div>
+                <div class="flow-container">
+                    <div class="flow-step">
+                        <div class="flow-box primary">getBean(name)</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">转换name (alias→beanName)</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">检查三级缓存</div>
+                        <div class="flow-label">singletonObjects</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">缓存存在?</div>
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">是 → 返回Bean</div>
+                            <div class="flow-box detail">否 → 继续创建</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box important">标记创建中</div>
+                        <div class="flow-label">singletonsCurrentlyInCreation</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box primary">createBean()</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">doCreateBean()</div>
+                        <div class="flow-label">实例化+注入+初始化</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">addSingleton()</div>
+                        <div class="flow-label">放入一级缓存</div>
+                    </div>
+                </div>
+            </div>
 
-3. prepareBeanFactory(beanFactory)
-   - 配置 BeanFactory
-   - 注册默认后处理器
+            <h3>4. doCreateBean() 流程图</h3>
+            <div class="flow-diagram">
+                <div class="flow-title">doCreateBean() - Bean创建核心流程</div>
+                <div class="flow-container">
+                    <div class="flow-step">
+                        <div class="flow-box primary">doCreateBean(beanName, mbd, args)</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">1. createBeanInstance()</div>
+                        <div class="flow-label">实例化</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">工厂方法</div>
+                            <div class="flow-box detail">构造器注入</div>
+                            <div class="flow-box detail">无参构造</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">2. applyMergedBeanDefinitionPostProcessors()</div>
+                        <div class="flow-label">收集注入元数据</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box important">3. addSingletonFactory()</div>
+                        <div class="flow-label">注册三级缓存（解决循环依赖）</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">4. populateBean()</div>
+                        <div class="flow-label">属性注入</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box primary">5. initializeBean()</div>
+                        <div class="flow-label">初始化</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">6. registerDisposableBean()</div>
+                        <div class="flow-label">注册销毁逻辑</div>
+                    </div>
+                </div>
+            </div>
 
-4. invokeBeanFactoryPostProcessors(beanFactory)
-   - 执行 BeanFactoryPostProcessor
-   - 处理顺序：PriorityOrdered → Ordered → 无顺序
+            <h3>5. initializeBean() 流程图</h3>
+            <div class="flow-diagram">
+                <div class="flow-title">initializeBean() - Bean初始化流程</div>
+                <div class="flow-container">
+                    <div class="flow-step">
+                        <div class="flow-box primary">initializeBean(beanName, bean, mbd)</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">1. invokeAwareMethods()</div>
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">BeanNameAware</div>
+                            <div class="flow-box detail">BeanFactoryAware</div>
+                            <div class="flow-box detail">ApplicationContextAware</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box important">2. applyBeanPostProcessorsBeforeInitialization()</div>
+                        <div class="flow-label">前置处理</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">@PostConstruct</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">3. invokeInitMethods()</div>
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">InitializingBean</div>
+                            <div class="flow-box detail">init-method</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box primary">4. applyBeanPostProcessorsAfterInitialization()</div>
+                        <div class="flow-label">后置处理（AOP代理在此）</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">AbstractAutoProxyCreator</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">返回完整Bean</div>
+                    </div>
+                </div>
+            </div>
 
-5. registerBeanPostProcessors(beanFactory)
-   - 注册 BeanPostProcessor
+            <h3>6. 三级缓存解决循环依赖</h3>
+            <div class="flow-diagram">
+                <div class="flow-title">三级缓存结构</div>
+                <div class="cache-diagram">
+                    <div class="cache-box level1">
+                        <div class="cache-title">一级缓存 singletonObjects</div>
+                        <div class="cache-desc">ConcurrentHashMap</div>
+                        <div class="cache-desc">完整的Bean对象</div>
+                        <div class="cache-desc">属性已注入、已初始化</div>
+                    </div>
+                    <div class="cache-box level2">
+                        <div class="cache-title">二级缓存 earlySingletonObjects</div>
+                        <div class="cache-desc">HashMap</div>
+                        <div class="cache-desc">早期Bean对象</div>
+                        <div class="cache-desc">属性未注入、可能已代理</div>
+                    </div>
+                    <div class="cache-box level3">
+                        <div class="cache-title">三级缓存 singletonFactories</div>
+                        <div class="cache-desc">HashMap&lt;String, ObjectFactory&gt;</div>
+                        <div class="cache-desc">Bean工厂</div>
+                        <div class="cache-desc">可生成早期Bean或代理</div>
+                    </div>
+                </div>
+            </div>
 
-6. initMessageSource()
-   - 初始化消息源（国际化）
-
-7. initApplicationEventMulticaster()
-   - 初始化事件广播器
-
-8. registerListeners()
-   - 注册监听器
-
-9. finishBeanFactoryInitialization(beanFactory)
-   - 初始化非懒加载 Bean（核心）
-
-10. finishRefresh()
-    - 清理缓存
-    - 发布 ContextRefreshedEvent</code></pre>
-
-            <h3>2. getBean() 流程底层</h3>
-            <pre><code>AbstractBeanFactory.getBean():
-
-1. 转换 name
-   - alias → beanName
-   - FactoryBean 前缀处理
-
-2. 检查缓存
-   - singletonObjects：已创建的单例
-   - earlySingletonObjects：早期单例
-   - singletonFactories：单例工厂
-
-3. 检查循环依赖
-   - singletonsCurrentlyInCreation：正在创建的单例集合
-   - 在集合中 = 循环依赖
-
-4. 标记创建中
-   - beforeSingletonCreation(beanName)
-
-5. 创建 Bean
-   - createBean(beanName, mbd, args)
-
-6. 处理循环依赖
-   - 三级缓存机制
-
-7. 完成创建
-   - afterSingletonCreation(beanName)</code></pre>
-
-            <h3>3. doCreateBean() 流程</h3>
-            <pre><code>doCreateBean():
-
-1. createBeanInstance()
-   - 实例化 Bean
-
-   a. 工厂方法
-      - factory-method 创建
-
-   b. 构造器注入
-      - resolveConstructorArguments()：解析构造参数
-      - autowireConstructor()：自动选择构造器
-
-   c. 无参构造
-      - 反射或 CGLIB 创建实例
-
-2. applyMergedBeanDefinitionPostProcessors()
-   - 收集注入元数据（@Autowired、@Resource）
-
-3. addSingletonFactory()
-   - 解决循环依赖
-   - 注册 ObjectFactory 到三级缓存
-
-4. populateBean()
-   - 属性注入
-   - 处理 @Autowired、@Resource、@Value
-
-5. initializeBean()
-   - 初始化 Bean
-
-6. registerDisposableBean()
-   - 注册销毁逻辑</code></pre>
-
-            <h3>4. initializeBean() 流程</h3>
-            <pre><code>initializeBean():
-
-1. invokeAwareMethods()
-   - BeanNameAware.setBeanName()
-   - BeanClassLoaderAware.setBeanClassLoader()
-   - BeanFactoryAware.setBeanFactory()
-
-2. applyBeanPostProcessorsBeforeInitialization()
-   - ApplicationContextAwareProcessor：处理 ApplicationContextAware
-   - InitDestroyAnnotationBeanPostProcessor：处理 @PostConstruct
-
-3. invokeInitMethods()
-   - InitializingBean.afterPropertiesSet()
-   - XML 配置的 init-method
-
-4. applyBeanPostProcessorsAfterInitialization()
-   - AbstractAutoProxyCreator：创建 AOP 代理
-   - AsyncAnnotationBeanPostProcessor：创建异步代理</code></pre>
-
-            <h3>5. 三级缓存实现</h3>
-            <pre><code>三级缓存：
-
-一级：singletonObjects（ConcurrentHashMap）
-- 完整的单例 Bean
-
-二级：earlySingletonObjects（HashMap）
-- 早期单例对象（属性未注入）
-
-三级：singletonFactories（HashMap）
-- 单例工厂（ObjectFactory）
-
-流程：
-
-1. A 创建
-   - 标记 singletonsCurrentlyInCreation.add(A)
-   - 实例化 A（属性未注入）
-   - 注册 singletonFactories.put(A, () -> getEarlyBeanReference(A))
-
-2. A 注入 B
-   - getBean(B)
-   - B 创建
-
-3. B 创建
-   - 实例化 B
-   - 注册 singletonFactories.put(B, ...)
-
-4. B 注入 A
-   - getBean(A)
-   - A 在 singletonsCurrentlyInCreation 中
-   - 循环依赖！
-
-5. 从缓存获取 A
-   - singletonObjects：没有
-   - earlySingletonObjects：没有
-   - singletonFactories：有
-   - 执行 ObjectFactory.getObject()
-   - 返回早期 A（可能已代理）
-   - 放入 earlySingletonObjects
-   - 移除 singletonFactories
-
-6. B 注入早期 A
-   - B 完成
-   - singletonObjects.put(B)
-
-7. A 注入 B
-   - B 已在 singletonObjects
-   - A 完成
-   - singletonObjects.put(A)
-   - 移除 earlySingletonObjects(A)</code></pre>
+            <div class="flow-diagram">
+                <div class="flow-title">循环依赖解决流程（A依赖B，B依赖A）</div>
+                <div class="cycle-flow">
+                    <div class="cycle-column bean-a">
+                        <h4 style="color:#667eea;margin-bottom:15px;">Bean A 创建流程</h4>
+                        <div class="cycle-step-item">
+                            <div class="step-num">1</div>
+                            <div class="step-content">getBean(A) 开始创建</div>
+                        </div>
+                        <div class="cycle-step-item">
+                            <div class="step-num">2</div>
+                            <div class="step-content">标记 A 正在创建</div>
+                        </div>
+                        <div class="cycle-step-item">
+                            <div class="step-num">3</div>
+                            <div class="step-content">实例化 A（属性未注入）</div>
+                        </div>
+                        <div class="cycle-step-item">
+                            <div class="step-num">4</div>
+                            <div class="step-content">注册三级缓存<br><code>singletonFactories.put(A, () -> getEarlyBeanReference(A))</code></div>
+                        </div>
+                        <div class="cycle-step-item">
+                            <div class="step-num">5</div>
+                            <div class="step-content">populateBean() 注入属性</div>
+                        </div>
+                        <div class="cycle-step-item">
+                            <div class="step-num">6</div>
+                            <div class="step-content">发现需要注入 B → getBean(B)</div>
+                        </div>
+                        <div class="cycle-step-item" style="background:#e8f5e9;padding:10px;border-radius:6px;">
+                            <div class="step-num" style="background:#28a745;">12</div>
+                            <div class="step-content">B 完成后注入 B</div>
+                        </div>
+                        <div class="cycle-step-item" style="background:#e8f5e9;padding:10px;border-radius:6px;">
+                            <div class="step-num" style="background:#28a745;">13</div>
+                            <div class="step-content">initializeBean() 初始化 A</div>
+                        </div>
+                        <div class="cycle-step-item" style="background:#e8f5e9;padding:10px;border-radius:6px;">
+                            <div class="step-num" style="background:#28a745;">14</div>
+                            <div class="step-content">放入一级缓存，移除二三级</div>
+                        </div>
+                    </div>
+                    <div class="cycle-column bean-b">
+                        <h4 style="color:#38ef7d;margin-bottom:15px;">Bean B 创建流程</h4>
+                        <div class="cycle-step-item">
+                            <div class="step-num" style="background:#11998e;">7</div>
+                            <div class="step-content">getBean(B) 开始创建</div>
+                        </div>
+                        <div class="cycle-step-item">
+                            <div class="step-num" style="background:#11998e;">8</div>
+                            <div class="step-content">标记 B 正在创建</div>
+                        </div>
+                        <div class="cycle-step-item">
+                            <div class="step-num" style="background:#11998e;">9</div>
+                            <div class="step-content">实例化 B</div>
+                        </div>
+                        <div class="cycle-step-item">
+                            <div class="step-num" style="background:#11998e;">10</div>
+                            <div class="step-content">populateBean() 注入属性</div>
+                        </div>
+                        <div class="cycle-step-item">
+                            <div class="step-num" style="background:#11998e;">11</div>
+                            <div class="step-content">发现需要注入 A → getBean(A)</div>
+                        </div>
+                        <div class="cycle-step-item" style="background:#fff3cd;padding:10px;border-radius:6px;">
+                            <div class="step-num" style="background:#ffc107;">!</div>
+                            <div class="step-content">A 正在创建中 → 循环依赖<br>从三级缓存获取 A<br>放入二级缓存</div>
+                        </div>
+                        <div class="cycle-step-item" style="background:#e8f5e9;padding:10px;border-radius:6px;">
+                            <div class="step-num" style="background:#28a745;">!</div>
+                            <div class="step-content">注入早期 A，完成 B</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <h2>二、AOP 底层原理</h2>
 
-            <h3>1. AbstractAutoProxyCreator</h3>
-            <pre><code>AbstractAutoProxyCreator：核心 AOP 后处理器
+            <h3>1. AOP 代理创建流程</h3>
+            <div class="flow-diagram">
+                <div class="flow-title">AbstractAutoProxyCreator - AOP代理创建</div>
+                <div class="flow-container">
+                    <div class="flow-step">
+                        <div class="flow-box primary">postProcessAfterInitialization()</div>
+                        <div class="flow-label">Bean初始化后调用</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">wrapIfNecessary()</div>
+                        <div class="flow-label">判断是否需要代理</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">getAdvicesAndAdvisorsForBean()</div>
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">findCandidateAdvisors()</div>
+                            <div class="flow-box detail">findAdvisorsThatCanApply()</div>
+                            <div class="flow-box detail">sortAdvisors()</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box important">createProxy()</div>
+                        <div class="flow-label">创建代理对象</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">有接口 → JDK动态代理</div>
+                            <div class="flow-box detail">无接口 → CGLIB代理</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-postProcessAfterInitialization():
-1. 检查是否已处理
-2. wrapIfNecessary(bean, beanName, cacheKey)
+            <h3>2. 拦截器链执行流程</h3>
+            <div class="flow-diagram">
+                <div class="flow-title">方法调用时拦截器链执行顺序</div>
+                <div class="chain-diagram">
+                    <div class="chain-box before">@Before<br>前置通知</div>
+                    <div class="chain-arrow">→</div>
+                    <div class="chain-box before">@Around<br>环绕通知(前半)</div>
+                    <div class="chain-arrow">→</div>
+                    <div class="chain-box target">目标方法<br>执行</div>
+                    <div class="chain-arrow">→</div>
+                    <div class="chain-box after">@Around<br>环绕通知(后半)</div>
+                    <div class="chain-arrow">→</div>
+                    <div class="chain-box after">@AfterReturning<br>返回通知</div>
+                </div>
+                <div class="chain-diagram" style="justify-content:flex-start;gap:5px;margin-top:10px;">
+                    <div style="font-size:12px;color:#dc3545;">异常时：</div>
+                    <div class="chain-box throwing">@AfterThrowing<br>异常通知</div>
+                    <div class="chain-arrow">→</div>
+                    <div class="chain-box after">@After<br>后置通知</div>
+                </div>
+            </div>
 
-wrapIfNecessary():
-1. getAdvicesAndAdvisorsForBean()
-   - 查找适用的 Advisor
-   - 返回拦截器数组
-
-2. createProxy()
-   - 创建代理对象
-
-getAdvicesAndAdvisorsForBean():
-1. findCandidateAdvisors()：找所有候选 Advisor
-2. findAdvisorsThatCanApply()：筛选适用的 Advisor
-3. sortAdvisors()：排序</code></pre>
-
-            <h3>2. JdkDynamicAopProxy</h3>
-            <pre><code>JdkDynamicAopProxy：JDK 动态代理实现
-
-字段：
-- AdvisedSupport advised：代理配置
-  - targetSource：目标对象
-  - advisors：Advisor 列表
-  - interfaces：接口列表
-
-invoke(Object proxy, Method method, Object[] args):
-1. equals/hashCode/toString：特殊处理
-
-2. getInterceptorsAndDynamicInterceptionAdvice()
-   - 获取拦截器链
-
-3. ReflectiveMethodInvocation.proceed()
-   - 执行拦截器链</code></pre>
-
-            <h3>3. 拦截器链执行</h3>
-            <pre><code>ReflectiveMethodInvocation:
-
-字段：
-- proxy：代理对象
-- target：目标对象
-- method：方法
-- args：参数
-- interceptorsAndDynamicMethodMatchers：拦截器列表
-- currentInterceptorIndex：当前索引
-
-proceed():
-if (currentInterceptorIndex == interceptors.size() - 1)
-    return invokeJoinpoint();  // 执行目标方法
-
-Object interceptor = interceptors.get(++currentInterceptorIndex);
-return interceptor.invoke(this);
-
-拦截器类型：
-- MethodBeforeAdviceInterceptor：执行前置通知，然后 proceed()
-- AfterReturningAdviceInterceptor：proceed()，然后执行返回通知
-- ThrowsAdviceInterceptor：try { proceed() } catch，执行异常通知
-- AspectJAfterAdvice：proceed()，然后执行后置通知</code></pre>
+            <div class="flow-diagram">
+                <div class="flow-title">ReflectiveMethodInvocation.proceed() 源码逻辑</div>
+                <div class="flow-container">
+                    <div class="flow-step">
+                        <div class="flow-box primary">proceed()</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">currentInterceptorIndex == interceptors.size() - 1 ?</div>
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">是 → invokeJoinpoint()</div>
+                            <div class="flow-box detail">否 → 继续</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">获取下一个拦截器</div>
+                        <div class="flow-label">interceptors.get(++currentInterceptorIndex)</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box important">interceptor.invoke(this)</div>
+                        <div class="flow-label">拦截器执行，内部调用proceed()</div>
+                    </div>
+                </div>
+            </div>
 
             <h2>三、事务底层原理</h2>
 
-            <h3>1. TransactionInterceptor</h3>
-            <pre><code>TransactionInterceptor：事务拦截器
+            <h3>1. 事务执行流程</h3>
+            <div class="flow-diagram">
+                <div class="tx-flow">
+                    <div class="tx-step">
+                        <div class="tx-icon begin">1</div>
+                        <div class="tx-content">
+                            <h4>开启事务 tm.getTransaction()</h4>
+                            <p>DataSourceTransactionManager.doBegin()</p>
+                            <p>connection.setAutoCommit(false)</p>
+                            <p>绑定Connection到ThreadLocal</p>
+                        </div>
+                    </div>
+                    <div class="tx-step">
+                        <div class="tx-icon exec">2</div>
+                        <div class="tx-content">
+                            <h4>执行业务方法 invocation.proceedWithInvocation()</h4>
+                            <p>调用目标方法</p>
+                            <p>所有SQL共用同一个Connection</p>
+                        </div>
+                    </div>
+                    <div class="tx-step">
+                        <div class="tx-icon commit">3</div>
+                        <div class="tx-content">
+                            <h4>提交事务 commitTransactionAfterReturning()</h4>
+                            <p>connection.commit()</p>
+                            <p>释放Connection</p>
+                        </div>
+                    </div>
+                    <div class="tx-step">
+                        <div class="tx-icon rollback">4</div>
+                        <div class="tx-content" style="background:#ffebee;">
+                            <h4>异常时回滚 rollbackOnException()</h4>
+                            <p>connection.rollback()</p>
+                            <p>根据rollbackFor判断是否回滚</p>
+                        </div>
+                    </div>
+                    <div class="tx-step">
+                        <div class="tx-icon end">5</div>
+                        <div class="tx-content">
+                            <h4>清理 cleanupAfterCompletion()</h4>
+                            <p>解绑ThreadLocal中的Connection</p>
+                            <p>恢复挂起的事务（如果有）</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-invoke(MethodInvocation invocation):
-1. getTransactionAttribute()
-   - 获取事务属性
+            <h3>2. 事务传播行为</h3>
+            <div class="flow-diagram">
+                <div class="flow-title">REQUIRED vs REQUIRES_NEW vs NESTED</div>
+                <div class="flow-container">
+                    <div class="flow-step">
+                        <div class="flow-box normal">REQUIRED（默认）</div>
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">有事务 → 加入</div>
+                            <div class="flow-box detail">无事务 → 新建</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box important">REQUIRES_NEW</div>
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">总是新建事务</div>
+                            <div class="flow-box detail">挂起当前事务</div>
+                            <div class="flow-box detail">独立提交/回滚</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">NESTED</div>
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">创建Savepoint</div>
+                            <div class="flow-box detail">嵌套事务</div>
+                            <div class="flow-box detail">部分回滚</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-2. determineTransactionManager()
-   - 确定事务管理器
-
-3. invokeWithinTransaction()
-   - tm.getTransaction(txAttr)
-   - invocation.proceedWithInvocation()
-   - commitTransactionAfterReturning()</code></pre>
-
-            <h3>2. DataSourceTransactionManager.doBegin()</h3>
-            <pre><code>doBegin():
-
-1. 获取 Connection
-   Connection con = dataSource.getConnection()
-
-2. 设置隔离级别
-   con.setTransactionIsolation(isolationLevel)
-
-3. 设置只读
-   if (readOnly) con.setReadOnly(true)
-
-4. 关闭自动提交
-   con.setAutoCommit(false)
-
-5. 创建 ConnectionHolder
-   holder = new ConnectionHolder(con)
-
-6. 绑定到线程
-   TransactionSynchronizationManager.bindResource(dataSource, holder)
-   - resources（ThreadLocal&lt;Map&lt;Object, Object&gt;&gt;）
-   - dataSource → ConnectionHolder</code></pre>
-
-            <h3>3. 事务传播行为实现</h3>
-            <pre><code>PROPAGATION_REQUIRED（默认）：
-- 已有事务：加入
-- 无事务：创建新事务
-
-PROPAGATION_REQUIRES_NEW：
-- 总是创建新事务
-- 挂起当前事务
-- 保存 suspendedResources
-
-PROPAGATION_NESTED：
-- 创建嵌套事务（Savepoint）
-- con.setSavepoint()</code></pre>
+            <h3>3. Connection绑定ThreadLocal</h3>
+            <div class="flow-diagram">
+                <div class="flow-title">TransactionSynchronizationManager 线程绑定机制</div>
+                <div class="flow-container">
+                    <div class="flow-step">
+                        <div class="flow-box primary">ThreadLocal&lt;Map&lt;Object, Object&gt;&gt; resources</div>
+                        <div class="flow-label">每个线程独立的资源Map</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">bindResource(dataSource, connectionHolder)</div>
+                        <div class="flow-label">绑定Connection到线程</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">Thread-1</div>
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">dataSource → Connection1</div>
+                        </div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">Thread-2</div>
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">dataSource → Connection2</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box important">同一事务中的所有DAO共用同一个Connection</div>
+                    </div>
+                </div>
+            </div>
 
             <h2>四、自动配置底层原理</h2>
 
-            <h3>1. @EnableAutoConfiguration</h3>
-            <pre><code>@EnableAutoConfiguration:
-@Import(AutoConfigurationImportSelector.class)
-
-AutoConfigurationImportSelector:
-selectImports():
-1. getCandidateConfigurations()
-   - SpringFactoriesLoader.loadFactoryNames()
-   - META-INF/spring.factories
-   - key: EnableAutoConfiguration
-
-2. removeDuplicates()
-   - 去重
-
-3. getExclusions()
-   - 排除配置
-
-4. filter()
-   - OnClassCondition
-   - OnBeanCondition
-   - OnPropertyCondition
-   - 过滤不满足条件的配置</code></pre>
-
-            <h3>2. Condition 实现</h3>
-            <pre><code>@ConditionalOnClass：
-- OnClassCondition.matches()
-- ClassUtils.isPresent(className, classLoader)
-- 检查类是否存在
-
-@ConditionalOnBean：
-- OnBeanCondition.matches()
-- BeanFactory.containsBeanDefinition(beanName)
-- 检查 Bean 是否存在
-
-@ConditionalOnProperty：
-- OnPropertyCondition.matches()
-- Environment.getProperty(key)
-- 检查属性值
-
-@ConditionalOnMissingBean：
-- 检查 Bean 不存在
-- 通常用于默认配置</code></pre>
+            <h3>1. @EnableAutoConfiguration 流程</h3>
+            <div class="flow-diagram">
+                <div class="flow-title">AutoConfigurationImportSelector 执行流程</div>
+                <div class="flow-container">
+                    <div class="flow-step">
+                        <div class="flow-box primary">@EnableAutoConfiguration</div>
+                        <div class="flow-label">@Import(AutoConfigurationImportSelector.class)</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">selectImports()</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">getCandidateConfigurations()</div>
+                        <div class="flow-label">SpringFactoriesLoader.loadFactoryNames()</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-box detail">META-INF/spring.factories</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">removeDuplicates()</div>
+                        <div class="flow-label">去重</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box normal">getExclusions()</div>
+                        <div class="flow-label">排除配置</div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box important">filter()</div>
+                        <div class="flow-label">条件过滤</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-horizontal">
+                            <div class="flow-box detail">OnClassCondition</div>
+                            <div class="flow-box detail">OnBeanCondition</div>
+                            <div class="flow-box detail">OnPropertyCondition</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">
+                        <div class="flow-box secondary">返回需要加载的配置类</div>
+                    </div>
+                </div>
+            </div>
 
             <div class="page-nav">
                 <a href="深入原理_04_Redis底层.html" class="prev-page">←上一篇：Redis 底层</a>
+                <span style="flex-grow:1"></span>
                 <a href="index.html" class="home-page">返回目录</a>
+                <span style="flex-grow:1"></span>
+                <a href="深入原理_06_SpringBoot底层.html" class="next-page">下一篇：SpringBoot 底层→</a>
             </div>
         </article>
     </main>
