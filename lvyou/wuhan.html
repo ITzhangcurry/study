@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>武汉 9/22–9/24 · 孕妇一人独行出差版 · 汉庭同济医学院店出发 | 时间窗 · 三块碎片 · 路线 · 避坑 · 伴手礼 · 应急</title>
+<style>
+  :root{
+    --ink:#1E2A32;
+    --ink-2:#3B4B57;
+    --muted:#6E7F8D;
+    --line:#E4E0D8;
+    --bg:#F7F5F0;
+    --card:#FFFFFF;
+    --river:#3E97BE;
+    --river-soft:#DCEFF6;
+    --accent:#E2582F;
+    --accent-soft:#FDEDE6;
+    --gold:#C8912F;
+    --gold-soft:#FBF2DF;
+    --green:#2F8F6B;
+    --green-soft:#E6F4EE;
+    --red:#C63B2F;
+    --red-soft:#FDECEA;
+    --shadow:0 1px 2px rgba(30,42,50,.05), 0 8px 24px -12px rgba(30,42,50,.18);
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB","Source Han Sans SC","Noto Sans CJK SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    font-size:15px;
+    line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent);text-decoration:none;}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 20px;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    background:linear-gradient(160deg,#0E3A57 0%,#155E7E 45%,#2E86AB 100%);
+    color:#fff;
+    padding:56px 0 44px;
+    overflow:hidden;
+  }
+  .hero .kicker{
+    display:inline-block;
+    font-size:12px;letter-spacing:.16em;
+    color:#AEE0F4;
+    border:1px solid rgba(174,224,244,.45);
+    padding:4px 12px;border-radius:999px;
+    margin-bottom:18px;
+  }
+  .hero h1{
+    margin:0 0 10px;
+    font-size:36px;line-height:1.25;letter-spacing:.01em;
+    font-weight:800;
+  }
+  .hero h1 em{font-style:normal;color:#FFC98B;}
+  .hero p.lead{
+    margin:0;max-width:680px;
+    color:#CFE7F3;font-size:15.5px;
+  }
+  .hero-meta{
+    display:flex;flex-wrap:wrap;gap:10px;margin-top:26px;
+  }
+  .hero-meta span{
+    background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.18);
+    border-radius:999px;
+    padding:6px 14px;
+    font-size:13px;color:#EAF6FB;
+  }
+  .hero-warn{
+    margin-top:26px;
+    padding:16px 20px;
+    background:rgba(255,201,139,.14);
+    border-left:3px solid #FFC98B;
+    border-radius:0 10px 10px 0;
+    font-size:13.5px;color:#FBEEDC;
+    max-width:760px;
+  }
+  .hero-warn b{color:#FFD9A8;}
+  .hero-warn ul{margin:8px 0 0;padding-left:18px;}
+  .hero-warn li{margin-bottom:3px;}
+  .hero-start{
+    margin-top:16px;
+    padding:14px 18px;
+    background:rgba(255,255,255,.10);
+    border-left:3px solid #AEE0F4;
+    border-radius:0 10px 10px 0;
+    font-size:14px;color:#EAF6FB;
+    max-width:760px;
+  }
+  .hero-start b{color:#fff;}
+
+  /* ---------- NAV ---------- */
+  nav.toc{
+    position:sticky;top:0;z-index:50;
+    background:rgba(247,245,240,.92);
+    border-bottom:1px solid var(--line);
+  }
+  nav.toc .wrap{display:flex;gap:6px;overflow-x:auto;padding:10px 20px;}
+  nav.toc a{
+    white-space:nowrap;font-size:13.5px;color:var(--ink-2);
+    padding:6px 13px;border-radius:999px;border:1px solid transparent;
+  }
+  nav.toc a:hover{background:#fff;border-color:var(--line);color:var(--accent);}
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:44px 0 8px;}
+  .sec-head{margin-bottom:22px;}
+  .sec-head .num{
+    font-size:12px;letter-spacing:.2em;color:var(--accent);font-weight:700;
+    display:block;margin-bottom:6px;
+  }
+  .sec-head h2{margin:0 0 6px;font-size:24px;letter-spacing:.01em;}
+  .sec-head p{margin:0;color:var(--muted);font-size:14px;}
+
+  /* ---------- STAT BAR ---------- */
+  .stats{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:12px;margin-bottom:6px;
+  }
+  .stat{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px 18px;box-shadow:var(--shadow);
+  }
+  .stat .v{font-size:21px;font-weight:800;letter-spacing:-.01em;}
+  .stat .k{font-size:12.5px;color:var(--muted);margin-top:2px;}
+  .stat.blue .v{color:var(--river);}
+  .stat.orange .v{color:var(--accent);}
+  .stat.gold .v{color:var(--gold);}
+  .stat.green .v{color:var(--green);}
+  .stat .k s{color:#B0BAC2;}
+
+  /* ---------- TABLE ---------- */
+  .table-card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);overflow:hidden;
+  }
+  table{width:100%;border-collapse:collapse;font-size:14px;}
+  thead th{
+    background:#F2F6F8;text-align:left;font-size:12.5px;letter-spacing:.06em;
+    color:var(--ink-2);font-weight:700;padding:11px 16px;border-bottom:1px solid var(--line);
+    white-space:nowrap;
+  }
+  tbody td{padding:11px 16px;border-bottom:1px solid #F0EDE7;vertical-align:top;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:#FCFBF9;}
+  td.time{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:700;color:var(--ink);width:124px;}
+  td.k-ind{color:var(--muted);font-size:13px;white-space:nowrap;}
+  .row-rest{background:var(--gold-soft) !important;}
+  .row-rest:hover{background:#F8EEDC !important;}
+  .row-work{background:#F4F0F8 !important;border-left:3px solid #6B5DA8;}
+  .row-work:hover{background:#ECE6F2 !important;}
+
+  /* ---------- TIMELINE ---------- */
+  .timeline{position:relative;margin-top:8px;}
+  .timeline::before{
+    content:"";position:absolute;left:77px;top:14px;bottom:26px;
+    width:2px;background:linear-gradient(180deg,var(--river),var(--accent) 60%,var(--gold));
+    opacity:.28;
+  }
+  .stop{
+    display:grid;grid-template-columns:60px 34px 1fr;
+    gap:0 14px;margin-bottom:18px;
+  }
+  .stop .t{
+    text-align:right;padding-top:16px;
+    font-size:13.5px;font-weight:700;font-variant-numeric:tabular-nums;
+    color:var(--ink-2);line-height:1.4;
+  }
+  .stop .t small{display:block;font-weight:400;color:var(--muted);font-size:11.5px;}
+  .stop .dot{position:relative;padding-top:15px;}
+  .stop .dot i{
+    display:flex;align-items:center;justify-content:center;
+    width:28px;height:28px;border-radius:50%;
+    background:#fff;border:2px solid var(--river);
+    color:var(--river);font-size:13px;font-weight:800;font-style:normal;
+    box-shadow:0 0 0 4px var(--bg);
+  }
+  .stop.food .dot i{border-color:var(--accent);color:var(--accent);}
+  .stop.sight .dot i{border-color:var(--green);color:var(--green);}
+  .stop.rest .dot i{border-color:var(--gold);color:var(--gold);}
+  .stop .body{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:15px 18px 16px;box-shadow:var(--shadow);
+  }
+  .stop.rest .body{border-color:#EFDDBA;background:#FEFCF7;}
+  .stop .body h3{
+    margin:0 0 2px;font-size:16.5px;letter-spacing:.01em;
+    display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;
+  }
+  .stop .body h3 .tag{
+    font-size:11px;font-weight:600;letter-spacing:.05em;
+    padding:2px 8px;border-radius:6px;flex:none;
+  }
+  .tag.go{background:var(--river-soft);color:#1D6E91;}
+  .tag.eat{background:var(--accent-soft);color:#B8431E;}
+  .tag.play{background:var(--green-soft);color:#1F7355;}
+  .tag.rest{background:var(--gold-soft);color:#8A6A1C;}
+  .tag.free{background:#EFEFE9;color:#5F6B63;}
+  .tag.cut{background:var(--red-soft);color:#9E2E23;}
+  .tag.work{background:#F4F0F8;color:#6B5DA8;}
+  .stop .body .meta{
+    font-size:12.5px;color:var(--muted);margin-bottom:8px;
+    display:flex;flex-wrap:wrap;gap:4px 14px;
+  }
+  .stop .body p{margin:8px 0 0;font-size:14px;color:var(--ink-2);}
+  .stop .body p:first-of-type{margin-top:0;}
+  .tips{
+    margin-top:11px;padding:10px 13px;
+    background:#FBFAF6;border-left:3px solid var(--gold);
+    border-radius:0 8px 8px 0;font-size:13px;color:#5C5648;
+  }
+  .tips b{color:#8A6A1C;}
+  .tips.warn{background:var(--red-soft);border-left-color:var(--red);color:#7C2F26;}
+  .tips.warn b{color:#9E2E23;}
+  .tips.ok{background:var(--green-soft);border-left-color:var(--green);color:#255C46;}
+  .tips.ok b{color:#1F7355;}
+
+  /* ---------- DAY SEPARATOR ---------- */
+  .day-sep{
+    display:flex;align-items:center;gap:12px;
+    margin:30px 0 18px;
+  }
+  .day-sep:first-child{margin-top:4px;}
+  .day-sep .d{
+    font-size:11.5px;font-weight:800;letter-spacing:.12em;
+    color:#fff;background:var(--ink-2);
+    padding:5px 12px;border-radius:999px;flex:none;
+  }
+  .day-sep .t2{font-size:15.5px;font-weight:700;color:var(--ink);flex:none;}
+  .day-sep .t2 small{font-weight:400;color:var(--muted);font-size:12.5px;margin-left:6px;}
+  .day-sep .line{flex:1;height:1px;background:var(--line);}
+  .day-sep.a .d{background:var(--river);}
+  .day-sep.b .d{background:var(--accent);}
+  .day-sep.c .d{background:var(--green);}
+
+  /* ---------- GRID / CARDS ---------- */
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px;}
+  .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;}
+  .food-card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:17px 19px;box-shadow:var(--shadow);
+  }
+  .food-card.ok{border-top:3px solid var(--green);}
+  .food-card.warn{border-top:3px solid var(--gold);}
+  .food-card.no{border-top:3px solid var(--red);}
+  .food-card h4{
+    margin:0 0 3px;font-size:15.5px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .food-card .loc{font-size:12.5px;color:var(--muted);margin-bottom:10px;}
+  .food-card ul{margin:0;padding-left:0;list-style:none;}
+  .food-card li{
+    font-size:13.5px;color:var(--ink-2);padding:5px 0 5px 15px;position:relative;
+  }
+  .food-card li::before{
+    content:"";position:absolute;left:0;top:13px;
+    width:5px;height:5px;border-radius:50%;background:var(--accent);opacity:.7;
+  }
+  .food-card.ok li::before{background:var(--green);}
+  .food-card.no li::before{background:var(--red);}
+  .food-card li b{color:var(--ink);}
+
+  /* ---------- MAP ---------- */
+  .map-card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:16px 16px 8px;overflow:hidden;
+  }
+  .map-card svg{width:100%;height:auto;display:block;}
+  .map-note{font-size:12px;color:var(--muted);text-align:center;padding:6px 0 8px;}
+
+  /* ---------- ALT CARD ---------- */
+  .alt{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:18px 20px;
+  }
+  .alt h3{margin:0 0 4px;font-size:16.5px;}
+  .alt .why{font-size:13px;color:var(--muted);margin-bottom:11px;}
+  .alt ol{margin:0;padding-left:20px;font-size:14px;color:var(--ink-2);}
+  .alt ol li{margin-bottom:4px;}
+
+  /* ---------- CALLOUT ---------- */
+  .callout{
+    margin-top:16px;padding:14px 18px;border-radius:var(--radius);
+    background:var(--gold-soft);border:1px solid #EFDDBA;
+    font-size:13.5px;color:#6B5615;
+  }
+  .callout b{color:#8A6A1C;}
+  .callout.blue{background:var(--river-soft);border-color:#C3E3EF;color:#18566F;}
+  .callout.blue b{color:#124A60;}
+  .callout.red{background:var(--red-soft);border-color:#F3CFC9;color:#7C2F26;}
+  .callout.red b{color:#9E2E23;}
+
+  ul.check{margin:0;padding-left:0;list-style:none;}
+  ul.check li{padding:6px 0 6px 24px;position:relative;font-size:14px;color:var(--ink-2);}
+  ul.check li::before{
+    content:"";position:absolute;left:2px;top:14px;width:11px;height:6px;
+    border-left:2px solid var(--green);border-bottom:2px solid var(--green);
+    transform:rotate(-45deg);
+  }
+  ul.cross{margin:0;padding-left:0;list-style:none;}
+  ul.cross li{padding:6px 0 6px 24px;position:relative;font-size:14px;color:var(--ink-2);}
+  ul.cross li::before{
+    content:"";position:absolute;left:4px;top:15px;width:12px;height:2px;
+    background:var(--red);transform:rotate(45deg);
+  }
+  ul.cross li::after{
+    content:"";position:absolute;left:4px;top:15px;width:12px;height:2px;
+    background:var(--red);transform:rotate(-45deg);
+  }
+
+  .pill{
+    display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.04em;
+    padding:1px 8px;border-radius:999px;margin-right:6px;vertical-align:1px;
+  }
+  .pill.ok{background:var(--green-soft);color:#1F7355;}
+  .pill.warn{background:var(--gold-soft);color:#8A6A1C;}
+  .pill.no{background:var(--red-soft);color:#9E2E23;}
+
+  .med{
+    background:var(--card);border:1px solid var(--line);border-left:4px solid var(--red);
+    border-radius:var(--radius);padding:16px 19px;box-shadow:var(--shadow);
+    margin-bottom:12px;
+  }
+  .med h4{margin:0 0 4px;font-size:16px;}
+  .med .addr{font-size:13.5px;color:var(--ink-2);}
+  .med .dist{font-size:13px;color:var(--red);font-weight:700;margin-top:4px;}
+
+  footer{
+    margin-top:52px;padding:26px 0 40px;border-top:1px solid var(--line);
+    font-size:12.5px;color:var(--muted);line-height:1.9;
+  }
+
+  @media (max-width:720px){
+    .hero{padding:40px 0 34px;}
+    .hero h1{font-size:26px;}
+    .timeline::before{left:0;display:none;}
+    .stop{grid-template-columns:1fr;gap:8px;}
+    .stop .t{text-align:left;padding-top:0;display:flex;gap:8px;align-items:baseline;}
+    .stop .t small{display:inline;}
+    .stop .dot{display:none;}
+    td.k-ind{display:none;}
+    thead th:nth-child(3){display:none;}
+  }
+  @media print{
+    body{background:#fff;font-size:11.5px;}
+    nav.toc{display:none;}
+    .hero{background:#12455F !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .stop .body,.stat,.table-card,.food-card,.alt,.map-card,.med{box-shadow:none;}
+    section{padding:18px 0 4px;page-break-inside:avoid;}
+    .stop{page-break-inside:avoid;}
+    footer{margin-top:20px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="kicker">WUHAN · 一人独行 · 孕中期 · 9/22 晚到 → 9/24 中午走</span>
+    <h1>武汉 9/22–9/24 · 孕妇独行版<br><em>今晚安顿 → 9/23 早晚插空 → 9/24 上午收尾送站</em></h1>
+    <p class="lead">时间窗已经定死：<b>9/22 19:40 到武汉，9/24 14:09 发车离汉</b>，中间夹着一个大概率要工作的 9/23。所以这趟真正能自由支配的<b>只有三块碎片</b>——今晚 20:50–22:30 的安顿时间、9/23 工作插空的早晚、9/24 上午退房前的 3 小时 45 分。下面把这两天半的<b>每一个时段都排进去了</b>：不按「一整天」排，按这三块碎片排，哪块有空就从哪块接上。</p>
+
+    <div class="hero-meta">
+      <span>🚄 9/22 19:40 抵达武汉</span>
+      <span>🚄 9/24 14:09 发车离汉</span>
+      <span>📍 汉庭（武汉解放大道同济医学院店）· 住 2 晚</span>
+      <span>🕚 9/24 11:00 退房 · 11:20 出发去车站</span>
+      <span>🚶 单日步行控制在 4 公里内</span>
+    </div>
+
+
+    <div class="hero-start">
+      <b>出发点：</b>硚口区解放大道 1037 号（湖北商务大楼 · 时代天骄商业中心）<br>
+      <b>最近地铁：</b>1 号线 <b>硚口路站</b>（约 880 米，步行 13 分钟）<br>
+      <b>最大底气：</b>华中科技大学同济医学院附属同济医院（汉口院区）就在解放大道 1095 号，<b>距酒店约 300 米</b>，步行 5 分钟，三甲、妇产科全国顶尖。<br>
+      <b>一个人走的底线：</b>手机电量、位置共享、能随时打车的预算 —— 这三样比省下任何一笔钱都重要。
+    </div>
+
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#overview">三天时间表</a>
+    <a href="#route">详细路线</a>
+    <a href="#map">路线示意</a>
+    <a href="#food">吃什么</a>
+    <a href="#gift">伴手礼</a>
+    <a href="#rest">休息点</a>
+    <a href="#traffic">交通预算</a>
+    <a href="#safety">安全应急</a>
+    <a href="#alt">备选方案</a>
+    <a href="#tips">贴士</a>
+  </div>
+</nav>
+
+<!-- ============ 行程一览 ============ -->
+<section id="overview">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="num">01 / MASTER SCHEDULE</span>
+      <h2>三天全部时间安排</h2>
+      <p>9/22 19:40 到站 → 9/24 14:09 发车。下面把这两天半的每一个时段都排进去，<b>空着的地方，就是可以机动的地方</b>。</p>
+    </div>
+
+    <div class="stats">
+      <div class="stat blue"><div class="v">19:40</div><div class="k">9/22 抵达武汉</div></div>
+      <div class="stat green"><div class="v">14:09</div><div class="k">9/24 发车离汉</div></div>
+      <div class="stat gold"><div class="v">2 晚</div><div class="k">住汉庭 · 同济店</div></div>
+      <div class="stat orange"><div class="v">11:20</div><div class="k">9/24 最晚出发去车站</div></div>
+    </div>
+
+    <div class="callout blue" style="margin:18px 0 0;">
+      <b>先认清现实：这趟的自由时间只有三块。</b>
+      <ul style="margin:8px 0 0;padding-left:18px;">
+        <li><b>碎片 A · 9/22 晚</b>　20:50 到酒店 → 22:30 睡。只够吃一顿饭 + 收拾，别安排任何景点。</li>
+        <li><b>碎片 B · 9/23 全天</b>　07:00–20:50。唯一能跑完整线路的一天，但要给工作让路 —— <b>工作几点结束，就从哪一站接上</b>。</li>
+        <li><b>碎片 C · 9/24 上午</b>　07:30–11:15。退房 + 就近半程，<b>11:20 必须出发去车站</b>，这是全程唯一的硬约束。</li>
+      </ul>
+      <b>只有两件事不能被压缩：9/23 中午回酒店午休的那 2 小时，和 9/24 11:00 前退房。</b>其余都可以砍。
+    </div>
+
+
+    <h3 style="margin:28px 0 10px;font-size:17px;">🌙 D1 · 9/22（周二）晚　落地 → 安顿 <span style="font-size:12.5px;font-weight:400;color:var(--muted);">碎片 A</span></h3>
+    <div class="table-card">
+      <table>
+        <thead><tr><th>时间</th><th>安排</th><th>怎么去</th><th>备注</th></tr></thead>
+        <tbody>
+          <tr><td class="time">19:40–20:05</td><td><b>抵达武汉站</b>，出站找车</td><td class="k-ind">按站内「网约车」指示牌走</td><td class="k-ind">不要跟站前揽客的走</td></tr>
+          <tr><td class="time">20:05–20:50</td><td><b>打车 → 汉庭（同济医学院店）</b></td><td class="k-ind">22–25 km / 40–50 分 / 约 75 元</td><td class="k-ind">若票面是汉口站，20 分钟就到</td></tr>
+          <tr><td class="time">20:50–21:20</td><td><b>办理入住</b>、放行李、洗手</td><td class="k-ind">步行</td><td class="k-ind">房卡套拍照存手机</td></tr>
+          <tr class="row-rest"><td class="time">21:20–22:00</td><td><b>晚餐</b>：就近堂食 或 外卖到房</td><td class="k-ind">步行 5–10 分 / 外卖</td><td class="k-ind">只吃「热、熟、现做」</td></tr>
+          <tr><td class="time">22:00–22:30</td><td>便利店补给 → <b>泡脚抬腿 → 睡</b></td><td class="k-ind">步行</td><td class="k-ind">顺手买明天的备用早餐</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin:28px 0 10px;font-size:17px;">☀️ D2 · 9/23（周三）全天　完整线路（前提：<b>早上 7:30–8:30 去肺科医院工作 1 小时</b>） <span style="font-size:12.5px;font-weight:400;color:var(--muted);">碎片 B</span></h3>
+    <div class="table-card">
+      <table>
+        <thead><tr><th>时间</th><th>安排</th><th>怎么去</th><th>备注</th></tr></thead>
+        <tbody>
+          <tr><td class="time">06:50–07:10</td><td>起床、补水、装包（房卡早用）</td><td class="k-ind">—</td><td class="k-ind">明早同时要设 07:00 + 07:10 双闹钟</td></tr>
+          <tr class="row-work"><td class="time">07:30–08:30</td><td><b>步行去肺科医院 · 工作约 1 小时</b></td><td class="k-ind">步行 8–10 分 / 800 m</td><td class="k-ind">近宝丰一路，顺路看是否要带文件 / U 盘</td></tr>
+          <tr><td class="time">08:30–09:10</td><td><b>回酒店附近过早</b>（不跑远）</td><td class="k-ind">步行回酒店</td><td class="k-ind">详见 D2 第 1 站推荐</td></tr>
+          <tr><td class="time">09:30–10:30</td><td><b>江汉关博物馆</b> ⭐</td><td class="k-ind">打车 6.5 km / 20 分</td><td class="k-ind">必须提前预约；周三正常开放</td></tr>
+          <tr><td class="time">10:45–12:00</td><td><b>黎黄陂路 · 洞庭街</b> 老租界 + 咖啡坐 30 分</td><td class="k-ind">打车 1.8 km / 8 分</td><td class="k-ind">二楼小店别上</td></tr>
+          <tr><td class="time">12:10–13:10</td><td><b>吉庆街</b> 午餐</td><td class="k-ind">打车 1.4 km / 8 分</td><td class="k-ind">老通城 / 四季美，有空调有座位</td></tr>
+          <tr class="row-rest"><td class="time">13:20–15:30</td><td><b>回酒店午休 2 小时</b> ⭐⭐</td><td class="k-ind">打车 5 km / 18 分</td><td class="k-ind">不要省；设 15:00 闹钟</td></tr>
+          <tr><td class="time">15:40–17:40</td><td><b>黄鹤楼</b>（电瓶车 + 主楼电梯）</td><td class="k-ind">打车 9.3 km / 28 分</td><td class="k-ind">17:20 停止入园</td></tr>
+          <tr><td class="time">18:00–18:55</td><td><b>武昌江滩</b> · 日落 + 大桥亮灯</td><td class="k-ind">打车 1.5 km / 8 分</td><td class="k-ind">坐长椅，不上桥面</td></tr>
+          <tr><td class="time">19:25–20:15</td><td><b>楚河汉街</b> 晚餐</td><td class="k-ind">打车 6 km / 20 分</td><td class="k-ind">顺手买伴手礼</td></tr>
+          <tr><td class="time">20:20–20:50</td><td>打车回酒店</td><td class="k-ind">12 km / 30 分</td><td class="k-ind">开启行程分享</td></tr>
+          <tr><td class="time">21:00–21:40</td><td><b>收行李（打包到 80%）</b></td><td class="k-ind">—</td><td class="k-ind">明天上午就不用慌</td></tr>
+          <tr><td class="time">21:40–22:30</td><td>泡脚抬腿 → 睡</td><td class="k-ind">—</td><td class="k-ind">明早 07:00 起</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin:28px 0 10px;font-size:17px;">🚄 D3 · 9/24（周四）上午　退房 → 送站 → 14:09 发车 <span style="font-size:12.5px;font-weight:400;color:var(--muted);">碎片 C</span></h3>
+    <div class="table-card">
+      <table>
+        <thead><tr><th>时间</th><th>安排</th><th>怎么去</th><th>备注</th></tr></thead>
+        <tbody>
+          <tr><td class="time">06:50–07:10</td><td>起床、洗漱、行李昨晚已收好</td><td class="k-ind">—</td><td class="k-ind">双闹钟 07:00 + 07:10</td></tr>
+          <tr class="row-work"><td class="time">07:30–08:30</td><td><b>步行去肺科医院 · 工作约 1 小时</b></td><td class="k-ind">步行 8–10 分 / 800 m</td><td class="k-ind">晚上行李可以推到今晚 22:00 收好</td></tr>
+          <tr><td class="time">08:30–09:00</td><td><b>回酒店附近过早</b>（最后一口热干面）</td><td class="k-ind">步行</td><td class="k-ind">别跑远，就近解决</td></tr>
+          <tr><td class="time">09:00–10:00</td><td><b>就近半程</b>（三选一，<b>只 1 小时</b>）</td><td class="k-ind">打车 10 分 / 步行</td><td class="k-ind">推荐 ② 武商 MALL / K11（10:00 才开门）</td></tr>
+          <tr><td class="time">10:00–10:30</td><td>回酒店，清点物品 + <b>退房</b></td><td class="k-ind">—</td><td class="k-ind">10:30 前办完（提前 30 分钟）</td></tr>
+          <tr><td class="time">10:30–11:20</td><td>大堂坐着、上厕所、<b>提前叫车</b></td><td class="k-ind">—</td><td class="k-ind">提前 20 分钟在 App 叫</td></tr>
+          <tr><td class="time">11:20–12:10</td><td><b>打车 → 武汉站</b></td><td class="k-ind">22–25 km / 40–50 分 / 约 75 元</td><td class="k-ind">若从汉口站走只需 20 分钟</td></tr>
+          <tr><td class="time">12:10–12:30</td><td>进站：刷证 → 安检 → 找候车区</td><td class="k-ind">站内</td><td class="k-ind">走「重点旅客」通道</td></tr>
+          <tr><td class="time">12:30–13:40</td><td><b>候车</b>：坐着、吃简餐、上厕所</td><td class="k-ind">站内</td><td class="k-ind">13:45 前到检票口</td></tr>
+          <tr><td class="time">13:45–14:09</td><td>检票上车、放行李、坐下</td><td class="k-ind">站台</td><td class="k-ind">发车前 15 分钟停止检票</td></tr>
+          <tr><td class="time">14:09</td><td><b>发车离汉</b></td><td class="k-ind">—</td><td class="k-ind">票面时间以 12306 为准</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout blue" style="margin-top:16px;">
+      <b>9/24 上午 08:30–10:15 怎么用（三选一）：</b>
+      <ul style="margin:8px 0 0;padding-left:18px;">
+        <li><b>① 汉口江滩</b>　打车 10 分钟，坐长椅吹 30 分钟江风再回来。最便宜、最省事。</li>
+        <li><b>② 武商 MALL / 武汉 K11</b>　打车 10–15 分钟，10:00 开门。室内空调、有洗手间、有座椅，<b>还能顺路补伴手礼</b> —— 这天最推荐这个。</li>
+        <li><b>③ 哪都不去</b>　楼下咖啡店坐 40 分钟，把行李再点一遍。<b>要拎箱子赶车，选这个一点都不丢人。</b></li>
+      </ul>
+      三个都必须 <b>10:15 前收手</b> —— 退房和叫车都要留时间。
+    </div>
+
+    <div class="callout red" style="margin-top:12px;">
+      <b>最要紧的一件事：先确认票面上是哪个站。</b> 武汉有三个站，从酒店过去差别极大：<b>武汉站</b>（青山区，高铁主站）约 22–25 km / 打车 40–50 分钟，<b>11:20 就得出发</b>；<b>汉口站</b>约 6.5 km / 打车 20 分钟，<b>12:20 出发也来得及</b>；<b>武昌站</b>约 14 km / 打车 30–35 分钟，<b>11:50 出发</b>。上面的时间表是按<b>最远的武汉站</b>排的 —— 如果票上是汉口站，你 9/24 上午能多出整整 1 小时。
+    </div>
+
+    <div class="callout" style="margin-top:12px;">
+      <b>给孕妇的两个高铁福利（很多人不知道）：</b><br>
+      ① <b>12306 App → 我的 → 重点旅客预约</b>（开车前 4 小时以上可免费预约）：车站会安排人接、轮椅/引导、优先进站，拎箱子的时候特别有用；<br>
+      ② 进站时直接跟检票口工作人员说一句「我怀孕了，能走人工通道吗」，一般都会放行，不用排长队。<br>
+      另外，武汉站内有母婴室和重点旅客候车区，12:10 到站后可以直接去那儿坐着等。
+    </div>
+
+    <div class="callout" style="margin-top:12px;">
+      <b>一句话逻辑：</b>今晚只做「安全到店 + 吃饱 + 睡好」；9/23 是唯一能跑完整线路的一天，上午在汉口一个片区里挪动（万松园 → 江汉关 → 黎黄陂路 → 吉庆街，都在 3 公里内），中午回酒店睡 2 小时，下午打车过江，晚上在武昌吃完饭打车回来；9/24 上午不贪、不跑远，<b>11:00 退房、11:20 出发、12:10 到站</b>，14:09 稳稳上车。
+    </div>
+  </div>
+</section>
+
+<!-- ============ 详细路线 ============ -->
+<section id="route">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="num">02 / ITINERARY</span>
+      <h2>逐段详解（9/22 晚 → 9/24 中午）</h2>
+      <p>按三天分开排。每一站都标了：怎么去 / 走多远 / 有没有空调和洗手间 / 孕妇注意事项 / 避坑点。</p>
+    </div>
+
+    <div class="timeline">
+
+      <div class="day-sep a">
+        <span class="d">D1 · 9/22 周二 晚</span>
+        <span class="t2">抵汉 → 安顿<small>碎片 A · 只有 2.5 小时</small></span>
+        <span class="line"></span>
+      </div>
+
+      <div class="stop">
+        <div class="t">19:40<small>25 分钟</small></div>
+        <div class="dot"><i>1</i></div>
+        <div class="body">
+          <h3>武汉站 · 出站上车 <span class="tag go">交通</span></h3>
+          <div class="meta"><span>🚄 19:40 到站</span><span>🚕 站内按「网约车 / 出租车」指示牌走</span><span>💰 到酒店约 75 元</span></div>
+          <p>晚上 19:40 列车到站。先在站内上一个洗手间，再往「网约车」指示牌方向走 —— 从出站口到网约车上客点还有 300–500 米，拎着箱子走这段是最累的，别急着赶。</p>
+          <div class="tips ok">
+            <b>✅ 出站第一件事：</b>给家人发一条「已到武汉，正在去酒店」。<br>
+            <b>✅ 打车只用 App（高德/滴滴）</b>，上车前拍车牌，上车就开「行程分享」。
+          </div>
+          <div class="tips warn">
+            <b>⚠️ 避坑指南：</b>① <b>不要跟着站内喊「打车吗」的人走</b>，一律 App 下单；② 定位要选<b>「武汉站网约车上客点」</b>，别自己站在广场上让司机找你；③ 拎箱子<b>走直梯，不走扶梯</b>；④ 晚上 8 点前后打车要排队，先看清排队区再站过去；⑤ 出站前再看一眼车票上的站名 —— <b>如果其实到的是汉口站，后面的路程完全不一样</b>（汉口站到酒店只要 20 分钟）。
+          </div>
+        </div>
+      </div>
+
+      <div class="stop">
+        <div class="t">20:50<small>30 分钟</small></div>
+        <div class="dot"><i>2</i></div>
+        <div class="body">
+          <h3>入住汉庭 · 同济医学院店 <span class="tag rest">安顿</span></h3>
+          <div class="meta"><span>🚕 高铁站 → 酒店 22–25 km / 40–50 分钟 / 约 75 元</span><span>📍 硚口区解放大道 1037 号</span><span>🏥 同济医院就在隔壁 300 米</span></div>
+          <p>到店办入住、放下行李、洗手。从这一刻起，这间房就是你这两天半的「补给站」—— 行李放这儿、累了回这儿、东西坏了回这儿。</p>
+          <div class="tips ok">
+            <b>✅ 进房先做三件事：</b>门反锁 → 房卡套（写着酒店地址电话）拍照存手机 → 手机充上电。
+          </div>
+          <div class="tips warn">
+            <b>⚠️ 避坑指南：</b>① 进门先看门背后的<b>逃生图</b>，一个人住这点要有数；② 尽量别要临街的低楼层，夜里车声会影响睡眠；③ 可以让前台挂「勿扰」，晚上不被打扰；④ 把<b>酒店地址和电话存进手机备忘录</b>，明天给司机看，比自己复述快。
+          </div>
+        </div>
+      </div>
+
+      <div class="stop food">
+        <div class="t">21:20<small>40 分钟</small></div>
+        <div class="dot"><i>3</i></div>
+        <div class="body">
+          <h3>晚餐：就近堂食 或 外卖到房 <span class="tag eat">晚餐</span></h3>
+          <div class="meta"><span>🚶 酒店周边步行 5–10 分钟</span><span>🛵 或点外卖到房间</span><span>💰 人均 30–60 元</span></div>
+          <p>到店已经 21:20，别为了「吃个正宗武汉菜」再跑 5 公里。<b>两个选择：楼下就近吃，或者直接点外卖到房间。</b>房间里桌子、水、洗手间都有，出任何状况也离同济医院只有 300 米 —— 一个人，这个最省心。</p>
+          <div class="tips ok">
+            <b>🍚 堂食三选一（按推荐度）：</b><br>
+            <b>① 湖北菜连锁（最稳）</b>　<b>小蓝鲸、丽华园、湖锦、太子酒轩</b> —— 都是湖北人办的老牌子，全牌点有「排骨藕汤 / 红菜薹 / 粉蒸肉 / 沔阳三蒸」等孕妇友好的炖菜和蒸菜，菜单里不碰生腌、酒水即可。<b>解放大道 / 建设大道一带都能搜到</b>，打车 10 分钟内。<br>
+            <b>② 武汉过早店开到晚（最近）</b>　<b>蔡林记 / 老通城 / 四季美</b> —— 万松园和同济周边都有分店，<b>晚上 21 点部分门店还在营业</b>，可以点热干面、豆皮、汤包、银耳汤，人均 20–35 元。<br>
+            <b>③ 粥铺/汤馆（最养胃）</b>　<b>嘉禾粥铺、潮味砂锅粥</b> 等全国连锁，皮蛋瘦肉粥、南瓜粥、虾饺、小炒（西红柿炒蛋、清炒菜心），一人食最舒服。
+          </div>
+          <div class="tips ok">
+            <b>🛵 外卖清单（直接照着点）：</b><br>
+            <b>主食：</b>排骨藕汤 + 米饭（湖北菜天花板）、牛肉粉/面（万松园那几家都送）、三鲜豆皮、汤包、饺子、云吞。<br>
+            <b>汤 / 粥：</b>银耳莲子羹、小米南瓜粥、皮蛋瘦肉粥、番茄蛋汤。<br>
+            <b>小炒：</b>西红柿炒蛋、清炒时蔬、清蒸鱼块（要求去皮去刺）。<br>
+            <b>打开美团/饿了么直接搜这些关键词</b>，筛选 <b>4.5 分以上、月销 1000+</b> 的店，<b>配送时间 30 分钟以内</b>为准。
+          </div>
+          <div class="tips warn">
+            <b>⚠️ 避坑指南：</b>① <b>21 点之后很多堂食店开始打烊</b>，别在点评上挑半天，最后只剩下烧烤摊；<b>下单前先打电话确认还在营业</b>；② 不点凉菜、卤味拼盘、生腌、任何酒（<b>包括米酒、蛋酒、醪糟</b>）；③ 外卖认准有品牌标识、能看到门店信息的商家，不点无名小店；④ 先喝几口温水再吃，别饿过头猛吃；⑤ 吃完就洗漱，<b>别刷手机到半夜</b>，明早 07:00 要起来。
+          </div>
+        </div>
+      </div>
+
+      <div class="stop rest">
+        <div class="t">22:20<small>—</small></div>
+        <div class="dot"><i>4</i></div>
+        <div class="body">
+          <h3>泡脚抬腿 · 睡 <span class="tag rest">收尾</span></h3>
+          <div class="meta"><span>⏱ 22:20–22:40 收尾，22:40 前躺下</span></div>
+          <p>一个人的出差，第一天最值的一件事就是睡好。温水泡脚 10 分钟 → 双腿抬高靠墙 15 分钟 → 洗澡 → 躺下。顺手把衣服和明天要带的东西摆在显眼处。</p>
+          <div class="tips warn">
+            <b>⚠️ 避坑：</b>① 泡脚水温别太烫（38–40℃）、时间别超 15 分钟；② <b>不要泡澡、不要泡温泉</b>；③ 设<b>两个闹钟（07:00 和 07:10）</b>—— 一个人没有人叫你起床。
+          </div>
+        </div>
+      </div>
+
+      <div class="day-sep b">
+        <span class="d">D2 · 9/23 周三</span>
+        <span class="t2">完整线路<small>碎片 B · 唯一能跑全程的一天，前提是不工作</small></span>
+        <span class="line"></span>
+      </div>
+
+      <div class="stop food">
+        <div class="t">07:30<small>—</small></div>
+        <div class="dot"><i>1</i></div>
+        <div class="body">
+          <h3>肺科医院 · 工作 1 小时 <span class="tag work">💼 工作</span><span class="tag">步行</span></h3>
+          <div class="meta"><span>🚶 酒店步行 8–10 分钟 / 800 m</span><span>⏱ 07:30–08:30</span><span>📍 宝丰一路 / 建设大道</span></div>
+          <p>早上从酒店出来，沿解放大道向西走，<b>肺科医院</b>（武汉市结核病防治所）就在建设大道与宝丰一路交叉口一带，<b>步行 8–10 分钟、800 米</b>。一个人走小路就够，路面平坦、有树荫。如果工作需要带 U 盘或文件，前一晚放背包最外层。</p>
+          <div class="tips ok">
+            <b>就医信息（顺路确认）：</b>医院早上 08:00 上班、门诊 08:00–11:30；<b>肺科医院和同济医院同在解放大道一带</b>，有任何不适走 5 分钟就到同济，路标都写着。
+          </div>
+          <div class="tips warn">
+            <b>⚠️ 避坑：</b>① 路上别戴耳机、注意电动车；② <b>出门前喝几口温水、垫一块饼干</b>，别空腹走；③ 提前查好对方联系人与楼层，问清是住院部还是门诊，<b>9/24 上午若赶时间可让对方等你到医院再走</b>。
+          </div>
+        </div>
+      </div>
+
+      <div class="stop food">
+        <div class="t">08:40<small>50 分钟</small></div>
+        <div class="dot"><i>2</i></div>
+        <div class="body">
+          <h3>回酒店附近 · 就近过早 <span class="tag eat">过早</span><span class="tag">坐店里吃</span></h3>
+          <div class="meta"><span>🚶 步行回酒店 5 分钟</span><span>🚶 酒店周边 200 m 内多家店</span><span>💰 人均 15–25 元</span></div>
+          <p>工作完回到酒店附近，不跑远。这块时间不够再去万松园（单程打车 12 元），就在解放大道一带找家坐得下来的店把早餐补上。</p>
+          <div class="tips ok">
+            <b>可以点：</b>热干面 + 豆浆、牛肉面/粉、三鲜豆皮、汤包、面窝。重油烧梅和生煎包可以，但要趁热吃。<b>饮品统一换成豆浆 / 绿豆汤 / 牛奶</b>，蛋酒米酒一律不要。
+          </div>
+          <div class="tips">
+            <b>想认认真真过早怎么办：</b>如果你想保留「万松园过早」这个体验，就把上午 09:30 江汉关这一站<b>顺延到 10:00</b>，打车 22 元多花 15 分钟。也可以把第二天（9/24 上午）当时间工作过完后去万松园 —— 不过第二天时间紧，不推荐。
+          </div>
+          <div class="tips warn">
+            <b>⚠️ 避坑指南：</b>① <b>不要点蛋酒、米酒、酒酿 —— 这是武汉过早最容易踩的坑</b>，很多摊子是默认给你配一份的，点单时先说清楚；② 不要买已经装好放凉、或者堆在案板上敞着放的油条和卤味；③ 找<b>有桌椅</b>的店坐下来吃，别端着碗站着；④ 这块时间上午 09:30 要出门，<b>8:50 前必须收手</b>。
+          </div>
+        </div>
+      </div>
+
+      <div class="stop sight">
+        <div class="t">09:00<small>90 分钟</small></div>
+        <div class="dot"><i>2</i></div>
+        <div class="body">
+          <h3>江汉关博物馆 <span class="tag play">室内</span><span class="tag free">免费</span><span class="tag">⭐最友好</span></h3>
+          <div class="meta"><span>🚕 打车 6.5 km / 20 分钟 / 约 22 元</span><span>⏰ 周二至周日 09:00–17:00，16:00 停止入馆</span><span>🚫 周一闭馆</span><span>💰 免费（须预约）</span></div>
+          <p>1924 年落成的江汉关大楼，希腊古典 + 文艺复兴风格，配一座英式钟楼，是汉口开埠的活化石。馆内常设《江汉朝宗 —— 武汉城市现代化历程》。<b>这是全程最舒服的一站：室内恒温、有专用电梯、有洗手间、随处可坐。</b></p>
+          <div class="tips ok">
+            <b>✅ 无障碍电梯：</b>馆内设有方便残障人士的专用电梯，<b>可通达博物馆各楼层</b>，同时配备专用轮椅和卫生间 —— 完全不用爬楼。<br>
+            <b>✅ 洗手间：</b>馆内每层都有。<br>
+            <b>✅ 拍照：</b>马路对面是拍大楼与晴川桥同框的最佳机位，站在路边拍两张就走，不用久站。
+          </div>
+          <div class="tips">
+            <b>必须预约：</b>微信公众号「江汉关博物馆」或小程序「武汉文旅码」，实名登记选时段，<b>现场没有票</b>。参观 1–1.5 小时刚好。<br>
+            <b>如果是周一：</b>直接跳过这一站，上午改成「万松园 → 黎黄陂路咖啡馆」。
+          </div>
+          <div class="tips warn">
+            <b>⚠️ 避坑指南：</b>① <b>现场不卖票、也不能现场预约</b>，没约上就是进不去，白跑一趟；临时改计划记得先在小程序里取消，爽约记录多了会被限制预约；② <b>16:00 停止入馆</b>，15:30 之后到基本看不完，别把它排在下午末段；③ 周一闭馆，节假日调休时间要另外查；④ 从落客点到馆门口有一段无遮阴的沿江路，正午来会很晒，<b>所以这一站排在上午</b>；⑤ 馆内拍照别开闪光灯，也<b>不要翻越围挡去靠展柜</b>——空间窄，容易被人流挤到；⑥ 顶层观景平台风大，上去前把外套穿上。
+          </div>
+        </div>
+      </div>
+
+      <div class="stop sight">
+        <div class="t">10:45<small>75 分钟</small></div>
+        <div class="dot"><i>3</i></div>
+        <div class="body">
+          <h3>黎黄陂路 · 洞庭街 · 同兴里 <span class="tag play">老租界</span><span class="tag free">免费</span><span class="tag rest">有咖啡座</span></h3>
+          <div class="meta"><span>🚕 从江汉关打车 1.8 km / 8 分钟 / 约 12 元</span><span>🚶 街区内约 800 m（慢走 40 分钟）</span><span>💰 咖啡约 35 元</span></div>
+          <p>汉口老租界最舒服的一段。法国梧桐遮荫、石板路平整、车少人少，比江汉路步行街安静十倍。巴公房子、同兴里里份建筑群、宋庆龄汉口旧居都在这片。</p>
+          <div class="tips ok">
+            <b>✅ 这一站的核心动作是「找家老房子咖啡馆坐下」</b> —— 点杯热饮，坐 30–40 分钟，把上午的体力省下来。街区人行道平整无台阶，孕妇走起来完全没压力。
+          </div>
+          <div class="tips warn">
+            <b>⚠️ 避坑指南：</b>① 这一片的老洋房很多是<b>民宅或办公场所</b>，门口挂着「谢绝参观」就别推门进去；② <b>有些小店在老楼二层，楼梯又窄又陡还陡转角，不要上去</b>，一楼的店足够坐；③ 石板路看着平整，但边缘高低不一，<b>走路别看手机</b>；④ 不要点生鲜果汁、冰饮、软冰淇淋；⑤ 宋庆龄汉口旧居纪念馆周二至周日 09:00–16:30 免费开放，状态一般就跳过；⑥ 傍晚以后这片游客变少，一个人不要往巷子深处走，走黎黄陂路和洞庭街两条主路就够。
+          </div>
+        </div>
+      </div>
+
+      <div class="stop food">
+        <div class="t">12:10<small>60 分钟</small></div>
+        <div class="dot"><i>4</i></div>
+        <div class="body">
+          <h3>吉庆街 午餐 <span class="tag eat">堂食</span><span class="tag rest">空调</span></h3>
+          <div class="meta"><span>🚕 从黎黄陂路打车 1.4 km / 8 分钟 / 约 12 元</span><span>🚶 街区内约 300 m</span><span>💰 人均 65 元</span></div>
+          <p>老通城豆皮、四季美汤包在这条街上都有实体店面 —— <b>空调、堂食座位、洗手间齐全</b>，比在户部巷站着吃舒服得多，卫生也更有保障。</p>
+          <div class="tips ok">
+            <b>推荐：</b>老通城豆皮（蛋皮裹熟糯米 + 笋丁香菇，省级非遗）、四季美汤包（现蒸、皮薄汤烫）、老万成酸梅汤、汪玉霞糕点（顺手带伴手礼）。
+          </div>
+          <div class="tips warn">
+            <b>点单原则：</b>只点「现做的、热的、全熟的」。<b>不要</b>凉菜拼盘、卤味冷盘、刺身、现榨果汁，<b>不要</b>任何米酒/酒酿类甜品。汤包先咬个小口放气再吃，别一口闷烫到嘴。
+          </div>
+          <div class="tips warn">
+            <b>⚠️ 避坑指南：</b>① 老字号在<b>午市 11:30 之后要排队取号</b>，一个人来可以错峰 12:00 之后再进，或者直接问能不能坐吧台/单人位；② <b>吉庆街的夜市属性在晚上</b>，中午来只有店，没有摊，这是正常的，别以为是走错了；③ 不要被「门口拉客」的店喊进去，认准老通城、四季美这类有招牌的老字号；④ 汤包上桌很烫，<b>先咬小口放气</b>；⑤ 这条街地面油滑，走路慢一点。
+          </div>
+        </div>
+      </div>
+
+      <div class="stop rest">
+        <div class="t">13:20<small>2 小时 10 分</small></div>
+        <div class="dot"><i>5</i></div>
+        <div class="body">
+          <h3>回酒店午休 <span class="tag rest">最关键</span><span class="tag">⭐必做</span></h3>
+          <div class="meta"><span>🚕 吉庆街打车回酒店 5 km / 18 分钟 / 约 20 元</span><span>⏱ 13:20–15:30，共 2 小时</span></div>
+          <p>9 月武汉的下午 1–3 点是一天中最热最晒的时段，对孕妇来说是硬扛。<b>回酒店躺 2 小时、把双腿抬高、补足水分、顺便把手机和充电宝充满</b>，下午的黄鹤楼才有体力。这一项删掉，整条路线就不成立。</p>
+          <div class="tips ok">
+            <b>✅ 躺着，别只是坐着</b> —— 能有效缓解腰背压力和下肢水肿。<br>
+            <b>✅ 出发前再补 300–500 ml 温水</b>，下午的户外段才有底气。<br>
+            <b>✅ 把薄外套、遮阳帽、水杯重新装包</b>，下午是纯户外 + 商场。
+          </div>
+          <div class="tips warn">
+            <b>⚠️ 避坑：</b>① 这一段<b>不要为了省 20 元打车费改成坐地铁</b>，2 号线换乘会把你一上午省下的体力全部吃掉；② 一个人回房，先把门反锁、把手机充上电再躺下，别躺下就睡着；③ 设个 <b>15:00 的闹钟</b>，睡过头就赶不上黄鹤楼 17:20 的入园截止时间。
+          </div>
+        </div>
+      </div>
+
+      <div class="stop sight">
+        <div class="t">15:40<small>2 小时</small></div>
+        <div class="dot"><i>6</i></div>
+        <div class="body">
+          <h3>黄鹤楼 <span class="tag play">必看</span><span class="tag">有电梯</span></h3>
+          <div class="meta"><span>🚕 酒店打车 9.3 km / 28 分钟 / 约 32 元</span><span>⏰ 日场 08:30–18:00，<b>17:20 停止入园</b></span><span>💰 70 元</span><span>🚶 园内约 1.2 km</span></div>
+          <p>江南三大名楼之一。主楼 5 层、共 275 级台阶 —— 但这正是黄鹤楼对孕妇友好的地方：<b>主楼电梯对老人和孕妇开放</b>，入园时跟工作人员说明情况就可以乘电梯直达 5 层观景台；园区东门有电瓶车往返主楼；西爽门对行动不便的游客开放，可以直接把轮椅/婴儿车推到主楼。</p>
+          <div class="tips ok">
+            <b>✅ 正确走法：</b>东门入园 → 乘<b>电瓶车（10 元/人次）</b>到主楼 → <b>坐电梯登 5 层观景台</b> → 原路返回。全程不用爬一级台阶。<br>
+            <b>📸 5 层观景台</b>可以一次拍到长江、长江大桥和武汉三镇。
+          </div>
+          <div class="tips warn">
+            <b>⚠️ 避坑指南：</b>① <b>不要硬爬 275 级台阶</b>，主楼楼梯窄且没有休息平台，中途想停下会挡住后面的人；② 不要为了「完整」把 3–4 公里的园内步道全走完，体力一般就只走「主楼 + 白云阁」这一小圈；③ <b>从西门进的人最多</b>，东门排队短，也别在西门口买黄牛票；④ 园内电瓶车 10 元/人次，<b>要现金或手机支付都行，但班次有间隔</b>，到了先问下一班几点；⑤ 观景平台人多、栏杆前挤，<b>不要为了拍照往人群里钻</b>，靠边站；⑥ 园区里有下坡台阶和湿滑石板，穿平底鞋；⑦ <b>17:20 停止入园、18:00 闭园</b>，闭园前会清场，别在山上磨到最后一刻才下山。
+          </div>
+          <div class="tips">
+            <b>必须预约：</b>公众号「黄鹤楼公园」实名预约购票，凭身份证入园；法定节假日建议提前 3 天。
+          </div>
+        </div>
+      </div>
+
+      <div class="stop sight">
+        <div class="t">18:00<small>55 分钟</small></div>
+        <div class="dot"><i>7</i></div>
+        <div class="body">
+          <h3>武昌江滩 · 长江大桥夜景 <span class="tag play">江景</span><span class="tag free">免费</span><span class="tag">坐长椅</span></h3>
+          <div class="meta"><span>🚕 从黄鹤楼打车 1.5 km / 8 分钟 / 约 12 元</span><span>🚶 江滩内约 400 m</span><span>💰 免费</span></div>
+          <p>从黄鹤楼打车到武昌江滩（大桥武昌桥头堡段）。<b>9 月下旬日落约 18:15，18:30–19:00 长江大桥灯光逐段亮起。</b>江滩公园里长椅密布，找个位置坐下看就行，对岸就是汉口的天际线。</p>
+          <div class="tips warn">
+            <b>⚠️ 避坑指南：</b>① <b>千万不要走长江大桥桥面</b> —— 人行道只有约 1.5 米宽，电动车呼啸而过，江风大，这一段直接放弃；② 想拍全景就在桥头堡附近的观景平台站 5 分钟，或者坐在江滩长椅上用长焦拍，效果更好；③ <b>天黑后不要往江滩深处或偏僻的步道走</b>，一个人留在有灯、有人、离马路近的地方；④ 江边风大、日落后降温快，17:50 前就把薄外套穿上；⑤ 江滩沿线洗手间在驿站/服务点，<b>进园前先用一次</b>；⑥ 台阶下到亲水平台的那一段没有护栏灯，别下去；⑦ 打车时定位到<b>「武昌江滩（大桥桥头堡段）」的具体落客点</b>，不要说「江滩」，武昌江滩很长，容易被放到很远的另一头。
+          </div>
+          <div class="tips">
+            <b>⚠️ 江边风大、日落后降温快</b>，把薄外套穿上。江滩的洗手间一般在沿线的驿站/服务点，进江滩前先用一次。
+          </div>
+        </div>
+      </div>
+
+      <div class="stop food">
+        <div class="t">19:25<small>50 分钟</small></div>
+        <div class="dot"><i>8</i></div>
+        <div class="body">
+          <h3>楚河汉街 晚餐 <span class="tag eat">晚餐</span><span class="tag rest">室内</span></h3>
+          <div class="meta"><span>🚕 从江滩打车 6 km / 20 分钟 / 约 22 元</span><span>🚶 街区内约 500 m</span><span>💰 人均 85 元</span></div>
+          <p>武昌中北路的商业街区，汉街万达广场里是成规模的室内餐厅集群：<b>空调、电梯、干净的洗手间、宽敞平整的步行道</b>，孕妇需要的它全有。吃完还能在汉街平地散步 15 分钟，不用挤路边摊。</p>
+          <div class="tips ok">
+            <b>✅ 首选商场内的连锁餐厅</b>，卫生、座位、出餐速度都有保障。<br>
+            <b>✅ 想吃清淡：</b>点个炖汤（排骨藕汤）+ 清炒时蔬 + 一份主食，湖北菜里这类菜很好找。<br>
+            <b>💰 想省钱：</b>汉街周边也有平价米粉/面馆，人均 30 元能吃饱。
+          </div>
+          <div class="tips warn">
+            <b>⚠️ 避坑指南：</b>① 晚市 18:30–19:30 是等位高峰，<b>到店先在小程序取号再逛街</b>，别站在门口排 40 分钟；② 汉街这条街<b>从头走到尾 1.5 公里以上</b>，只走靠近你餐厅的那半段，别顺着走完；③ 点菜避开：生腌、刺身、凉拌菜、半熟牛排、现榨果汁、任何酒水；④ 街面上有很多卖小吃的推车，<b>热的、现做的可以，切开摆着的不要</b>；⑤ 吃完别再从汉街走回江滩，直接打车走。
+          </div>
+        </div>
+      </div>
+
+      <div class="stop">
+        <div class="t">20:20<small>30 分钟</small></div>
+        <div class="dot"><i>9</i></div>
+        <div class="body">
+          <h3>打车回酒店 <span class="tag go">交通</span></h3>
+          <div class="meta"><span>🚕 12 km / 30 分钟 / 约 40 元</span><span>🚇 若坐地铁：5 → 2 → 1 号线，约 45 分钟 / 6 元</span></div>
+          <p><b>直接打车。</b>不要为了省 30 多块钱，让孕妇在晚上 8 点半去挤全国最拥挤的 2 号线换乘三次。</p>
+          <div class="tips ok">
+            <b>回酒店后：</b>温水泡脚 10 分钟 → 双腿抬高 15 分钟 → 再洗澡睡觉。第二天大概率不会酸。
+          </div>
+          <div class="tips warn">
+            <b>⚠️ 一个人打车的 3 个动作：</b>① 上车前把<b>车牌号截图</b>发给家人；② 用打车 App 的<b>「行程分享」</b>把实时位置共享出去；③ 上车坐<b>后排右侧</b>、系好安全带（安全带下缘压在肚子下方、跨过大腿根部）。到家后给家人发一句「到了」。
+          </div>
+          <div class="tips ok">
+            <b>回到酒店后别马上躺：</b>先把行李收一收（收 80% 就行），把明天的衣服和证件摆好，明天上午会轻松很多。
+          </div>
+        </div>
+      </div>
+
+      <div class="day-sep c">
+        <span class="d">D3 · 9/24 周四 上午</span>
+        <span class="t2">退房 → 送站<small>碎片 C · 11:20 必须出发，这是硬约束</small></span>
+        <span class="line"></span>
+      </div>
+
+      <div class="stop food">
+        <div class="t">07:30<small>—</small></div>
+        <div class="dot"><i>1</i></div>
+        <div class="body">
+          <h3>肺科医院 · 工作 1 小时 <span class="tag work">💼 工作</span><span class="tag">步行</span></h3>
+          <div class="meta"><span>🚶 酒店步行 8–10 分钟 / 800 m</span><span>⏱ 07:30–08:30</span><span>📍 宝丰一路 / 建设大道</span></div>
+          <p>和 9/23 一样，<b>走同一条路</b>，沿解放大道向西到建设大道与宝丰一路交叉口。<b>行李前一晚收好（22:00 前）</b>，早上只用背个小包出门（钱包、手机、房卡、水、身份证、一包饼干）。</p>
+          <div class="tips warn">
+            <b>⚠️ 关键提醒：</b>① 9/24 这一天<span style="color:var(--red);font-weight:700;">11:00 之前必须退房、11:20 必须出发去车站</span>，所以工作完回到酒店后，<b>8:50 之前收手</b>，把剩余时间留给过早 + 半程 + 退房 + 送站；② <b>如果对方临时改时间或不开时间</b>，直接忽略本节，按原版 07:30 过早就近吃。
+          </div>
+        </div>
+      </div>
+
+      <div class="stop food">
+        <div class="t">08:40<small>30 分钟</small></div>
+        <div class="dot"><i>2</i></div>
+        <div class="body">
+          <h3>酒店附近 · 最后一口热干面 <span class="tag eat">过早</span></h3>
+          <div class="meta"><span>🚶 步行回酒店 5 分钟</span><span>💰 人均 15–25 元</span></div>
+          <p>回酒店附近坐店吃早饭，把武汉味道收个尾。不跑远，<b>09:00 前收手</b>，把时间留给就近半程和退房。</p>
+          <div class="tips ok">
+            <b>可以点：</b>热干面 + 豆浆（<b>不要蛋酒</b>）、牛肉粉、汤粉、豆皮。吃完顺手在便利店买瓶水带上车。
+          </div>
+          <div class="tips warn">
+            <b>⚠️ 避坑：</b>① 别为了「吃顿好的」跑 2 公里以外，今天每一分钟都要留给退房和赶车；② 照样不碰蛋酒、米酒、凉菜；③ 出门只带手机和房卡，行李留在房间；④ 吃完直接去半程或回大堂坐一会儿，<b>别一路小跑</b>。
+          </div>
+        </div>
+      </div>
+
+      <div class="stop sight">
+        <div class="t">09:00<small>1 小时</small></div>
+        <div class="dot"><i>3</i></div>
+        <div class="body">
+          <h3>就近半程（三选一，<b>只 1 小时</b>） <span class="tag play">轻量</span><span class="tag free">不跑远</span></h3>
+          <div class="meta"><span>🚕 打车 10–15 分钟 / 或步行</span><span>⏰ 10:00 前必须收手</span></div>
+          <p>比原版少 45 分钟 —— 因为早上去医院工作了 1 小时。<b>三个方案的优先级不变</b>：<br>
+          <b>① 汉口江滩</b> —— 打车 10 分钟，坐长椅吹 30 分钟江风，原路回来。最便宜、最省事。<br>
+          <b>② 武商 MALL / 武汉 K11</b> —— 打车 10–15 分钟，10:00 开门。室内空调、有座椅、还能补伴手礼，<b>这天最推荐这个</b>。注意：10:00 才开门，要么 <b>09:00 先去汉口江滩坐 40 分钟再过去</b>，要么直接 10:00 准时到。<br>
+          <b>③ 哪都不去</b> —— 楼下咖啡店坐 30 分钟。拎箱子赶车，这个最稳。</p>
+          <div class="tips warn">
+            <b>⚠️ 避坑指南：</b>① <b>10:00 前必须收手</b>（比原版提前 15 分钟），给退房多留时间；② 不要去黄鹤楼、湖北省博这类要 1.5 小时以上的地方；③ 出门前把大件行李留在房间或寄存前台，别拖着走；④ 打车去、打车回；⑤ <b>10:00 闹钟</b>提醒自己往回走。
+          </div>
+        </div>
+      </div>
+
+      <div class="stop rest">
+        <div class="t">10:15<small>35 分钟</small></div>
+        <div class="dot"><i>3</i></div>
+        <div class="body">
+          <h3>回酒店 · 清点 + 退房 <span class="tag rest">关键</span><span class="tag">11:00 前办完</span></h3>
+          <div class="meta"><span>🧳 清点顺序：床头柜 → 卫生间 → 插座上的充电器 → 衣柜 → 保险柜</span></div>
+          <p>回房做最后一次清点，然后下楼退房。跟前台说一句「等一下有车来接」，把行李箱放在大堂边上，你坐着等 —— 不用站在门口晒。</p>
+          <div class="tips ok">
+            <b>✅ 退房前拍一张房间全景照</b>，万一东西落了还能对得上；<br>
+            <b>✅ 身份证和车票信息放在外层口袋</b>，进站时不用现翻包。
+          </div>
+          <div class="tips warn">
+            <b>⚠️ 避坑指南：</b>① <b>充电器、耳机、洗面奶</b>是酒店最常忘的三样，逐个插座看一遍；② 房卡要还给前台，别带走；③ 退房时顺口问一句「现在去武汉站大概多久」，前台对实时路况最清楚；④ <b>就算酒店能延迟退房到 14:00 也别用</b> —— 今天不赌。
+          </div>
+        </div>
+      </div>
+
+      <div class="stop">
+        <div class="t">11:20<small>50 分钟</small></div>
+        <div class="dot"><i>4</i></div>
+        <div class="body">
+          <h3>打车 → 武汉站 <span class="tag go">交通</span></h3>
+          <div class="meta"><span>🚕 22–25 km / 40–50 分钟 / 约 75 元</span><span>📍 定位「武汉站进站口 / 落客平台」</span><span>⏰ 若票面是汉口站，20 分钟就到</span></div>
+          <p>提前 20 分钟在 App 叫车（选优享/专车），上车前拍车牌发家人。这一段是全程唯一不能「差不多」的地方 —— 时间表里给武汉站留了 50 分钟车程 <b>外加 40 分钟缓冲</b>，就是为了不赌路况。</p>
+          <div class="tips warn">
+            <b>⚠️ 避坑指南：</b>① <b>别坐地铁</b>：4 → 2 → 1 号线换乘两次、约 70 分钟，还要拎着箱子走 880 米，一个人不值；② 定位只写「武汉站」不够，要选到<b>具体进站口 / 落客平台</b>；③ 上车和司机确认一次「走哪条路、大概多久到」；④ <b>如果 11:40 还没上车，立刻换方案</b>（就近打车或地铁 4 号线），别继续等；⑤ 车上先把身份证和 12306 电子客票调出来。
+          </div>
+        </div>
+      </div>
+
+      <div class="stop">
+        <div class="t">12:10<small>→ 14:09 发车</small></div>
+        <div class="dot"><i>5</i></div>
+        <div class="body">
+          <h3>进站 · 候车 · 14:09 发车 <span class="tag go">返程</span><span class="tag">终点</span></h3>
+          <div class="meta"><span>🎫 刷身份证进站 → 安检 → 候车区</span><span>🚻 站内有母婴室 / 重点旅客候车区</span><span>⏰ 发车前 15 分钟停止检票</span></div>
+          <p>12:10 到站，刷证进站、过安检，直接去重点旅客候车区或母婴室旁边找座位坐下。中间去吃一份简单的热食（面或饭），上一次洗手间。<b>13:45 前挪到检票口</b>，别卡着点。</p>
+          <div class="tips ok">
+            <b>✅ 预约了 12306 重点旅客服务的</b>，到服务台报名字，会有人引导、优先上车；<br>
+            <b>✅ 上车后先放好箱子再坐下</b>，把水杯和小零食放在随手能拿到的地方。
+          </div>
+          <div class="tips warn">
+            <b>⚠️ 避坑指南：</b>① <b>发车前 15 分钟停止检票</b>，13:54 之后闸机就关了；② 不要在站内买散装卤味、切好的水果带上车；③ 候车别坐太偏，留意广播和电子屏；④ 上车后如果过道太挤，可以跟乘务员说明怀孕，通常会帮你调到方便进出的位置。
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ 路线示意 ============ -->
+<section id="map">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="num">03 / ROUTE MAP</span>
+      <h2>路线示意图（9/23 那条完整线路）</h2>
+      <p>非精确比例。左为汉口，右为武昌，中间是长江。<b>橙色是上午的汉口小环线（含回酒店午休），蓝色是打车过江，绿色是武昌段。</b>9/22 晚上和 9/24 上午的动线很短，见第 01 章的时间总表。</p>
+    </div>
+    <div class="map-card">
+      <svg viewBox="0 0 900 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="武汉一日游孕妇低强度版路线示意图">
+        <defs>
+          <linearGradient id="water" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#BFE3F1"/>
+            <stop offset="100%" stop-color="#9AD3E8"/>
+          </linearGradient>
+        </defs>
+        <rect width="900" height="470" fill="#FBFBF8"/>
+
+        <!-- 汉江 -->
+        <path d="M -30 150 C 90 165, 250 195, 400 232 L 400 268 C 250 232, 90 202, -30 187 Z"
+              fill="url(#water)"/>
+        <!-- 长江 -->
+        <path d="M 30 480 C 200 400, 430 300, 560 120 C 620 40, 670 -10, 700 -30
+                 L 800 -30 C 760 40, 700 110, 640 195 C 500 380, 250 470, 120 480 Z"
+              fill="url(#water)"/>
+
+        <text x="150" y="182" font-size="13" fill="#2A7391" font-weight="600" transform="rotate(9 150 182)">汉 江</text>
+        <text x="618" y="330" font-size="15" fill="#2A7391" font-weight="700" transform="rotate(-52 618 330)">长 江</text>
+        <text x="150" y="90" font-size="14" fill="#8A9AA5" font-weight="700" letter-spacing="3">汉 口</text>
+        <text x="740" y="150" font-size="14" fill="#8A9AA5" font-weight="700" letter-spacing="3">武 昌</text>
+
+        <!-- 上午：汉口小环线（橙） -->
+        <path d="M 112 172 L 262 126 L 566 138 L 632 104 L 606 82"
+              fill="none" stroke="#E2582F" stroke-width="2.5" stroke-dasharray="7 5"
+              stroke-linejoin="round" stroke-linecap="round" opacity="0.8"/>
+        <path d="M 606 82 C 520 40, 260 60, 112 160"
+              fill="none" stroke="#E2582F" stroke-width="2" stroke-dasharray="3 6"
+              stroke-linejoin="round" stroke-linecap="round" opacity="0.45"/>
+        <text x="330" y="46" font-size="11.5" fill="#B8431E">回酒店午休（13:20–15:30，打车 18 分钟）</text>
+
+        <!-- 过江（蓝） -->
+        <path d="M 112 176 C 300 300, 520 380, 726 392"
+              fill="none" stroke="#3E97BE" stroke-width="2.5" stroke-dasharray="4 6" opacity="0.95"/>
+        <text x="300" y="330" font-size="11.5" fill="#1D6E91" transform="rotate(19 300 330)">打车过江 9.3 km / 28 分钟 / 32 元</text>
+
+        <!-- 武昌段（绿） -->
+        <path d="M 726 388 L 646 344 L 806 296"
+              fill="none" stroke="#2F8F6B" stroke-width="2.5" stroke-dasharray="7 5"
+              stroke-linejoin="round" stroke-linecap="round" opacity="0.8"/>
+        <path d="M 806 296 C 620 210, 300 190, 118 176"
+              fill="none" stroke="#2F8F6B" stroke-width="2" stroke-dasharray="3 6"
+              stroke-linejoin="round" stroke-linecap="round" opacity="0.45"/>
+        <text x="742" y="252" font-size="11.5" fill="#1F7355">打车回酒店 30 分钟</text>
+
+        <!-- 节点 -->
+        <g font-size="12" font-weight="700">
+          <circle cx="112" cy="172" r="13" fill="#fff" stroke="#3E97BE" stroke-width="3"/>
+          <text x="112" y="176" text-anchor="middle" fill="#1D6E91" font-size="11">住</text>
+          <text x="112" y="202" text-anchor="middle" font-size="11" fill="#4A5A66" font-weight="400">汉庭·同济店</text>
+
+          <circle cx="262" cy="126" r="12" fill="#fff" stroke="#E2582F" stroke-width="2.5"/>
+          <text x="262" y="130" text-anchor="middle" fill="#B8431E">1</text>
+          <text x="262" y="104" text-anchor="middle" font-size="11" fill="#4A5A66" font-weight="400">万松园 · 过早</text>
+
+          <circle cx="566" cy="138" r="12" fill="#fff" stroke="#2F8F6B" stroke-width="2.5"/>
+          <text x="566" y="142" text-anchor="middle" fill="#1F7355">2</text>
+          <text x="566" y="118" text-anchor="middle" font-size="11" fill="#4A5A66" font-weight="400">江汉关博物馆</text>
+
+          <circle cx="632" cy="104" r="12" fill="#fff" stroke="#2F8F6B" stroke-width="2.5"/>
+          <text x="632" y="108" text-anchor="middle" fill="#1F7355">3</text>
+          <text x="668" y="92" text-anchor="middle" font-size="11" fill="#4A5A66" font-weight="400">黎黄陂路</text>
+
+          <circle cx="606" cy="82" r="12" fill="#fff" stroke="#E2582F" stroke-width="2.5"/>
+          <text x="606" y="86" text-anchor="middle" fill="#B8431E">4</text>
+          <text x="592" y="62" text-anchor="middle" font-size="11" fill="#4A5A66" font-weight="400">吉庆街 · 午餐</text>
+
+          <circle cx="726" cy="392" r="13" fill="#fff" stroke="#C8912F" stroke-width="3"/>
+          <text x="726" y="396" text-anchor="middle" fill="#8A6A1C">6</text>
+          <text x="726" y="420" text-anchor="middle" font-size="11" fill="#4A5A66" font-weight="400">黄鹤楼（电梯）</text>
+
+          <circle cx="646" cy="344" r="12" fill="#fff" stroke="#2F8F6B" stroke-width="2.5"/>
+          <text x="646" y="348" text-anchor="middle" fill="#1F7355">7</text>
+          <text x="606" y="332" text-anchor="middle" font-size="11" fill="#4A5A66" font-weight="400">武昌江滩·大桥</text>
+
+          <circle cx="806" cy="296" r="12" fill="#fff" stroke="#E2582F" stroke-width="2.5"/>
+          <text x="806" y="300" text-anchor="middle" fill="#B8431E">8</text>
+          <text x="806" y="322" text-anchor="middle" font-size="11" fill="#4A5A66" font-weight="400">楚河汉街·晚餐</text>
+        </g>
+
+        <!-- 图例 -->
+        <g transform="translate(24,412)" font-size="11.5" fill="#5A6A76">
+          <line x1="0" y1="0" x2="26" y2="0" stroke="#E2582F" stroke-width="2.5" stroke-dasharray="6 4"/>
+          <text x="34" y="4">上午·汉口</text>
+          <line x1="120" y1="0" x2="146" y2="0" stroke="#3E97BE" stroke-width="2.5" stroke-dasharray="3 5"/>
+          <text x="154" y="4">打车过江</text>
+          <line x1="230" y1="0" x2="256" y2="0" stroke="#2F8F6B" stroke-width="2.5" stroke-dasharray="6 4"/>
+          <text x="264" y="4">下午·武昌</text>
+          <line x1="0" y1="20" x2="26" y2="20" stroke="#8A9AA5" stroke-width="2" stroke-dasharray="3 6"/>
+          <text x="34" y="24">回酒店（午休 / 收尾）</text>
+        </g>
+      </svg>
+      <div class="map-note">9/23 路线示意 · 顺序：酒店 → 万松园 → 江汉关博物馆 → 黎黄陂路 → 吉庆街 → 回酒店午休 → 黄鹤楼 → 武昌江滩 → 楚河汉街 → 打车回酒店</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 吃什么 ============ -->
+<section id="food">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="num">04 / FOOD</span>
+      <h2>吃什么（孕妇版）</h2>
+      <p>武汉小吃种类多，但不是每样都能吃。下面按「放心吃 / 想清楚再吃 / 一口别碰」分成三类，照着点就行。</p>
+    </div>
+
+    <div class="grid3">
+      <div class="food-card ok">
+        <h4><span class="pill ok">放心吃</span></h4>
+        <div class="loc">现做、全熟、热的 —— 武汉小吃里的大多数</div>
+        <ul>
+          <li><b>热干面</b> —— 面条全熟 + 芝麻酱，武汉最安全的小吃</li>
+          <li><b>老通城豆皮</b> —— 蛋皮裹熟糯米 + 笋丁香菇</li>
+          <li><b>四季美汤包</b> —— 猪肉现蒸，务必趁热吃</li>
+          <li><b>牛肉粉 / 牛肉面</b> —— 汤头久煮，全熟</li>
+          <li><b>糊汤粉</b> —— 鲫鱼熬的糊汤煮透，注意小刺</li>
+          <li><b>生煎包 / 面窝 / 烧梅</b> —— 要现炸现吃，别买放凉的</li>
+          <li><b>湖北炖汤</b>（排骨藕汤等）—— 炖足时间，营养好</li>
+          <li><b>豆浆 / 酸梅汤 / 黑芝麻糊</b> —— 解腻，注意少糖</li>
+        </ul>
+      </div>
+
+      <div class="food-card warn">
+        <h4><span class="pill warn">想清楚再吃</span></h4>
+        <div class="loc">技术上可以做，但有附加条件</div>
+        <ul>
+          <li><b>小龙虾</b>（靓靓蒸虾 / 巴厘龙虾）—— 必须完全煮透、<b>去掉虾头</b>（头部富集重金属），不点死虾；油焖重辣容易引起胃部不适，浅尝即可</li>
+          <li><b>周黑鸭等卤味</b> —— 只买真空包装、标明保质期的；散装常温放置的不要</li>
+          <li><b>凉面</b> —— 熟面冷却后放置时间长，卫生难保证</li>
+          <li><b>奶茶</b> —— 咖啡因 + 高糖，选无咖啡因的，一天一杯上限</li>
+          <li><b>咖啡</b> —— 全天咖啡因不超过 200 mg（约 1 杯中杯）</li>
+          <li><b>酸梅汤 / 甜品</b> —— 含糖量高，孕期控糖的话少喝</li>
+        </ul>
+      </div>
+
+      <div class="food-card no">
+        <h4><span class="pill no">一口别碰</span></h4>
+        <div class="loc">和口味偏好无关，是安全问题</div>
+        <ul>
+          <li><b>蛋酒 / 米酒 / 酒酿圆子</b> —— 含酒精，酒精可直接通过胎盘，任何低度酒都不行</li>
+          <li><b>蟹 / 蟹脚热干面</b> —— 传统上孕期忌寒凉，且需要啃咬，卫生风险高，不吃为妙</li>
+          <li><b>生鱼片 / 刺身 / 生腌</b> —— 李斯特菌与寄生虫风险</li>
+          <li><b>溏心蛋 / 自制蛋黄酱 / 生蛋拌料</b> —— 沙门氏菌</li>
+          <li><b>卤味凉菜 / 凉拌菜 / 熟食拼盘</b> —— 冷藏 + 久放，李斯特菌的高危场景</li>
+          <li><b>现榨果汁 / 农家自产乳制品 / 软冰淇淋</b> —— 未经巴氏杀菌</li>
+          <li><b>大量冰镇饮料</b> —— 刺激肠胃，引起宫缩样不适</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout red" style="margin-top:16px;">
+      <b>一句话原则：入口的东西都要「热、熟、现做」。</b> 路边摊不必排斥，但要挑「正在锅里、在火上、在蒸笼上」的；一切凉的、生的、放久的、切好摆着的，都不要碰。武汉过早最常见的「热干面 + 蛋酒」组合，请务必把蛋酒换成豆浆。
+    </div>
+
+    <div class="grid2" style="margin-top:16px;">
+      <div class="alt">
+        <h3>🍜 本方案的实际吃法</h3>
+        <div class="why">四个进食节点，全都坐着吃</div>
+        <ul class="check">
+          <li><b>07:40 万松园</b> —— 热干面 + 豆浆，或牛肉粉 + 面窝（<b>不点蛋酒</b>）</li>
+          <li><b>10:45 黎黄陂路</b> —— 咖啡馆，热饮 + 一块蛋糕，纯休息</li>
+          <li><b>12:10 吉庆街</b> —— 老通城豆皮 + 四季美汤包 + 酸梅汤</li>
+          <li><b>19:25 楚河汉街</b> —— 商场内餐厅，炖汤 + 时蔬 + 主食</li>
+        </ul>
+      </div>
+      <div class="alt">
+        <h3>🌙 一个人想吃小龙虾怎么办</h3>
+        <div class="why">不建议一个人去夜市，但有更省力的办法</div>
+        <ol>
+          <li><b>不要去万松园夜市、吉庆街夜市</b> —— 19:00 之后人挤人，一个人在里面被挤到也没人扶</li>
+          <li>改在<b>正规餐厅堂食</b>：点清蒸虾，要求<b>去头</b>、确认<b>完全熟透</b>，避开麻辣重油的油焖大虾。有空调、有座位、有洗手间，吃完直接打车走</li>
+          <li>或者<b>点外卖到酒店</b>：房间里有桌子、有水、有洗手间，出问题也离同济医院只有 300 米</li>
+          <li>吃之前先给家人发一句「今晚在酒店吃小龙虾」，吃的过程留意身体反应</li>
+          <li>任何不适（腹痛、腹泻、皮疹）立刻停止，别想着「忍一忍就好」</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 伴手礼 ============ -->
+<section id="gift">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="num">05 / SOUVENIRS</span>
+      <h2>带回去给亲友的伴手礼</h2>
+      <p>出差一趟，空手回不好看。下面按「买什么、在哪买、多少钱、怎么拎回来」拆开写。<b>你是一个人，所以「轻、能寄、不容易坏」是第一原则。</b></p>
+    </div>
+
+    <div class="grid3">
+      <div class="food-card ok">
+        <h4>🥮 老字号糕点</h4>
+        <div class="loc">最稳的一类，送长辈和领导不会错</div>
+        <ul>
+          <li><b>汪玉霞</b>（1739 年老铺）—— 喜饼、京果、酥糖、麻烘糕、云片糕，<b>礼盒装最体面</b></li>
+          <li><b>曹祥泰</b>（1884 年）—— 绿豆糕、芝麻糕、酥京果、盐酥饼，老武汉人认这个</li>
+          <li><b>五芳斋</b>（武汉老字号）—— 汤圆、粽子，<b>速冻款不适合长途，别买</b></li>
+          <li><b>冠生园</b>—— 酥糖、麻烘糕，超市就能买</li>
+          <li>⚠️ 散装无包装的糕点不要买：路上会压碎，也没法送人</li>
+        </ul>
+      </div>
+
+      <div class="food-card ok">
+        <h4>🍜 武汉味道</h4>
+        <div class="loc">送同事、朋友、家里，性价比最高</div>
+        <ul>
+          <li><b>蔡林记 · 热干面速食礼盒</b> —— <b>武汉伴手礼第一名</b>，一箱十几袋，分给同事最合适，20–50 元</li>
+          <li><b>周黑鸭 / 精武鸭脖</b>（真空装）—— 认准真空 + 保质期，选微辣；<b>锁鲜装要冷藏，长途别买</b></li>
+          <li><b>老万成酸梅膏</b> —— 冲水喝的浓缩酸梅汁，很轻，夏天受欢迎</li>
+          <li><b>孝感麻糖</b> —— 湖北名产，白芝麻 + 麦芽糖，轻、便宜、适合大批量送</li>
+          <li><b>孝感米酒</b>（罐装）—— 送人可以，<b>但你自己一口都不能喝</b>，送哺乳期的朋友也要提醒一句</li>
+        </ul>
+      </div>
+
+      <div class="food-card ok">
+        <h4>🎁 文创与湖北特产</h4>
+        <div class="loc">轻、好看、不占地方</div>
+        <ul>
+          <li><b>湖北省博物馆文创</b> —— 编钟摆件、越王勾践剑书签和冰箱贴，送年轻朋友很出彩</li>
+          <li><b>黄鹤楼文创</b> —— 冰箱贴、书签、明信片，<b>景区商店和黄鹤楼公园里就有，顺手买</b></li>
+          <li><b>武汉大学文创</b> —— 校徽、笔记本（樱花周边只有 3 月有）</li>
+          <li><b>恩施玉露茶、赵李桥青砖茶</b> —— 湖北名茶，送长辈合适</li>
+          <li><b>随州香菇、罗田板栗、荆州鱼糕</b> —— 超市和机场都有，适合自家吃</li>
+          <li>⚠️ <b>洪山菜薹</b>是武汉特产，但只有 11 月–次年 2 月有，且不耐长途</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:16px;">
+      <div class="alt">
+        <h3>🎯 送谁买什么（照着抄）</h3>
+        <div class="why">不用纠结，按对象直接选</div>
+        <ul class="check">
+          <li><b>送同事 / 一大群人</b> —— 蔡林记热干面速食礼盒 + 孝感麻糖（<b>20–50 元</b>，能拆开分）</li>
+          <li><b>送父母 / 长辈</b> —— 汪玉霞礼盒 + 曹祥泰绿豆糕 + 恩施玉露茶（<b>40–150 元</b>，包装体面）</li>
+          <li><b>送朋友 / 年轻人</b> —— 省博文创或黄鹤楼冰箱贴 + 汉绣小件（<b>20–80 元</b>，轻且好看）</li>
+          <li><b>送爱喝酒的亲戚</b> —— 黄鹤楼酒、白云边（<b>100–300 元</b>，超市或机场买，走托运/快递）</li>
+          <li><b>自己带回家吃</b> —— 老万成酸梅膏 + 周黑鸭真空装 + 随州香菇（<b>20–60 元</b>，超市一次买齐）</li>
+          <li><b>预算 200 元以内</b>就能覆盖「同事 + 长辈 + 自己」三份</li>
+        </ul>
+      </div>
+
+      <div class="alt">
+        <h3>🧳 一个人怎么拎回来</h3>
+        <div class="why">这段比买什么更重要</div>
+        <ul class="cross">
+          <li><b>不要上午就买</b> —— 拎着一天，一天的体力就废了。放在<b>最后一站楚河汉街</b>或回酒店路上买</li>
+          <li><b>不要买超过 5 公斤</b> —— 手提袋一旦拎久了，腰和手腕先受不了</li>
+          <li><b>现场最多买一个手提袋</b>，其余当场在驿站或让酒店前台代寄回家</li>
+          <li><b>液体类（酸梅膏、酒、米酒）不能随身带上飞机</b>，要么托运要么快递；高铁对带酒有度数和数量限制，提前查</li>
+          <li>真空卤味看清储存条件：常温款能带，<b>冷藏/锁鲜款路上会坏</b></li>
+          <li>别在景区门口买高价「特产」，同款在超市便宜一半</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout red" style="margin-top:16px;">
+      <b>给自己的两条提醒：</b>① 送人的米酒、黄鹤楼酒，<b>你自己一口都不要尝</b>，别为了一句「尝尝嘛」破功；② 糕点含糖高，自己最多尝两块，别当正餐吃。
+    </div>
+
+    <div class="callout" style="margin-top:12px;">
+      <b>哪里买最省事：</b>吉庆街一带（汪玉霞、老万成）→ 中山大道（曹祥泰）→ 大型超市（蔡林记速食、真空卤味、孝感麻糖、随州香菇一次买齐）→ 黄鹤楼／省博景区店（文创）→ 机场和高铁站（都有，但贵 20%–30%，适合临时补）。<b>具体门店和价格以现场为准，出行前可在大众点评搜一次确认营业时间。</b>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 休息点 ============ -->
+<section id="rest">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="num">06 / REST STOPS</span>
+      <h2>休息与补给点</h2>
+      <p>孕期出行的核心不是「看多少」，是「随时能坐下」。下面这些点，空调、座位、洗手间至少满足两项。</p>
+    </div>
+
+    <div class="grid2">
+      <div class="food-card ok">
+        <h4>🏛 江汉关博物馆</h4>
+        <div class="loc">汉口沿江大道 129 号 · 09:00–17:00</div>
+        <ul>
+          <li>✅ <b>室内恒温空调</b></li>
+          <li>✅ <b>无障碍专用电梯通达各楼层</b>，不用爬楼</li>
+          <li>✅ 每层都有洗手间</li>
+          <li>✅ 展厅与咨询中心有座椅，随时可歇</li>
+        </ul>
+      </div>
+
+      <div class="food-card ok">
+        <h4>☕ 黎黄陂路咖啡馆</h4>
+        <div class="loc">江岸区黎黄陂路 / 洞庭街一带</div>
+        <ul>
+          <li>✅ 老房子内空调 + 沙发座位</li>
+          <li>✅ 树荫街区，人行道平整无台阶</li>
+          <li>✅ 人少、安静、车少，比步行街安全得多</li>
+          <li>⚠️ 二楼小店楼梯陡，只去一楼的</li>
+        </ul>
+      </div>
+
+      <div class="food-card ok">
+        <h4>🥟 吉庆街（老通城 / 四季美）</h4>
+        <div class="loc">江岸区中山大道 · 午餐时段</div>
+        <ul>
+          <li>✅ 老字号实体店面，空调 + 堂食座位</li>
+          <li>✅ 店内洗手间</li>
+          <li>✅ 出餐快，不用久等久站</li>
+        </ul>
+      </div>
+
+      <div class="food-card ok">
+        <h4>🛍 楚河汉街 · 万达广场</h4>
+        <div class="loc">武昌区中北路 · 晚餐时段</div>
+        <ul>
+          <li>✅ 空调、电梯、大量座椅</li>
+          <li>✅ 洗手间干净且有<b>母婴室</b></li>
+          <li>✅ 步行道宽敞平整，不用挤</li>
+          <li>✅ 餐厅集群，选择多</li>
+        </ul>
+      </div>
+
+      <div class="food-card warn">
+        <h4>🏯 黄鹤楼园区</h4>
+        <div class="loc">武昌区蛇山西山坡特 1 号 · 08:30–18:00</div>
+        <ul>
+          <li>✅ <b>主楼电梯对孕妇开放</b>（入园时告知工作人员）</li>
+          <li>✅ <b>东门电瓶车 10 元/人次</b>直达主楼，不用走路</li>
+          <li>✅ 园内多处休息椅、洗手间</li>
+          <li>⚠️ 园内是 3–4 公里步道，别贪多</li>
+        </ul>
+      </div>
+
+      <div class="food-card warn">
+        <h4>🌊 武昌江滩</h4>
+        <div class="loc">武昌大桥武昌桥头堡段 · 全天开放</div>
+        <ul>
+          <li>✅ 长椅密布，随处可坐</li>
+          <li>✅ 树荫多、地面平整</li>
+          <li>⚠️ 洗手间在沿线的江滩驿站，进园前先用一次</li>
+          <li>⚠️ 江风大，带薄外套</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout">
+      <b>就近备用（离酒店最近的两个空调避难所）：</b>武商 MALL（距酒店 1.7 km）、武汉 K11（距酒店 1.3 km）。任何一个环节觉得撑不住，打车 10 分钟到这两个商场，空调、洗手间、座椅、餐饮全都有，歇够了再决定要不要继续。
+    </div>
+  </div>
+</section>
+
+<!-- ============ 交通与预算 ============ -->
+<section id="traffic">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="num">07 / TRANSPORT &amp; BUDGET</span>
+      <h2>交通与预算</h2>
+      <p>这一版把地铁换成了打车。贵一些，但这是孕期出行最值的一笔钱。</p>
+    </div>
+
+    <div class="table-card">
+      <table>
+        <thead><tr><th>项目</th><th>明细</th><th>费用</th></tr></thead>
+        <tbody>
+          <tr><td>打车 · 9/22 晚</td><td>武汉站 → 酒店（这一段最贵，也最不能省）</td><td class="k-ind">约 75 元</td></tr>
+          <tr><td>打车 · 9/23</td><td>万松园、江汉关、黎黄陂路、吉庆街、回酒店、黄鹤楼、江滩、汉街、回酒店（9 段）</td><td class="k-ind">约 184 元</td></tr>
+          <tr><td>打车 · 9/24</td><td>就近半程往返约 30 元 + 酒店 → 武汉站 约 75 元</td><td class="k-ind">约 105 元</td></tr>
+          <tr><td>门票</td><td>黄鹤楼日场 70 元；其余景点全免费</td><td class="k-ind">70 元</td></tr>
+          <tr><td>餐饮</td><td>9/22 晚餐 50 + 9/23 过早 20 / 咖啡 35 / 午餐 65 / 晚餐 85 + 9/24 过早 20 / 站内简餐 30</td><td class="k-ind">约 305 元</td></tr>
+          <tr><td><b>三天合计（一个人）</b></td><td>不含伴手礼、住宿和往返车票</td><td class="k-ind"><b>约 740 元</b></td></tr>
+          <tr><td><b>如果 9/23 整天要工作</b></td><td>砍掉过早、江汉关、老租界、黄鹤楼、江滩，只留晚餐和送站</td><td class="k-ind"><b>约 370 元</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid2" style="margin-top:16px;">
+      <div class="alt">
+        <h3>🚇 关于地铁，三件事</h3>
+        <div class="why">能不打车就坐地铁时，也要有讲究</div>
+        <ul class="check">
+          <li><b>避开高峰</b>：武汉地铁 2 号线是全国最拥挤的线路之一，早高峰 7:30–9:00、晚高峰 17:00–19:00 极端拥挤。这版方案的时间安排已经全部避开。</li>
+          <li><b>安检没有辐射风险</b>：安检门和手持金属探测器是金属探测，不含电离辐射；行李 X 光机的辐射被铅帘挡住，别把手伸进帘内就行。有顾虑可以主动告知，要求人工手检。</li>
+          <li><b>离酒店最近的站</b>：1 号线硚口路站，880 米（步行 13 分钟）。但去市区方向反而不如直接打车方便。</li>
+        </ul>
+      </div>
+
+      <div class="alt">
+        <h3>🚕 打车小技巧</h3>
+        <div class="why">让每一段路都更舒服</div>
+        <ul class="check">
+          <li>只用正规 App（高德 / 滴滴），不跟路边揽客的走</li>
+          <li>叫车时选 <b>「优享 / 专车」</b>车型，座椅更舒服、司机更稳、车内更干净</li>
+          <li>上车就说「<b>师傅，麻烦开慢点稳一点</b>」，武汉司机开得快是常态</li>
+          <li>把目的地设成 <b>景区门口的落客点</b>（如黄鹤楼东门），能少走几百米就少走</li>
+          <li>每段车程控制在 30 分钟以内，路远的话中途可以要求停一下</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 安全与应急 ============ -->
+<section id="safety">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="num">08 / SAFETY</span>
+      <h2>安全与应急</h2>
+      <p>这一节比行程本身更重要。请把这一屏截图存到手机相册。</p>
+    </div>
+
+    <div class="med">
+      <h4>⭐ 华中科技大学同济医学院附属同济医院（汉口院区）</h4>
+      <div class="addr">硚口区解放大道 1095 号 · 电话 027-83665555 · 三甲综合医院 · 妇产科实力全国前列</div>
+      <div class="dist">距酒店约 300 米 · 步行 5 分钟 —— 这是本方案最大的底气</div>
+    </div>
+
+    <div class="table-card">
+      <table>
+        <thead><tr><th>医院</th><th>地址</th><th>距酒店</th></tr></thead>
+        <tbody>
+          <tr><td><b>同济医院（汉口院区）</b></td><td>硚口区解放大道 1095 号（027-83665555）</td><td class="k-ind">约 300 m · 步行 5 分钟</td></tr>
+          <tr><td>武汉市第一医院</td><td>硚口区中山大道 215 号</td><td class="k-ind">约 3 km · 打车 10 分钟</td></tr>
+          <tr><td>武汉市中心医院</td><td>江岸区胜利街 26 号</td><td class="k-ind">约 6 km · 打车 20 分钟</td></tr>
+          <tr><td>湖北省妇幼保健院</td><td>洪山区武珞路 745 号（过江）</td><td class="k-ind">约 12 km · 打车 30 分钟</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout" style="margin-top:12px;">
+      以上为公开地址信息。<b>出行前请用地图 App 复核一次并收藏</b>，同时把酒店地址、家人电话、产检医生电话存在手机备忘录里。
+    </div>
+
+    <div class="grid2" style="margin-top:16px;">
+      <div class="alt">
+        <h3>🚨 出现这些情况，立刻终止行程</h3>
+        <div class="why">不要忍，不要「走完这一站再说」</div>
+        <ul class="cross">
+          <li>阴道流血或流水</li>
+          <li>规律腹痛、腹部发紧发硬</li>
+          <li>头晕、视物模糊、严重头痛</li>
+          <li>胎动明显减少或异常增多</li>
+          <li>心慌、气短、胸闷</li>
+          <li>呕吐腹泻不止</li>
+        </ul>
+        <div class="callout red" style="margin-top:10px;font-size:12.5px;">
+          处理顺序：<b>立刻找地方坐下</b> → 打车上最近的医院（同济医院 5 分钟车程）→ 同时联系产检医生。不要先回酒店观察。
+        </div>
+      </div>
+
+      <div class="alt">
+        <h3>🌡 防暑与防脱水</h3>
+        <div class="why">9 月下旬武汉仍可能 30℃+</div>
+        <ul class="check">
+          <li>11:00–15:00 尽量待在室内（本方案已把这段时间全部安排为午休）</li>
+          <li>每小时补水 <b>150–200 ml</b>，少量多次，别等口渴</li>
+          <li>随身带小零食（坚果、苏打饼干），防低血糖和孕吐</li>
+          <li>遮阳帽 + 防晒 + 折叠伞，武汉的太阳说晒就晒</li>
+          <li>穿浅色透气衣物，出汗多的话随身带一件替换上衣</li>
+        </ul>
+      </div>
+
+      <div class="alt">
+        <h3>📱 一个人走，出门前先做这 5 件事</h3>
+        <div class="why">全程没有同伴，安全网要提前织好</div>
+        <ul class="check">
+          <li><b>开启位置共享</b>：微信把实时位置共享给家人（可以设成持续 8 小时），让家里人能看到你在哪</li>
+          <li><b>报点制度</b>：每到一个大节点（江汉关 / 吉庆街 / 酒店 / 黄鹤楼 / 江滩）给家人发一句「到了」，超过 2 小时没动静就让家人打你电话</li>
+          <li><b>手机电量保持 50% 以上</b>，充电宝随身带；打车、导航、付款全靠它，没电等于没了腿</li>
+          <li><b>酒店房卡和信息卡拍照存手机</b> —— 写有酒店地址和电话的房卡套拍一张，迷路时可以给司机看</li>
+          <li><b>预约好返程用车</b>：晚上那段（楚河汉街 → 酒店）不要指望路边拦车，提前 20 分钟在 App 上叫</li>
+        </ul>
+        <div class="callout red" style="margin-top:10px;font-size:12.5px;">
+          <b>一个人最要命的情况是「突然不舒服但没人发现」。</b>所以：任何不适的第一动作是<b>就近找个有人的地方坐下</b>（店里、商场里、岗亭边），不要一个人蹲在路边或撑到回酒店。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 备选方案 ============ -->
+<section id="alt">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="num">09 / PLAN B</span>
+      <h2>备选方案</h2>
+      <p>按当天的身体状态和天气挑一个。宁可少走一站，也不要硬撑。</p>
+    </div>
+
+    <div class="grid2">
+      <div class="alt">
+        <h3>⏱ 极简版（4 小时 · 只走 2 站）</h3>
+        <div class="why">状态一般就直接用这个，省力程度最高</div>
+        <ol>
+          <li><b>09:00</b> 打车 → 江汉关博物馆（1.5 小时，有电梯）</li>
+          <li><b>11:00</b> 打车 → 吉庆街午餐（老通城 / 四季美）</li>
+          <li><b>12:30</b> 打车回酒店午休</li>
+          <li><b>16:00</b> 打车 → 黄鹤楼（电瓶车 + 电梯，90 分钟）</li>
+          <li><b>18:00</b> 打车回酒店，附近吃晚饭</li>
+        </ol>
+        <div class="callout" style="margin-top:12px;font-size:12.5px;">
+          步行总量 &lt; 2 公里，打车约 110 元。这条线把「汉口过早」「江滩夜景」都砍了，但留下了一天里最舒服的两站。
+        </div>
+      </div>
+
+      <div class="alt">
+        <h3>☔ 下雨 / 高温版（&gt;33℃ 或有雨）</h3>
+        <div class="why">全部改室内，一步不晒</div>
+        <ol>
+          <li>万松园过早（有棚，照常）</li>
+          <li>江汉关博物馆（室内 1.5 小时）</li>
+          <li>黎黄陂路咖啡馆坐着看雨（40 分钟）</li>
+          <li>吉庆街午餐</li>
+          <li>回酒店午休 2 小时</li>
+          <li>下午改逛 <b>武商 MALL / 武汉 K11</b>（离酒店 1.3–1.7 km，空调 + 洗手间 + 座椅）</li>
+          <li>商场内晚餐，打车回酒店</li>
+        </ol>
+        <div class="callout" style="margin-top:12px;font-size:12.5px;">
+          雨天不要安排黄鹤楼 —— 园内石板路湿滑，台阶和坡道风险明显上升。
+        </div>
+      </div>
+
+      <div class="alt">
+        <h3>💪 状态好加量版</h3>
+        <div class="why">当天觉得轻松，可以在主线里加这些（最多加 2 项）</div>
+        <ol>
+          <li><b>+ 汉口江滩</b>：黎黄陂路南口出来就是沿江大道，坐长椅吹江风 20 分钟，零成本</li>
+          <li><b>+ 中山公园</b>：离万松园 600 米，树荫多、长椅多、有公厕，慢走 40 分钟</li>
+          <li><b>+ 轮渡体验</b>：见下方注意事项，风险明显高于打车</li>
+        </ol>
+        <div class="callout red" style="margin-top:12px;font-size:12.5px;">
+          <b>关于轮渡（重要）：</b>武中线汉口武汉关 ↔ 武昌中华路，1.5 元、约 15 分钟，是武汉最经典的体验 —— 但它也是<b>唯一允许电动自行车上船的航线</b>，一层甲板停满电动车，码头栈桥和船上人流车辆混杂，高峰时段（14:00–20:00）还会限流甚至需要预约。<br>
+          <b>但按你现在的情况 —— 一个人、没人搭手 —— 建议直接放弃轮渡。</b>如果确实想坐：<b>①</b> 只选上午 10–11 点的非高峰时段；<b>②</b> 到码头后主动告知工作人员你怀孕，请他们协助安排优先登船，别去挤队列；<b>③</b> 直接上二层甲板找座位区，不要待在一层；<b>④</b> 走登船栈桥缓坡时<b>抓稳扶手、一步一停</b> —— 扶手只有一侧，另一侧没有人可以扶你，这是全程最不适合一个人走的环节。<br>
+          <b>更稳的替代：直接打车过江（约 30 元 / 25 分钟），或者坐「江滩观光线」游船（50 元，船体更大更舒适、有座位）。</b>
+        </div>
+      </div>
+
+      <div class="alt">
+        <h3>🏛 纯室内文化版</h3>
+        <div class="why">不想晒太阳、又喜欢看展</div>
+        <ol>
+          <li>上午：江汉关博物馆（1.5 小时）</li>
+          <li>午餐：吉庆街</li>
+          <li>回酒店午休 2 小时</li>
+          <li>下午：打车去 <b>湖北省博物馆</b>（武昌东湖路 160 号，地铁 8 号线省博湖北日报站 A 口步行 5 分钟）</li>
+          <li>看越王勾践剑、曾侯乙编钟；<b>编钟演奏</b>是全程最值得坐下来的 20 分钟</li>
+          <li>傍晚就近吃晚饭，打车回酒店</li>
+        </ol>
+        <div class="callout" style="margin-top:12px;font-size:12.5px;">
+          省博周二至周日 09:00–17:00、周一闭馆，<b>免费但必须提前实名预约</b>（官方公众号/官网，最早可提前 5 天，每日放票时间为 17:18，周末名额很紧张）。代价：距酒店约 15 km，打车单程 35 分钟。
+        </div>
+      </div>
+
+      <div class="alt">
+        <h3>💼 9/23 要工作版（出差主推）</h3>
+        <div class="why">你已知 23、24 号两天早上都要去肺科医院 1 小时左右，按这个走最不容易出错</div>
+        <ol>
+          <li><b>06:50 起床</b>，7:00–7:10 双闹钟设好，出门背包带：身份证、房卡、手机、U 盘/文件（前一晚放背包最外层）</li>
+          <li><b>07:30 步行去肺科医院</b>（沿解放大道向西，800 m / 8–10 分），<b>工作约 1 小时</b>，8:30 前结束</li>
+          <li><b>08:30 回酒店附近过早</b>，9:00 前完成（附近就行，<b>不必去万松园</b>）</li>
+          <li><b>9/23 工作如果是临时 1 小时</b> → 从 <b>江汉关博物馆</b> 接，全天线路一站不落；<br>
+          <b>占掉整个上午</b> → <b>12:00 直接打车去吉庆街</b> 吃午饭；<br>
+          <b>临时提前结束</b> → 从 <b>回酒店过早</b> 接；<br>
+          <b>推迟到下午</b> → 上午先走前 3 站，办完事再去黄鹤楼看日落</li>
+          <li><b>13:20–15:30</b> 回酒店午休 2 小时（<b>这一段不要省</b>）</li>
+          <li><b>15:40</b> 打车去黄鹤楼，东门电瓶车 + 主楼电梯，<b>17:20 前必须入园</b></li>
+          <li><b>18:00</b> 打车去武昌江滩，坐长椅看日落和大桥亮灯</li>
+          <li><b>19:25</b> 楚河汉街吃晚饭 + 顺手买伴手礼</li>
+          <li><b>20:20</b> 打车回酒店 → <b>21:00 开始收行李</b>（9/24 上午要用）</li>
+        </ol>
+        <div class="callout" style="margin-top:12px;font-size:12.5px;">
+          早上去医院多走 1.6 km，全天打车多约 25 元，<b>但不影响下午和晚上的完整线路</b>。如果对方说「明早不开会」，就直接忽略医院那段，按原版 07:30 万松园过早走。
+        </div>
+      </div>
+
+      <div class="alt">
+        <h3>🎯 9/24 送站日（不管前面怎么变，这天都照这个走）</h3>
+        <div class="why">这天只有一件事：别误车</div>
+        <ol>
+          <li><b>07:30</b> 酒店附近过早 —— 就近，不跑远</li>
+          <li><b>08:30–10:15</b> 就近半程三选一（汉口江滩 / 武商 MALL·K11 / 哪都不去）</li>
+          <li><b>10:15</b> 回房清点物品，<b>11:00 前完成退房</b>；行李放前台，你在大堂坐着</li>
+          <li><b>11:20</b> 提前叫的车到门口 → <b>出发去武汉站</b>（若票面是汉口站，12:20 出发即可）</li>
+          <li><b>12:10</b> 到站，刷证进站、走重点旅客通道</li>
+          <li><b>13:45</b> 到检票口 · <b>14:09 发车</b></li>
+        </ol>
+        <div class="callout red" style="margin-top:12px;font-size:12.5px;">
+          <b>唯一不能变的是两个数字：11:00 退房、11:20 出发。</b> 为了这两个数字，9/24 上午宁可什么都不安排。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 贴士 ============ -->
+<section id="tips">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="num">10 / TIPS</span>
+      <h2>实用贴士</h2>
+      <p>出发前 5 分钟扫一眼，出门前把「随身清单」对一遍。</p>
+    </div>
+
+    <div class="grid2">
+      <div class="alt">
+        <h3>✅ 出发前必做 6 件事</h3>
+        <div class="why">不做会白跑、或者赶不上车</div>
+        <ul class="check">
+          <li><b>确认发车站</b>：车票上是武汉站 / 汉口站 / 武昌站 —— 9/24 的出发时间差 1 小时以上</li>
+          <li><b>问产检医生</b>：确认当前孕周和身体情况适合这趟出差</li>
+          <li><b>预约江汉关博物馆</b>：公众号「江汉关博物馆」或「武汉文旅码」，提前 1–3 天</li>
+          <li><b>买黄鹤楼门票</b>：公众号「黄鹤楼公园」实名预约，提前 1 天</li>
+          <li><b>12306 预约「重点旅客服务」</b>：App → 我的 → 重点旅客预约，开车前 4 小时以上、免费 —— 返程拎箱子时最有用</li>
+          <li><b>查天气</b>：&gt;33℃ 或下雨就走室内版（江汉关周一闭馆，本次是周二到周四，不受影响）</li>
+        </ul>
+      </div>
+
+      <div class="alt">
+        <h3>🎒 随身清单</h3>
+        <div class="why">按这个对一遍再出门</div>
+        <ul class="check">
+          <li>孕产妇保健手册 + 医保卡 + 身份证</li>
+          <li><b>保温杯</b>（温水，小口多次喝）</li>
+          <li><b>小零食</b>（坚果、苏打饼干）防低血糖和孕吐</li>
+          <li><b>防滑平底鞋</b> —— 绝对不穿新鞋、不穿高跟</li>
+          <li><b>托腹带</b> —— 孕中期后走久了腰会酸</li>
+          <li>遮阳帽 + 防晒霜 + 折叠伞</li>
+          <li><b>湿巾 + 免洗洗手液</b> —— 吃小吃前擦手</li>
+          <li>备用内衣裤 + 卫生护垫</li>
+          <li>薄外套（商场和地铁空调冷，江边风大）</li>
+          <li>充电宝 + 手机（存好家人、酒店、医院电话）</li>
+        </ul>
+      </div>
+
+      <div class="alt">
+        <h3>⏰ 关键时间卡点</h3>
+        <div class="why">错过任何一个都要改方案</div>
+        <ul class="check">
+          <li><b>9/22 · 19:40</b> 列车到武汉站</li>
+          <li><b>9/22 · 20:50</b> 之前到酒店（到站后别在车站逗留）</li>
+          <li><b>9/23 · 16:00</b> 江汉关博物馆停止入馆</li>
+          <li><b>9/23 · 17:20</b> 黄鹤楼日场停止入园（18:00 闭园）</li>
+          <li><b>9/23 · 18:15</b> 9 月下旬日落；18:30–19:00 长江大桥亮灯</li>
+          <li><b>9/23 · 21:00</b> 开始收行李（打包到 80%）</li>
+          <li><b>9/24 · 11:00</b> 必须完成退房</li>
+          <li><b>9/24 · 11:20</b> 必须出发去车站（按最远的武汉站算）</li>
+          <li><b>9/24 · 13:54</b> 停止检票 → <b>14:09 发车</b></li>
+          <li><b>周一</b> 江汉关博物馆闭馆（本次是周二到周四，不受影响）</li>
+        </ul>
+      </div>
+
+      <div class="alt">
+        <h3>🚫 绝对不要做的 7 件事</h3>
+        <div class="why">这一栏比上面所有都重要</div>
+        <ul class="cross">
+          <li>不走<b>长江大桥桥面</b>（人行道窄、电动车多、风大）</li>
+          <li>不爬<b>黄鹤楼主楼台阶</b>（坐电梯）</li>
+          <li>不去<b>江汉路步行街 / 户部巷 / 万松园夜市</b>人挤人</li>
+          <li>不骑共享单车</li>
+          <li>不泡温泉、不坐刺激性游乐设施</li>
+          <li>不吃生冷、不吃任何含酒精的东西</li>
+          <li>不久站、不硬撑 —— 每 40 分钟坐下休息 10 分钟</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout blue" style="margin-top:16px;">
+      <b>如果只想记一句话：</b><b>9/22 晚只做「到店 + 吃饭 + 睡」；9/23 工作几点结束就从哪一站接上；9/24 上午 11:00 退房、11:20 出发去车站。</b> 9/23 的走法是：上午在汉口（万松园过早 → 江汉关博物馆 → 黎黄陂路 → 吉庆街），中午<b>回酒店睡 2 小时</b>，下午打车过江去黄鹤楼（<b>电瓶车 + 电梯</b>，绝不爬楼），傍晚在武昌江滩<b>坐着</b>看大桥亮灯，汉街吃晚饭（顺路买伴手礼），打车回酒店（<b>21:00 开始收行李</b>）。<b>全程打车、单日步行不超过 4 公里、随时能坐下、位置共享一直开着、同济医院就在酒店旁边 300 米。</b>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p style="margin:0 0 8px;"><b>行程版本：</b>2026-09-22 整理（第三版）· 孕妇一人独行 · 时间窗 9/22 19:40 到武汉 → 9/24 14:09 离汉 · 住汉庭（武汉解放大道同济医学院店）2 晚 · 按「三块碎片」而不是整日排程</p>
+    <p style="margin:0 0 8px;"><b>关于车站：</b>本方案按发车站为<b>武汉站</b>（22–25 km）预留时间，所以 11:20 就得出发。若票面是<b>汉口站</b>（约 6.5 km），出发时间可以推到 12:20；<b>武昌站</b>（约 14 km）则可推到 11:50。<b>出发前一天请在 12306 上确认一次站名和发车时间。</b></p>
+    <p style="margin:0 0 8px;"><b>信息来源：</b>黄鹤楼日场 08:30–18:00 / 17:20 停止入园 / 成人 70 元（公众号「黄鹤楼公园」实名预约）；江汉关博物馆 汉口沿江大道 129 号 / 周二至周日 09:00–17:00 / 16:00 停止入馆 / 周一闭馆 / 免费预约 / 馆内设无障碍专用电梯；武汉轮渡武中线 06:30–20:00 / 1.5 元 / 唯一允许非机动车上船的航线；同济医院汉口院区 解放大道 1095 号；湖北省博物馆 东湖路 160 号 / 周一闭馆 / 提前 5 天预约。</p>
+    <p style="margin:0 0 8px;"><b>重要声明：</b>本方案按<b>孕中期（4–6 个月）、一人独行</b>的通用原则设计。如果你处于孕早期、孕晚期，或有先兆流产、宫颈机能不全、妊娠高血压、前置胎盘等情况，请遵医嘱，不建议一日外出。本方案为行程安排建议，不构成医疗意见，孕期出行请以你的产检医生的判断为准。门票价格、开放时间、轮渡班次均来自公开信息，出行前一天请再核对一次官方公告，节假日可能有调整。</p>
+    <p style="margin:0;">🔖 建议在手机浏览器打开本页并「添加到主屏幕」，或把「安全与应急」一节截图存到相册，路上随时翻看。</p>
+  </div>
+</footer>
+
+<script>
+// 极简交互：目录高亮
+(function(){
+  var links = document.querySelectorAll('nav.toc a');
+  var sections = [];
+  links.forEach(function(a){
+    var el = document.querySelector(a.getAttribute('href'));
+    if(el) sections.push({a:a, el:el});
+  });
+  function onScroll(){
+    var y = window.scrollY + 120;
+    var active = sections[0];
+    sections.forEach(function(s){ if(s.el.offsetTop <= y) active = s; });
+    links.forEach(function(a){ a.style.background=''; a.style.borderColor='transparent'; a.style.color=''; });
+    if(active){
+      active.a.style.background = '#fff';
+      active.a.style.borderColor = '#E4E0D8';
+      active.a.style.color = '#E2582F';
+    }
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+})();
+</script>
+</body>
+</html>
