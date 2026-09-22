@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>柳州三天两夜·情侣浪漫游</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #fff5f7 0%, #ffe8ec 50%, #ffd6e0 100%);
+    color: #4a3b3b;
+    line-height: 1.7;
+    padding: 20px;
+  }
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(255, 122, 152, 0.15);
+    overflow: hidden;
+  }
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, #ff7a98 0%, #ff5e7e 50%, #d94677 100%);
+    color: #fff;
+    padding: 50px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "❤";
+    position: absolute;
+    font-size: 200px;
+    opacity: 0.08;
+    top: -40px;
+    right: -30px;
+  }
+  .hero::after {
+    content: "❤";
+    position: absolute;
+    font-size: 160px;
+    opacity: 0.08;
+    bottom: -50px;
+    left: -20px;
+  }
+  .hero h1 {
+    font-size: 38px;
+    margin-bottom: 12px;
+    letter-spacing: 2px;
+  }
+  .hero .subtitle {
+    font-size: 18px;
+    opacity: 0.95;
+    margin-bottom: 8px;
+  }
+  .hero .meta {
+    font-size: 14px;
+    opacity: 0.85;
+    margin-top: 16px;
+  }
+  .tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.25);
+    padding: 6px 14px;
+    border-radius: 20px;
+    margin: 4px;
+    font-size: 13px;
+  }
+  /* 概要卡片 */
+  .overview {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    padding: 30px 40px;
+    background: #fff8f9;
+  }
+  .overview-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px 14px;
+    text-align: center;
+    border: 1px solid #ffd6e0;
+    transition: transform 0.2s;
+  }
+  .overview-card:hover { transform: translateY(-4px); }
+  .overview-card .icon { font-size: 30px; margin-bottom: 8px; }
+  .overview-card .label { font-size: 13px; color: #888; }
+  .overview-card .value { font-size: 18px; font-weight: bold; color: #d94677; margin-top: 4px; }
+  /* 内容区 */
+  .content { padding: 40px; }
+  .day {
+    margin-bottom: 50px;
+    position: relative;
+  }
+  .day-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px dashed #ffd6e0;
+  }
+  .day-badge {
+    background: linear-gradient(135deg, #ff7a98, #d94677);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 14px;
+    font-weight: bold;
+    font-size: 16px;
+    min-width: 110px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(255, 122, 152, 0.3);
+  }
+  .day-theme h2 {
+    font-size: 22px;
+    color: #d94677;
+    margin-bottom: 4px;
+  }
+  .day-theme p {
+    font-size: 14px;
+    color: #888;
+  }
+  /* 时间线 */
+  .timeline {
+    position: relative;
+    padding-left: 28px;
+  }
+  .timeline::before {
+    content: "";
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: linear-gradient(to bottom, #ff7a98, #ffd6e0);
+  }
+  .item {
+    position: relative;
+    margin-bottom: 24px;
+    background: #fff8fa;
+    border-radius: 14px;
+    padding: 18px 20px;
+    border-left: 4px solid #ff7a98;
+    transition: all 0.2s;
+  }
+  .item:hover {
+    background: #fff0f4;
+    transform: translateX(4px);
+  }
+  .item::before {
+    content: "❤";
+    position: absolute;
+    left: -28px;
+    top: 20px;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border: 3px solid #ff7a98;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    color: #ff7a98;
+  }
+  .item-time {
+    font-size: 13px;
+    color: #d94677;
+    font-weight: bold;
+    margin-bottom: 6px;
+  }
+  .item-title {
+    font-size: 17px;
+    font-weight: bold;
+    color: #4a3b3b;
+    margin-bottom: 6px;
+  }
+  .item-desc {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+  }
+  .item-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .item-tag {
+    background: #fff;
+    border: 1px solid #ffd6e0;
+    color: #d94677;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+  }
+  .item-tip {
+    background: #fff3cd;
+    border-left: 3px solid #ffc107;
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin-top: 8px;
+    font-size: 13px;
+    color: #856404;
+  }
+  /* 美食 */
+  .food-section {
+    margin-top: 50px;
+    padding: 30px;
+    background: linear-gradient(135deg, #fff8f9, #fff0f4);
+    border-radius: 20px;
+  }
+  .food-section h2 {
+    text-align: center;
+    color: #d94677;
+    font-size: 26px;
+    margin-bottom: 24px;
+  }
+  .food-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .food-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 4px 12px rgba(255, 122, 152, 0.08);
+  }
+  .food-card .emoji { font-size: 32px; margin-bottom: 8px; }
+  .food-card h4 { color: #d94677; margin-bottom: 6px; }
+  .food-card p { font-size: 13px; color: #777; }
+  /* 预算表 */
+  .budget {
+    margin-top: 40px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid #ffd6e0;
+  }
+  .budget h2 { color: #d94677; margin-bottom: 16px; font-size: 22px; }
+  .budget table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .budget th, .budget td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid #ffe8ec;
+    font-size: 14px;
+  }
+  .budget th {
+    background: #fff0f4;
+    color: #d94677;
+    font-weight: bold;
+  }
+  .budget tfoot td {
+    font-weight: bold;
+    color: #d94677;
+    background: #fff8f9;
+  }
+  /* 提示 */
+  .tips {
+    margin-top: 30px;
+    background: linear-gradient(135deg, #fff5e6, #ffe8cc);
+    border-radius: 16px;
+    padding: 24px;
+    border-left: 5px solid #ff9800;
+  }
+  .tips h2 { color: #e65100; margin-bottom: 12px; font-size: 22px; }
+  .tips ul { padding-left: 20px; }
+  .tips li { margin-bottom: 8px; font-size: 14px; color: #5d4037; }
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 30px;
+    background: linear-gradient(135deg, #ff7a98, #d94677);
+    color: #fff;
+  }
+  .footer p { margin-bottom: 6px; }
+  .footer .small { font-size: 12px; opacity: 0.85; }
+
+  @media (max-width: 720px) {
+    .overview { grid-template-columns: repeat(2, 1fr); }
+    .hero h1 { font-size: 28px; }
+    .hero { padding: 36px 24px; }
+    .content { padding: 24px; }
+    .day-header { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <h1>💕 柳州 三天两夜 浪漫游</h1>
+    <p class="subtitle">和心爱的 TA，邂逅龙城的山水与螺香</p>
+    <div>
+      <span class="tag">🌸 山水龙城</span>
+      <span class="tag">🍜 螺蛳粉之乡</span>
+      <span class="tag">💑 情侣定制</span>
+      <span class="tag">📷 出片率高</span>
+    </div>
+    <p class="meta">推荐出行时间：3-5月 / 9-11月 · 人均预算 ¥1200-1800</p>
+  </div>
+
+  <!-- 概要 -->
+  <div class="overview">
+    <div class="overview-card">
+      <div class="icon">📅</div>
+      <div class="label">行程天数</div>
+      <div class="value">3 天 2 晚</div>
+    </div>
+    <div class="overview-card">
+      <div class="icon">🚄</div>
+      <div class="label">推荐交通</div>
+      <div class="value">高铁/动车</div>
+    </div>
+    <div class="overview-card">
+      <div class="icon">🏨</div>
+      <div class="label">住宿区域</div>
+      <div class="value">市中心/柳江畔</div>
+    </div>
+    <div class="overview-card">
+      <div class="icon">💰</div>
+      <div class="label">人均预算</div>
+      <div class="value">¥1200-1800</div>
+    </div>
+  </div>
+
+  <!-- 行程内容 -->
+  <div class="content">
+
+    <!-- 第一天 -->
+    <div class="day">
+      <div class="day-header">
+        <div class="day-badge">Day 1<br>初见龙城</div>
+        <div class="day-theme">
+          <h2>🛬 抵达 + 柳江夜游</h2>
+          <p>放慢节奏，从一碗螺蛳粉开始你们的柳州故事</p>
+        </div>
+      </div>
+      <div class="timeline">
+
+        <div class="item">
+          <div class="item-time">上午 09:00 - 12:00</div>
+          <div class="item-title">🚄 抵达柳州站 · 入住酒店</div>
+          <div class="item-desc">建议选择五星酒店/精品民宿，提前预订江景房，放下行李稍作休息。推荐区域：城中区（步行可达五星街、柳江边）。</div>
+          <div class="item-tags">
+            <span class="item-tag">#交通</span>
+            <span class="item-tag">#入住</span>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="item-time">中午 12:30 - 14:00</div>
+          <div class="item-title">🍜 第一顿：正宗螺蛳粉</div>
+          <div class="item-desc">前往本地人最爱的老牌店打第一卡！十几家分别是：<b>凤张螺蛳粉、聚宝螺蛳粉、西环肥仔螺蛳粉</b>。先来一碗经典款，再加卤蛋、鸭脚、腐竹。</div>
+          <div class="item-tags">
+            <span class="item-tag">#必吃</span>
+            <span class="item-tag">#辣度可选</span>
+          </div>
+          <div class="item-tip">💡 第一次尝试的女生可以从"微辣 + 多加酸笋"开始，体验地道风味。</div>
+        </div>
+
+        <div class="item">
+          <div class="item-time">下午 14:30 - 17:30</div>
+          <div class="item-title">🌳 柳侯祠 + 柳侯公园（文化漫步）</div>
+          <div class="item-desc">为纪念唐代文学家柳宗元而建，古朴雅致。园内亭台楼阁、小桥流水，是情侣拍照的绝佳背景。慢慢逛，了解柳宗元的故事，更添旅程深度。</div>
+          <div class="item-tags">
+            <span class="item-tag">#文化</span>
+            <span class="item-tag">#古风拍照</span>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="item-time">晚上 18:30 - 21:30</div>
+          <div class="item-title">🌃 百里柳江 · 夜游船 + 灯光秀</div>
+          <div class="item-desc">夜幕下乘坐柳江游船，看沿岸灯火璀璨，<b>水上音乐喷泉</b>是国内规模较大的江面喷泉之一。船上吹着江风，两人依偎，看城市倒影，浪漫值拉满。</div>
+          <div class="item-tags">
+            <span class="item-tag">#夜游</span>
+            <span class="item-tag">#浪漫满分</span>
+          </div>
+          <div class="item-tip">💡 游船建议提前 1 天在网上订票，价格更优惠且可选靠窗位置。</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 第二天 -->
+    <div class="day">
+      <div class="day-header">
+        <div class="day-badge">Day 2<br>山水相依</div>
+        <div class="day-theme">
+          <h2>⛰️ 龙潭公园 + 都乐岩</h2>
+          <p>走进喀斯特地貌的天然氧吧，感受大自然的鬼斧神工</p>
+        </div>
+      </div>
+      <div class="timeline">
+
+        <div class="item">
+          <div class="item-time">上午 08:30 - 09:30</div>
+          <div class="item-title">🥣 柳州早茶 · 茶楼点心</div>
+          <div class="item-desc">去本地人气早茶店，凤爪、虾饺、肠粉、艇仔粥……感受岭南早茶慢生活，情侣一起享受"食"的仪式感。</div>
+        </div>
+
+        <div class="item">
+          <div class="item-time">上午 10:00 - 13:00</div>
+          <div class="item-title">🏞️ 龙潭公园（情侣重头戏）</div>
+          <div class="item-desc">国家 4A 级景区，喀斯特地貌 + 少数民族风情园。<b>必拍机位</b>：风雨桥、侗族鼓楼、雷潭。湖光山色特别出片，建议穿浅色/汉服，拍出氛围感大片。</div>
+          <div class="item-tags">
+            <span class="item-tag">#4A景区</span>
+            <span class="item-tag">#出片圣地</span>
+            <span class="item-tag">#徒步</span>
+          </div>
+          <div class="item-tip">💡 园区较大，可选电瓶车代步；记得带驱蚊水和防晒。</div>
+        </div>
+
+        <div class="item">
+          <div class="item-time">中午 13:30 - 15:00</div>
+          <div class="item-title">🍲 午餐：柳州风味菜</div>
+          <div class="item-desc">推荐菜：<b>螺蛳鸡、酿豆腐、醋血鸭、芋头扣肉</b>。去本地家常菜馆，性价比高，味道正宗。</div>
+        </div>
+
+        <div class="item">
+          <div class="item-time">下午 15:30 - 18:00</div>
+          <div class="item-title">🕳️ 都乐岩（溶洞探秘）</div>
+          <div class="item-desc">"大自然艺术宫殿"，溶洞内钟乳石千姿百态，灯光映衬下如梦似幻。洞内恒温 18°C，夏天特别舒适，<b>情侣牵手穿越一线天</b>，氛围感十足。</div>
+          <div class="item-tags">
+            <span class="item-tag">#溶洞</span>
+            <span class="item-tag">#奇观</span>
+            <span class="item-tag">#避暑</span>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="item-time">晚上 19:00 - 22:00</div>
+          <div class="item-title">🏙️ 五星街 · 美食+购物</div>
+          <div class="item-desc">柳州最繁华的步行街，<b>酸嘢、凉拌牛杂、烧烤、糖水</b>全部一网打尽。还能为对方挑一份小礼物。</div>
+          <div class="item-tags">
+            <span class="item-tag">#美食街</span>
+            <span class="item-tag">#购物</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 第三天 -->
+    <div class="day">
+      <div class="day-header">
+        <div class="day-badge">Day 3<br>告别龙城</div>
+        <div class="day-theme">
+          <h2>🗻 鱼峰山 + 马鞍山</h2>
+          <p>登高远望，把这座城市的温柔留在记忆里</p>
+        </div>
+      </div>
+      <div class="timeline">
+
+        <div class="item">
+          <div class="item-time">上午 08:30 - 10:30</div>
+            <div class="item-title">🗻 鱼峰山公园</div>
+            <div class="item-desc">柳州标志性景区，传说是刘三姐传歌升仙之地。山不高，台阶较缓，适合情侣慢慢爬。登顶可俯瞰柳州全景，"小龙潭"是必打卡点。</div>
+            <div class="item-tags">
+              <span class="item-tag">#登高</span>
+              <span class="item-tag">#传说</span>
+            </div>
+        </div>
+
+        <div class="item">
+          <div class="item-time">上午 11:00 - 12:30</div>
+          <div class="item-title">⛰️ 马鞍山（柳州之眼）</div>
+          <div class="item-desc">登顶可看<b>柳州全城 + 柳江"S"型大弯</b>，非常震撼。有索道可选，体力一般的女生也可轻松登顶。建议上午去，避开正午暴晒。</div>
+          <div class="item-tip">💡 索道运营时间一般 8:30-17:30，单程约 15 分钟。</div>
+        </div>
+
+        <div class="item">
+          <div class="item-time">中午 13:00 - 14:30</div>
+          <div class="item-title">🍜 临行前最后一顿：升级版螺蛳粉火锅</div>
+          <div class="item-desc">把螺蛳粉吃出新花样！<b>螺蛳粉 + 卤味套餐 + 冰豆浆</b>，满足地告别柳州。</div>
+        </div>
+
+        <div class="item">
+          <div class="item-time">下午 15:00 - 17:00</div>
+          <div class="item-title">🎁 购买伴手礼 · 返程</div>
+          <div class="item-desc">推荐带走的伴手礼：<b>袋装螺蛳粉（柳州人骄傲）、酸嘢、芋圆糕点、螺蛳鸭脚煲料包</b>。建议去大型超市买，品种齐全。</div>
+          <div class="item-tags">
+            <span class="item-tag">#伴手礼</span>
+            <span class="item-tag">#螺蛳粉</span>
+          </div>
+          <div class="item-tip">💡 螺蛳粉 1-2 包尝鲜，5-10 包分享亲友；鸭脚煲料包煮一次家人会爱上。</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 美食专区 -->
+    <div class="food-section">
+      <h2>🍴 柳州必吃美食清单</h2>
+      <div class="food-grid">
+        <div class="food-card">
+          <div class="emoji">🍜</div>
+          <h4>螺蛳粉</h4>
+          <p>柳州灵魂美食，酸笋+花生+腐竹+鸭脚，每家味道不同，多试几家。</p>
+        </div>
+        <div class="food-card">
+          <div class="emoji">🥟</div>
+          <h4>柳州早茶</h4>
+          <p>凤爪虾饺肠粉艇仔粥，慢生活仪式感。</p>
+        </div>
+        <div class="food-card">
+          <div class="emoji">🍲</div>
+          <h4>螺蛳鸭脚煲</h4>
+          <p>螺蛳粉升级版，汤底浓郁，配料丰富。</p>
+        </div>
+        <div class="food-card">
+          <div class="emoji">🍢</div>
+          <h4>酸嘢</h4>
+          <p>广西特色，萝卜、芒果、李子腌酸，爽口开胃。</p>
+        </div>
+        <div class="food-card">
+          <div class="emoji">🥩</div>
+          <h4>醋血鸭</h4>
+          <p>柳州地方菜代表，酸辣开胃，下饭神器。</p>
+        </div>
+        <div class="food-card">
+          <div class="emoji">🍧</div>
+          <h4>糖水甜品</h4>
+          <p>槐花粉、玉米糖水、清补凉，岭南甜品精髓。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 预算 -->
+    <div class="budget">
+      <h2>💰 人均预算明细（双人合计 → 人均）</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>项目</th>
+            <th>说明</th>
+            <th>金额</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>🚄 往返交通</td>
+            <td>高铁/动车二等座（按临近城市估算）</td>
+            <td>¥300-500</td>
+          </tr>
+          <tr>
+            <td>🏨 住宿</td>
+            <td>2 晚江景房/精品酒店</td>
+            <td>¥400-700</td>
+          </tr>
+          <tr>
+            <td>🍜 餐饮</td>
+            <td>含螺蛳粉、早茶、正餐、宵夜</td>
+            <td>¥300-450</td>
+          </tr>
+          <tr>
+            <td>🎫 门票</td>
+            <td>柳江夜游 + 龙潭公园 + 都乐岩 + 鱼峰山/马鞍山</td>
+            <td>¥120-180</td>
+          </tr>
+          <tr>
+            <td>🛍️ 伴手礼</td>
+            <td>螺蛳粉、酸嘢、特产</td>
+            <td>¥80-150</td>
+          </tr>
+          <tr>
+            <td>🚕 市内交通</td>
+            <td>公交/打车/打车软件</td>
+            <td>¥60-100</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="2">合计（人均）</td>
+            <td>¥1260-2080</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- 情侣提示 -->
+    <div class="tips">
+      <h2>💕 情侣出行贴心提示</h2>
+      <ul>
+        <li><b>拍照建议：</b>龙潭公园风雨桥、马鞍山观景台、柳江夜游船，是出片率最高的三个机位。</li>
+        <li><b>住宿选择：</b>优选江景房（柳江畔），晚上推开窗就是城市夜景，浪漫加分。</li>
+        <li><b>穿搭建议：</b>龙潭公园/都乐岩适合汉服/浅色连衣裙；马鞍山运动鞋更舒适。</li>
+        <li><b>错峰建议：</b>周末人较多，尽量避开五一、十一、寒暑假；工作日体验更好。</li>
+        <li><b>螺蛳粉接受度：</b>如果女生第一次吃不习惯，可以先从"原味 + 微辣"开始。</li>
+        <li><b>现金准备：</b>部分老字号只收现金或本地支付，备少量现金更稳妥。</li>
+        <li><b>回程小礼物：</b>在五星街给对方挑选一件小礼物，留下专属记忆。</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <p>💕 愿你们在柳州，留下最甜的记忆 💕</p>
+    <p class="small">行程仅供参考 · 价格随季节浮动 · 提前预订更优惠</p>
+  </div>
+
+</div>
+</body>
+</html>
