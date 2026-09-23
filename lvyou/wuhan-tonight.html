@@ -158,6 +158,78 @@
   }
   .total b{color:#f5cc7a;}
 
+  /* ── 实时地图 ── */
+  .map-card{
+    background:var(--card);border-radius:var(--r);box-shadow:var(--sh);
+    padding:16px 18px 18px;margin:0 0 32px;border:1px solid rgba(230,234,239,.8);
+  }
+  .map-head{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:12px;}
+  .map-head .ttl{margin:0;font-size:19px;font-weight:800;}
+  .live{
+    display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;letter-spacing:.12em;
+    color:#fff;background:var(--red);padding:3px 9px;border-radius:999px;
+  }
+  .live i{width:7px;height:7px;border-radius:50%;background:#fff;animation:blink 1.4s infinite;}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+  .map-head .sp{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;}
+  .btn{
+    border:none;cursor:pointer;font-family:inherit;font-size:13.5px;font-weight:700;
+    padding:9px 15px;border-radius:10px;background:var(--ink);color:#fff;transition:opacity .15s;
+  }
+  .btn:hover{opacity:.86;}
+  .btn:disabled{opacity:.55;cursor:default;}
+  .btn.blue{background:var(--blue);}
+  .btn.ghost{background:#eef1f5;color:var(--ink-2);}
+  #map{height:400px;border-radius:12px;overflow:hidden;background:#eef1f5;}
+  .leaflet-container{font-family:inherit;}
+  .map-msg{
+    margin-top:11px;font-size:13.4px;color:var(--ink-2);
+    background:#f2f4f7;border-radius:10px;padding:10px 13px;line-height:1.65;
+  }
+  .map-msg b{color:var(--ink);}
+  .map-msg.ok{background:var(--green-soft);color:#1e5c44;}
+  .map-msg.ok b{color:#14432f;}
+  .map-msg.warn{background:var(--red-soft);color:#8f231c;}
+  .map-msg.warn b{color:#6d1a15;}
+  .geo-list{margin-top:11px;display:grid;gap:6px;}
+  .geo-item{
+    display:flex;align-items:center;gap:9px;font-size:13.5px;background:#f7f8fa;
+    border-radius:9px;padding:8px 12px;color:var(--ink-2);cursor:pointer;
+  }
+  .geo-item:hover{background:#eef1f5;}
+  .geo-item .no{
+    flex:0 0 auto;width:20px;height:20px;border-radius:50%;background:var(--muted);color:#fff;
+    font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center;
+  }
+  .geo-item .k{font-weight:700;color:var(--ink);}
+  .geo-item .d{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap;}
+  .geo-item.near{background:var(--green-soft);}
+  .geo-item.near .no{background:var(--green);}
+  .geo-item.near .d{color:#1e5c44;font-weight:800;}
+
+  /* 地图上的自定义标记（不依赖图片，避免图标丢文件） */
+  .pin-wrap{background:none !important;border:none !important;}
+  .pin{
+    width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:12.5px;font-weight:800;color:#fff;border:2px solid #fff;
+    box-shadow:0 2px 7px rgba(16,23,32,.35);font-family:inherit;
+  }
+  .pin.b{background:var(--blue);} .pin.r{background:var(--red);}
+  .pin.g{background:var(--gold);} .pin.n{background:var(--green);} .pin.p{background:var(--purple);}
+  .dot-wrap{background:none !important;border:none !important;}
+  .me-dot{
+    width:16px;height:16px;border-radius:50%;background:#1a73e8;border:3px solid #fff;
+    box-shadow:0 0 0 1px rgba(26,115,232,.45);position:relative;
+  }
+  .me-dot::after{
+    content:"";position:absolute;left:50%;top:50%;width:16px;height:16px;margin:-8px 0 0 -8px;
+    border-radius:50%;background:rgba(26,115,232,.35);animation:pulse 2s ease-out infinite;
+  }
+  @keyframes pulse{0%{transform:scale(.5);opacity:.85}100%{transform:scale(3.2);opacity:0}}
+  .leaflet-popup-content{font-size:13.5px;line-height:1.65;margin:12px 14px;}
+  .leaflet-popup-content b{color:var(--ink);}
+  .leaflet-popup-content a{color:var(--blue);}
+
   .foot{padding:30px 0;text-align:center;font-size:12px;color:var(--muted);}
 
   @media print{
@@ -168,6 +240,10 @@
   @media (max-width:560px){
     .sec-head .sub{margin-left:0;width:100%;}
     .sec-head{flex-wrap:wrap;}
+    #map{height:330px;}
+    .map-head .ttl{font-size:17.5px;}
+    .map-head .sp{margin-left:0;width:100%;}
+    .map-head .sp .btn{flex:1;}
   }
 </style>
 </head>
@@ -182,6 +258,7 @@
       <span class="fact">🤰 孕妇 · 单人</span>
       <span class="fact">🛺 园内坐车 + 电梯，<b>不爬台阶</b></span>
       <span class="fact">⏰ 16:30 出发</span>
+      <span class="fact">🗺 页面内可<b>实时定位</b></span>
     </div>
   </div>
 </header>
@@ -191,6 +268,22 @@
   <div class="lead">
     路线：<b>打车到黄鹤楼东门 → 园内电瓶车到主楼 → 电梯上 5 层 → 出西门 → 中华路城市阳台看日落 → 打车去楚河汉街吃饭 → 打车回酒店。</b>
   </div>
+
+  <!-- 实时地图 -->
+  <section class="map-card">
+    <div class="map-head">
+      <span class="live"><i></i>LIVE</span>
+      <h2 class="ttl">地图 · 我现在在哪</h2>
+      <span class="sp">
+        <button class="btn blue" id="locBtn" type="button">📍 定位我的位置</button>
+        <button class="btn ghost" id="fitBtn" type="button">看全程</button>
+      </span>
+    </div>
+    <div id="map"></div>
+    <div class="map-msg" id="mapMsg">地图加载中……点上面的按钮，<b>蓝点就是你</b>。地图上 6 个点：酒店 → 黄鹤楼东门 → 主楼 → 西门 → 中华路城市阳台 → 楚河汉街（点标记能直接跳高德／百度导航）。</div>
+    <div class="geo-list" id="geoList"></div>
+  </section>
+
 
   <!-- 打车速查 -->
   <section class="sec">
@@ -456,6 +549,254 @@
   </div>
 
 </div>
+
+<script>
+/* ============ 实时地图（Leaflet + 高德底图）============ */
+window.__bootMap = function () {
+  var L = window.L;
+  var mapEl   = document.getElementById('map');
+  var msgEl   = document.getElementById('mapMsg');
+  var listEl  = document.getElementById('geoList');
+  var locBtn  = document.getElementById('locBtn');
+  var fitBtn  = document.getElementById('fitBtn');
+  if (!L || !mapEl) { return; }
+
+  /* ---- 坐标（GCJ-02 / 高德火星坐标，与底图同一坐标系）---- */
+  var STOPS = [
+    {no:'起', n:'汉庭酒店（同济医院旁）', lat:30.578193, lng:114.252496, cls:'p', t:'出发 16:30 / 回程 21:00',
+     desc:'汉庭武汉解放大道同济医学院店，硚口区解放大道 1037 号。', mode:'taxi'},
+    {no:'1',  n:'黄鹤楼公园东门',         lat:30.541982, lng:114.308942, cls:'b', t:'17:05 进园',
+     desc:'武昌区武珞路 9 号。<b>全园只有东门有电瓶车</b>，10 元坐 5 分钟到主楼。', mode:'taxi'},
+    {no:'2',  n:'黄鹤楼主楼',             lat:30.544400, lng:114.303000, cls:'r', t:'17:15 登楼',
+     desc:'坐电梯上 5 层观景台再逐层下。<b>18:00 清园，17:50 前出楼</b>。', mode:'walk'},
+    {no:'3',  n:'黄鹤楼公园西门',         lat:30.545180, lng:114.300377, cls:'r', t:'17:50 出园',
+     desc:'主楼往西门约 500 米主轴缓坡，10–15 分钟，出园正对长江大桥。', mode:'walk'},
+    {no:'4',  n:'中华路城市阳台',         lat:30.548400, lng:114.295200, cls:'g', t:'18:05 日落',
+     desc:'长江大桥武昌桥头 ↔ 中华路码头之间，临江大道边。<b>日落 18:10–18:25，19:00 灯光秀</b>。', mode:'walk'},
+    {no:'5',  n:'楚河汉街',               lat:30.553405, lng:114.346604, cls:'n', t:'19:40 晚饭',
+     desc:'吃<b>香钿楚菜</b>，点排骨藕汤。', mode:'taxi'},
+    {no:'备', n:'中华路码头（备选定位）', lat:30.549695, lng:114.294084, cls:'g', t:'搜不到时用',
+     desc:'临江大道江滩 78 号。搜不到「中华路城市阳台」就输这个。', mode:'walk'}
+  ];
+  var ROUTE = [[30.578193,114.252496],[30.541982,114.308942],[30.544400,114.303000],
+               [30.545180,114.300377],[30.548400,114.295200],[30.553405,114.346604]];
+
+  /* ---- 起地图 ---- */
+  var map = L.map('map', {
+    center: [30.5495, 114.3060], zoom: 13,
+    zoomControl: true, attributionControl: true
+  });
+  L.tileLayer('https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
+    subdomains: ['1','2','3','4'], minZoom: 10, maxZoom: 18, attribution: '底图 © 高德地图'
+  }).addTo(map);
+
+  /* 行程连线：灰虚线＝车程，红实线＝园内步行 */
+  L.polyline(ROUTE, {color:'#8a94a0', weight:2.5, opacity:.65, dashArray:'6 8'}).addTo(map);
+  L.polyline([ROUTE[1], ROUTE[2], ROUTE[3]], {color:'#c8332b', weight:5, opacity:.8}).addTo(map);
+
+  function navLinks(s) {
+    var amap = 'https://uri.amap.com/marker?position=' + s.lng + ',' + s.lat +
+               '&name=' + encodeURIComponent(s.n.replace(/（.*?）/g,'')) +
+               '&coordinate=gaode&callnative=1&src=wuhan-tonight';
+    var baidu = 'https://api.map.baidu.com/marker?location=' + s.lat + ',' + s.lng +
+                '&title=' + encodeURIComponent(s.n.replace(/（.*?）/g,'')) +
+                '&content=' + encodeURIComponent('今晚半日行程') +
+                '&output=html&coord_type=gcj02&src=webapp.wuhan-tonight';
+    return '<a href="' + amap + '" target="_blank" rel="noopener">高德地图打开</a>' +
+           ' &nbsp;·&nbsp; <a href="' + baidu + '" target="_blank" rel="noopener">百度地图打开</a>';
+  }
+
+  var markers = [];
+  STOPS.forEach(function (s) {
+    var big = s.no !== '备';
+    var icon = L.divIcon({
+      className: 'pin-wrap',
+      html: '<div class="pin ' + s.cls + '" style="' + (big ? '' : 'width:22px;height:22px;font-size:11px;opacity:.8;') + '">' + s.no + '</div>',
+      iconSize: [big ? 26 : 22, big ? 26 : 22],
+      iconAnchor: [big ? 13 : 11, big ? 13 : 11],
+      popupAnchor: [0, -14]
+    });
+    var m = L.marker([s.lat, s.lng], {icon: icon, zIndexOffset: big ? 0 : -100}).addTo(map);
+    m.bindPopup('<b>' + s.n + '</b><br>' + (s.t ? '⏰ ' + s.t + '<br>' : '') + s.desc + '<br>' + navLinks(s));
+    markers.push({stop: s, marker: m});
+  });
+
+  fitBtn.addEventListener('click', function () {
+    map.fitBounds(L.latLngBounds(ROUTE).pad(0.18));
+  });
+
+  /* ---- 定位相关 ---- */
+  var PI = 3.141592653589793, A = 6378245.0, EE = 0.00669342162296594323;
+  function outOfChina(lat, lng) { return !(lng > 73.66 && lng < 135.05 && lat > 3.86 && lat < 53.55); }
+  function tLat(x, y) {
+    var r = -100 + 2*x + 3*y + 0.2*y*y + 0.1*x*y + 0.2*Math.sqrt(Math.abs(x));
+    r += (20*Math.sin(6*x*PI) + 20*Math.sin(2*x*PI)) * 2/3;
+    r += (20*Math.sin(y*PI) + 40*Math.sin(y/3*PI)) * 2/3;
+    r += (160*Math.sin(y/12*PI) + 320*Math.sin(y*PI/30)) * 2/3;
+    return r;
+  }
+  function tLng(x, y) {
+    var r = 300 + x + 2*y + 0.1*x*x + 0.1*x*y + 0.1*Math.sqrt(Math.abs(x));
+    r += (20*Math.sin(6*x*PI) + 20*Math.sin(2*x*PI)) * 2/3;
+    r += (20*Math.sin(x*PI) + 40*Math.sin(x/3*PI)) * 2/3;
+    r += (150*Math.sin(x/12*PI) + 300*Math.sin(x/30*PI)) * 2/3;
+    return r;
+  }
+  /* GPS 是 WGS-84，高德底图是 GCJ-02，必须换算，否则会偏几百米 */
+  function wgs2gcj(lat, lng) {
+    if (outOfChina(lat, lng)) { return [lat, lng]; }
+    var dLat = tLat(lng - 105, lat - 35), dLng = tLng(lng - 105, lat - 35);
+    var rl = lat / 180 * PI, m = Math.sin(rl);
+    m = 1 - EE * m * m;
+    var sm = Math.sqrt(m);
+    dLat = (dLat * 180) / ((A * (1 - EE)) / (m * sm) * PI);
+    dLng = (dLng * 180) / (A / sm * Math.cos(rl) * PI);
+    return [lat + dLat, lng + dLng];
+  }
+  function dist(a, b) {
+    var R = 6371000, dLat = (b[0]-a[0])*PI/180, dLng = (b[1]-a[1])*PI/180;
+    var la1 = a[0]*PI/180, la2 = b[0]*PI/180;
+    var h = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(la1)*Math.cos(la2)*Math.sin(dLng/2)*Math.sin(dLng/2);
+    return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
+  }
+  function fmtM(m) {
+    if (m < 1000) { return Math.round(m / 10) * 10 + ' 米'; }
+    return (m / 1000).toFixed(m < 10000 ? 1 : 0) + ' 公里';
+  }
+  function etaMin(m, mode) { return Math.max(1, Math.round(m / (mode === 'taxi' ? 350 : 70))); }
+
+  function renderList(g) {
+    var arr = STOPS.filter(function (s) { return s.no !== '备'; }).map(function (s) {
+      return {s: s, d: g ? dist(g, [s.lat, s.lng]) : null};
+    });
+    if (g) { arr.sort(function (a, b) { return a.d - b.d; }); }
+    listEl.innerHTML = arr.map(function (it) {
+      var cls = (g && it === arr[0]) ? 'geo-item near' : 'geo-item';
+      var d = it.d === null ? '点一下定位' : fmtM(it.d) + ' · ' + (it.s.mode === 'taxi' ? '打车约 ' : '步行约 ') + etaMin(it.d, it.s.mode) + ' 分';
+      return '<div class="' + cls + '" data-n="' + it.s.n + '"><span class="no">' + it.s.no + '</span>' +
+             '<span class="k">' + it.s.n + '</span><span class="d">' + d + '</span></div>';
+    }).join('');
+    Array.prototype.forEach.call(listEl.children, function (row) {
+      row.addEventListener('click', function () {
+        var s = null;
+        STOPS.forEach(function (x) { if (x.n === row.getAttribute('data-n')) { s = x; } });
+        if (!s) { return; }
+        map.setView([s.lat, s.lng], 16);
+        markers.forEach(function (o) { if (o.stop === s) { o.marker.openPopup(); } });
+      });
+    });
+  }
+  renderList(null);
+
+  var meMarker = null, meCircle = null, watchId = null, gotFix = false;
+  var meIcon = L.divIcon({className:'dot-wrap', html:'<div class="me-dot"></div>', iconSize:[16,16], iconAnchor:[8,8]});
+
+  function onPos(p) {
+    gotFix = true;
+    var g = wgs2gcj(p.coords.latitude, p.coords.longitude);
+    var acc = Math.round(p.coords.accuracy || 0);
+    if (!meMarker) {
+      meMarker = L.marker(g, {icon: meIcon, zIndexOffset: 1200}).addTo(map);
+      meCircle = L.circle(g, {radius: p.coords.accuracy || 50, color:'#1a73e8', weight:1,
+                              fillColor:'#1a73e8', fillOpacity:.12}).addTo(map);
+      map.setView(g, 15);
+    }
+    meMarker.setLatLng(g);
+    meCircle.setLatLng(g).setRadius(p.coords.accuracy || 50);
+
+    var arr = STOPS.filter(function (s) { return s.no !== '备'; }).map(function (s) {
+      return {s: s, d: dist(g, [s.lat, s.lng])};
+    }).sort(function (a, b) { return a.d - b.d; });
+    var n = arr[0];
+    var t = new Date();
+    msgEl.className = 'map-msg ok';
+    msgEl.innerHTML = '📍 已定位（精度约 ±' + acc + ' 米）· 你离 <b>' + n.s.n + '</b> 最近，约 <b>' + fmtM(n.d) +
+      '</b>，' + (n.s.mode === 'taxi' ? '打车' : '步行') + '约 ' + etaMin(n.d, n.s.mode) + ' 分钟 · 更新于 ' +
+      t.toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    locBtn.disabled = false;
+    locBtn.textContent = '📍 回到我的位置';
+    renderList(g);
+  }
+  function clearWatch() {
+    if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+  }
+  function onErr(e) {
+    var why = '定位失败。';
+    if (e && e.code === 1) { why = '浏览器拒绝了定位权限（地址栏里允许一下，或点允许后重试）。'; }
+    else if (e && e.code === 2) { why = '暂时拿不到位置信号（室内、地下或设备定位关闭时常见）。'; }
+    else if (e && e.code === 3) { why = '定位超时，可以再点一次。'; }
+    if (location.protocol === 'file:') {
+      why += '<br>这个页面是<b>从本地文件打开的</b>，部分浏览器（尤其手机端 Safari／微信）会直接禁用网页定位。';
+    }
+    msgEl.className = 'map-msg warn';
+    msgEl.innerHTML = '<b>' + why + '</b><br>最稳的替代办法：手机打开<b>高德地图</b>，蓝点就是你本人，点「路线」直接导航——本页上面 01 节写了每一段该输什么。';
+    locBtn.disabled = false;
+    locBtn.textContent = '📍 再试一次';
+  }
+
+  locBtn.addEventListener('click', function () {
+    if (gotFix && meMarker) { map.setView(meMarker.getLatLng(), 16); return; }
+    if (!navigator.geolocation) {
+      msgEl.className = 'map-msg warn';
+      msgEl.innerHTML = '<b>这个浏览器不支持网页定位。</b>用手机高德地图看自己的位置就行。';
+      return;
+    }
+    locBtn.disabled = true;
+    locBtn.textContent = '定位中…';
+    msgEl.className = 'map-msg';
+    msgEl.innerHTML = '正在获取位置……第一次会弹权限提示，选<b>「允许」</b>。';
+    clearWatch();
+    gotFix = false;
+    watchId = navigator.geolocation.watchPosition(onPos, function (e) {
+      if (gotFix) { return; }        /* 已经定到过位置，偶发报错忽略 */
+      clearWatch();
+      onErr(e);
+    }, {enableHighAccuracy: true, maximumAge: 5000, timeout: 15000});
+  });
+};
+
+/* Leaflet 加载：多个 CDN 依次兜底 */
+(function () {
+  var CSS = [
+    'https://cdn.bootcdn.net/ajax/libs/leaflet/1.9.4/leaflet.css',
+    'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css',
+    'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
+  ];
+  var JS = [
+    'https://cdn.bootcdn.net/ajax/libs/leaflet/1.9.4/leaflet.js',
+    'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js',
+    'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
+  ];
+  var msgEl = document.getElementById('mapMsg');
+
+  function loadCss(i) {
+    if (i >= CSS.length) { return; }
+    var l = document.createElement('link');
+    l.rel = 'stylesheet'; l.href = CSS[i]; l.crossOrigin = '';
+    l.onerror = function () { loadCss(i + 1); };
+    document.head.appendChild(l);
+  }
+  function boot() {
+    try { window.__bootMap(); }
+    catch (err) {
+      if (msgEl) { msgEl.className = 'map-msg warn'; msgEl.innerHTML = '地图初始化失败：' + err.message; }
+    }
+  }
+  function loadJs(i) {
+    if (i >= JS.length) {
+      if (msgEl) { msgEl.className = 'map-msg warn'; msgEl.innerHTML = '地图组件没加载出来（可能是网络问题，刷新一次试试）。'; }
+      return;
+    }
+    var s = document.createElement('script');
+    s.src = JS[i]; s.async = true;
+    s.onload = boot;
+    s.onerror = function () { loadJs(i + 1); };
+    document.head.appendChild(s);
+  }
+  loadCss(0);
+  loadJs(0);
+})();
+</script>
 
 </body>
 </html>
