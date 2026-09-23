@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>今晚半日 · 一条路 + 打车定位 + 吃什么 + 伴手礼</title>
+<style>
+  :root{
+    --ink:#101720; --ink-2:#39434f; --muted:#77828e;
+    --line:#e6eaef; --bg:#f7f5f1; --card:#fff;
+    --red:#c8332b; --red-soft:#fdecea;
+    --gold:#b98f2e; --gold-soft:#fbf2e0;
+    --blue:#1b5c8b; --blue-soft:#e9f1f8;
+    --green:#2d7a5b; --green-soft:#e9f4ef;
+    --purple:#6d4a9c; --purple-soft:#f1ecf9;
+    --r:16px;
+    --sh:0 1px 2px rgba(16,23,32,.04),0 10px 26px rgba(16,23,32,.06);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,sans-serif;
+    line-height:1.72;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:820px;margin:0 auto;padding:0 20px;}
+
+  .hero{
+    background:linear-gradient(160deg,#1b1024 0%,#3f2455 45%,#8a4257 78%,#b96a5c 100%);
+    color:#fff;padding:38px 0 30px;position:relative;overflow:hidden;
+  }
+  .hero::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(600px 220px at 80% 12%,rgba(245,204,122,.3),transparent 70%);
+  }
+  .hero .wrap{position:relative;z-index:2;}
+  .kicker{
+    display:inline-block;font-size:12px;letter-spacing:.16em;padding:5px 12px;border-radius:999px;margin-bottom:14px;
+    background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);color:#ffe6b6;
+  }
+  .hero h1{margin:0 0 10px;font-size:clamp(26px,4.6vw,36px);line-height:1.25;font-weight:800;letter-spacing:-.01em;}
+  .hero h1 .hl{color:#f5cc7a;}
+  .hero p{margin:0 0 20px;font-size:15px;color:rgba(255,255,255,.84);max-width:600px;}
+  .facts{display:flex;flex-wrap:wrap;gap:9px;}
+  .fact{
+    font-size:13px;padding:7px 13px;border-radius:999px;
+    background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.9);
+  }
+  .fact b{color:#f5cc7a;}
+
+  .lead{
+    background:var(--card);border-radius:var(--r);box-shadow:var(--sh);
+    padding:16px 20px;margin:22px 0 30px;font-size:14.5px;color:var(--ink-2);
+    border-left:4px solid var(--red);
+  }
+  .lead b{color:var(--ink);}
+
+  /* 区块标题 */
+  .sec{margin-bottom:34px;}
+  .sec-head{
+    display:flex;align-items:center;gap:11px;margin-bottom:15px;
+    padding-bottom:10px;border-bottom:2px solid var(--ink);
+  }
+  .sec-head .num{
+    font-size:12px;font-weight:800;color:#fff;background:var(--ink);
+    padding:3px 9px;border-radius:6px;letter-spacing:.04em;
+  }
+  .sec-head h2{margin:0;font-size:19px;}
+  .sec-head .sub{font-size:12.5px;color:var(--muted);margin-left:auto;}
+
+  /* 时间线 */
+  .timeline{position:relative;padding-left:28px;}
+  .timeline::before{
+    content:"";position:absolute;left:7px;top:16px;bottom:16px;width:2px;border-radius:2px;
+    background:linear-gradient(180deg,var(--blue) 0%,var(--blue) 30%,var(--red) 58%,var(--gold) 78%,var(--green) 100%);
+  }
+  .stop{position:relative;margin-bottom:16px;}
+  .stop::before{
+    content:"";position:absolute;left:-28px;top:22px;width:16px;height:16px;border-radius:50%;
+    background:#fff;border:3px solid var(--blue);box-shadow:0 0 0 3px var(--blue-soft);
+  }
+  .stop.s3::before{border-color:var(--red);box-shadow:0 0 0 3px var(--red-soft);}
+  .stop.s4::before,.stop.s5::before{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-soft);}
+  .stop.s6::before,.stop.s7::before{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft);}
+
+  .card{
+    background:var(--card);border-radius:var(--r);box-shadow:var(--sh);
+    padding:17px 19px;border:1px solid rgba(230,234,239,.8);
+  }
+  .row{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;margin-bottom:7px;}
+  .time{
+    font-variant-numeric:tabular-nums;font-weight:800;font-size:15px;
+    color:var(--blue);background:var(--blue-soft);padding:3px 10px;border-radius:7px;white-space:nowrap;
+  }
+  .s3 .time{color:var(--red);background:var(--red-soft);}
+  .s4 .time,.s5 .time{color:#7d5c14;background:var(--gold-soft);}
+  .s6 .time,.s7 .time{color:var(--green);background:var(--green-soft);}
+  .card h3{margin:0;font-size:17.5px;}
+  .card p{margin:0;font-size:14.6px;color:var(--ink-2);}
+  .card p + p{margin-top:8px;}
+  .card b{color:var(--ink);}
+  .nav-target{
+    margin-top:10px;background:var(--blue-soft);border-radius:10px;padding:10px 13px;
+    font-size:13.6px;color:#124468;
+  }
+  .nav-target b{color:#0d3350;}
+  .nav-target .ttl{font-size:12px;font-weight:800;letter-spacing:.06em;color:#4a7fa5;display:block;margin-bottom:3px;}
+  .nav-target.alt{background:#f2f4f7;color:var(--ink-2);}
+  .nav-target.alt .ttl{color:var(--muted);}
+  .card .mini{margin-top:10px;font-size:12.9px;color:var(--muted);border-top:1px dashed var(--line);padding-top:9px;}
+
+  /* 通用表格 */
+  .table-scroll{overflow-x:auto;border-radius:var(--r);box-shadow:var(--sh);background:#fff;}
+  table{width:100%;border-collapse:collapse;font-size:14px;min-width:520px;}
+  thead th{
+    background:var(--ink);color:#fff;text-align:left;font-weight:600;font-size:12.5px;
+    padding:11px 14px;white-space:nowrap;letter-spacing:.02em;
+  }
+  tbody td{padding:11px 14px;border-bottom:1px solid var(--line);color:var(--ink-2);vertical-align:top;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:nth-child(even){background:#fbfbfc;}
+  td.name{font-weight:700;color:var(--ink);white-space:nowrap;}
+  .money{color:var(--red);font-weight:600;white-space:nowrap;}
+  .must{color:var(--red);font-weight:700;}
+
+  /* 提示卡 */
+  .note{
+    background:var(--card);border-radius:var(--r);box-shadow:var(--sh);
+    padding:16px 19px;font-size:14.3px;color:var(--ink-2);border-left:4px solid var(--gold);
+  }
+  .note.red{border-left-color:var(--red);}
+  .note.purple{border-left-color:var(--purple);}
+  .note.green{border-left-color:var(--green);}
+  .note b{color:var(--ink);}
+  .note p{margin:0 0 7px;}
+  .note p:last-child{margin-bottom:0;}
+  .note .hl{background:var(--gold-soft);color:#7d5c14;font-weight:800;padding:1px 5px;border-radius:4px;}
+  .note ul{margin:6px 0 0;padding-left:18px;}
+  .note li{margin-bottom:5px;}
+  .note li:last-child{margin-bottom:0;}
+
+  /* 提醒 */
+  .rem ul{margin:0;padding:0;list-style:none;display:grid;gap:11px;}
+  .rem li{
+    background:var(--card);border-radius:var(--r);box-shadow:var(--sh);
+    padding:14px 17px;font-size:14.4px;color:var(--ink-2);
+    display:flex;gap:12px;align-items:flex-start;
+  }
+  .rem li span.n{
+    flex:0 0 auto;width:22px;height:22px;border-radius:50%;background:var(--ink);color:#fff;
+    font-size:12.5px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:2px;
+  }
+  .rem li b{color:var(--ink);}
+
+  .total{
+    margin:26px 0 0;background:var(--ink);color:rgba(255,255,255,.82);
+    border-radius:var(--r);padding:16px 20px;font-size:14px;
+  }
+  .total b{color:#f5cc7a;}
+
+  .foot{padding:30px 0;text-align:center;font-size:12px;color:var(--muted);}
+
+  @media print{
+    body{background:#fff;}
+    .hero{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .stop,.rem li,.note{page-break-inside:avoid;}
+  }
+  @media (max-width:560px){
+    .sec-head .sub{margin-left:0;width:100%;}
+    .sec-head{flex-wrap:wrap;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="kicker">今晚半日 · 一条路 · 含打车定位与吃喝</span>
+    <h1>打车去黄鹤楼东门<br>看完日落 <span class="hl">回汉街吃饭</span></h1>
+    <p>全程只有这一条路线。下面把「每段打车定位输什么」「汉街吃什么」「伴手礼买什么」都写全了。</p>
+    <div class="facts">
+      <span class="fact">🤰 孕妇 · 单人</span>
+      <span class="fact">🛺 园内坐车 + 电梯，<b>不爬台阶</b></span>
+      <span class="fact">⏰ 16:30 出发</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="lead">
+    路线：<b>打车到黄鹤楼东门 → 园内电瓶车到主楼 → 电梯上 5 层 → 出西门 → 中华路城市阳台看日落 → 打车去楚河汉街吃饭 → 打车回酒店。</b>
+  </div>
+
+  <!-- 打车速查 -->
+  <section class="sec">
+    <div class="sec-head">
+      <span class="num">01</span>
+      <h2>打车定位速查</h2>
+      <span class="sub">照着输入，别输简称</span>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>哪一段</th><th>目的地输入这个</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="name">酒店 → 黄鹤楼</td>
+            <td class="must">黄鹤楼公园东门</td>
+            <td>武昌区武珞路阅马场。<b>一定带「东门」两个字</b>——全园只有东门有电瓶车。</td>
+          </tr>
+          <tr>
+            <td class="name">黄鹤楼 → 看日落</td>
+            <td class="must">中华路城市阳台</td>
+            <td>搜不到就改输 <b>中华路码头</b> 或 <b>武汉长江大桥武昌桥头堡</b>，都在同一片。</td>
+          </tr>
+          <tr>
+            <td class="name">日落 → 吃饭</td>
+            <td class="must">楚河汉街</td>
+            <td>下车沿街找店；定位不准就直接搜店名「香钿楚菜」。</td>
+          </tr>
+          <tr>
+            <td class="name">汉街 → 回酒店</td>
+            <td class="must">汉庭武汉解放大道同济医学院店</td>
+            <td>把酒店名存进地图收藏，回程一键叫车。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note red" style="margin-top:14px;">
+      <p><b>⚠️ 关于「江滩」——千万别只输这两个字。</b>武汉有三个江滩，隔得都很远：</p>
+      <ul>
+        <li><b>汉口江滩</b>（江岸区，江汉关一带）——在对岸，要过江，<b>今晚不去</b>。</li>
+        <li><b>武昌江滩</b>——就是你要去的这条，在临江大道上，<b>全长好几公里、有好几个门</b>，输「江滩」可能把你丢在中段。</li>
+        <li><b>汉阳江滩</b>——在汉阳一侧，<b>今晚不去</b>。</li>
+      </ul>
+      <p>你今晚要的是<b>武昌江滩靠长江大桥的那一段</b>，它就叫<span class="hl">中华路城市阳台</span>：位于<b>长江大桥武昌桥头与临江大道交汇处</b>，从桥头堡一直延伸到中华路码头，是三级亲水平台。让师傅停在<b>临江大道边上</b>，下车往江边走 1 分钟就到。</p>
+    </div>
+  </section>
+
+  <!-- 时间线 -->
+  <section class="sec">
+    <div class="sec-head">
+      <span class="num">02</span>
+      <h2>今晚怎么走 · 7 步</h2>
+      <span class="sub">每步都给了定位和细节</span>
+    </div>
+
+    <div class="timeline">
+
+      <div class="stop s1">
+        <div class="card">
+          <div class="row"><span class="time">16:30</span><h3>出门打车</h3></div>
+          <p>车程 20–35 分钟，25–35 元。<b>现在就叫车，别等。</b>路上顺手把门票买好（见第 05 节）。</p>
+          <div class="nav-target">
+            <span class="ttl">导航输入</span>
+            <b>黄鹤楼公园东门</b>（武昌区武珞路阅马场）
+          </div>
+        </div>
+      </div>
+
+      <div class="stop s2">
+        <div class="card">
+          <div class="row"><span class="time">17:05</span><h3>东门进园，坐电瓶车到主楼</h3></div>
+          <p>票已在手机上买好，刷身份证直接进。<b>园内电瓶车 10 元、约 5 分钟到主楼</b>，这段坡路全省掉。</p>
+          <div class="mini">
+            东门游客中心有卫生间，进园前先上一次（也能问母婴室和免费轮椅租赁）。电瓶车 <b>8:00–17:00</b> 运行，<b>备 10 元现金</b>（有渠道说只收现金）。<br>
+            万一 17:00 后才到东门，让师傅<b>直接改停西门</b>——西门到主楼只有约 500 米缓坡，一样不爬台阶。
+          </div>
+        </div>
+      </div>
+
+      <div class="stop s3">
+        <div class="card">
+          <div class="row"><span class="time">17:15</span><h3>主楼：坐电梯上 5 层</h3></div>
+          <p><b>主楼电梯只对老人、孕妇、残障人士开放</b>，进楼跟工作人员说一声就行。<b>先上 5 层观景台，再一层层往下走</b>，全程不爬楼梯。</p>
+          <p>5 层是今晚最值的一眼：长江大桥、龟山电视塔、武昌老城一次全收。3–4 层展厅人少，<b>可以坐下歇 5 分钟</b>。</p>
+          <div class="mini">18:00 清园，<b>17:50 前出来</b>。若电梯排队超过 15 分钟，说明孕妇身份请求优先，等不到就放弃登楼，把时间留给日落。</div>
+        </div>
+      </div>
+
+      <div class="stop s4">
+        <div class="card">
+          <div class="row"><span class="time">17:50</span><h3>出主楼，往西门走</h3></div>
+          <p>沿主楼西侧主轴慢慢走，<b>约 500 米、缓下坡，10–15 分钟</b>。路上顺路看：黄鹤归来铜雕、三楚一楼牌坊、<b>胜像宝塔</b>（元代白塔）。</p>
+          <p>出西门就对了，正对长江大桥武昌桥头。</p>
+        </div>
+      </div>
+
+      <div class="stop s5">
+        <div class="card">
+          <div class="row"><span class="time">18:05</span><h3>中华路城市阳台：看日落 + 大桥</h3></div>
+          <p>从西门打车 <b>5 分钟</b>（或沿江边平路走 1.2 公里，约 18 分钟）。<b>日落约 18:10–18:25</b>，太阳从龟山电视塔背后沉下去；<b>19:00 灯光秀</b>亮灯，原地不动接着看。</p>
+          <div class="nav-target">
+            <span class="ttl">导航输入</span>
+            <b>中华路城市阳台</b> ｜ 备选：中华路码头、长江大桥武昌桥头堡
+          </div>
+          <div class="mini">三台阶梯本身就是天然座位，站着累就坐下。园里有现成的取景框（爱心框住电视塔），手机对着拍就行。旁边中华路码头有 1.5 元轮渡，但末班约 20:00，今晚赶不上。</div>
+        </div>
+      </div>
+
+      <div class="stop s6">
+        <div class="card">
+          <div class="row"><span class="time">19:40</span><h3>打车去楚河汉街，吃晚饭</h3></div>
+          <p>打车 <b>15 分钟</b>。到汉街吃 <b>香钿楚菜</b>，<b>点一份排骨藕汤</b>（暖胃、清淡、不辣），人均 80–110 元。</p>
+          <div class="nav-target">
+            <span class="ttl">导航输入</span>
+            <b>楚河汉街</b>，或直接搜店名「香钿楚菜」
+          </div>
+          <div class="mini">汉街是 1.5 公里长的滨水商业街，楚河从街中穿过。座位多、卫生间干净、有空调，是今晚最适合坐下来缓一缓的地方。其他店见第 03 节。</div>
+        </div>
+      </div>
+
+      <div class="stop s7">
+        <div class="card">
+          <div class="row"><span class="time">21:00</span><h3>打车回酒店</h3></div>
+          <p>从汉街直接打车回去，<b>25–30 分钟，35–45 元</b>。今天走了不少，<b>别换乘地铁</b>。</p>
+          <div class="nav-target">
+            <span class="ttl">导航输入</span>
+            <b>汉庭武汉解放大道同济医学院店</b>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 吃什么 -->
+  <section class="sec">
+    <div class="sec-head">
+      <span class="num">03</span>
+      <h2>汉街吃什么</h2>
+      <span class="sub">首推第 1 家，其余按口味挑</span>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>店</th><th>类型 / 招牌</th><th>人均</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="name">香钿楚菜 <span class="must">← 就去这家</span></td>
+            <td>湖北菜。<b>排骨藕汤</b>、牛筋炖牛腩、草莓松饼。环境雅致，本地口碑十年</td>
+            <td class="money">80–110</td>
+          </tr>
+          <tr>
+            <td class="name">百艳青花创意楚菜</td>
+            <td>湖北菜，开了很多年。<b>洪湖野藕汤</b>、鱼头泡饭、牛腩炖土豆</td>
+            <td class="money">70–90</td>
+          </tr>
+          <tr>
+            <td class="name">小蓝鲸海鲜酒楼</td>
+            <td>湖北菜。<b>清蒸武昌鱼</b>、莲藕排骨汤——来武汉该吃的一道</td>
+            <td class="money">约 80</td>
+          </tr>
+          <tr>
+            <td class="name">蔡林记（热干面）</td>
+            <td>快餐，出餐快。<b>热干面</b> + 蛋花米酒。累了不想等正餐就选它</td>
+            <td class="money">15–25</td>
+          </tr>
+          <tr>
+            <td class="name">老通城豆皮</td>
+            <td>快餐。<b>三鲜豆皮</b>，蛋皮金黄、内馅软糯</td>
+            <td class="money">15–25</td>
+          </tr>
+          <tr>
+            <td class="name">换口味的选择</td>
+            <td>青柠记忆泰式火锅（约 100）· 济州烤肉（约 80）· 小川料理（日料）· KUMO 芝士蛋糕（甜品）</td>
+            <td class="money">80–100</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note green" style="margin-top:14px;">
+      <p><b>点菜就记住两句：</b></p>
+      <p>① 优先 <b>排骨藕汤 / 洪湖野藕汤</b>——热汤、清淡、不辣，是今晚最合适的一顿；主食配米饭或面条。</p>
+      <p>② <b>小龙虾、重油重辣的先放一放。</b>9 月是龙虾尾季确实诱人，但你一个人在外面，肠胃出问题会很麻烦。想尝留到有家人陪、离住处近的时候。</p>
+      <p>如果想把武汉小吃扫一遍，<b>粮道街</b>（赵师傅油饼包烧卖、熊太婆水饺）和<b>大成路</b>（小秋水饺、李记鲜鱼糊汤粉）都在黄鹤楼附近，<b>今晚不顺路，记着就行</b>。</p>
+    </div>
+  </section>
+
+  <!-- 伴手礼 -->
+  <section class="sec">
+    <div class="sec-head">
+      <span class="num">04</span>
+      <h2>伴手礼买什么</h2>
+      <span class="sub">认准牌子 + 看保质期</span>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>买什么</th><th>认准这个牌子</th><th>注意</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="name">热干面礼盒</td>
+            <td><b>蔡林记</b>、大汉口（预包装干面 + 芝麻酱）</td>
+            <td>最好带、最不会出错，送谁都合适</td>
+          </tr>
+          <tr>
+            <td class="name">老字号糕点</td>
+            <td><b>汪玉霞</b>（京果、酥糖、蛋黄酥）· <b>曹祥泰</b>（绿豆糕、麻烘糕）· 扬子江（龙须酥、桃片糕）</td>
+            <td>保质期一般 3–15 天，别囤</td>
+          </tr>
+          <tr>
+            <td class="name">卤味</td>
+            <td><b>周黑鸭</b>锁鲜装、精武鸭脖</td>
+            <td><b>锁鲜装只 7 天</b>，少买、别拖到回家才吃</td>
+          </tr>
+          <tr>
+            <td class="name">本地风物</td>
+            <td>孝感麻糖、<b>罗田板栗</b>（9–10 月新栗正当时）、脆藕带、牛肉酱</td>
+            <td>藕带、牛肉酱先试味再买</td>
+          </tr>
+          <tr>
+            <td class="name">茶与酒</td>
+            <td>宜红 / 青砖茶、白云边、黄鹤楼酒</td>
+            <td>沉，建议直接寄，别自己拎</td>
+          </tr>
+          <tr>
+            <td class="name">文创小物</td>
+            <td>汉绣小件、黄鹤楼旋转灯、武汉方言发声玩偶、明信片</td>
+            <td>汉绣、绿松石这类要证书和防伪码</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note purple" style="margin-top:14px;">
+      <p><b>去哪买（按顺路排序）：</b></p>
+      <ul>
+        <li><b>顺路一家：曹祥泰（解放路店）</b>——武昌区解放路 409 号，就在黄鹤楼这一片，从西门出来打车 5 分钟。招牌是纯手工<b>绿豆糕</b>，也有礼盒和礼品袋。</li>
+        <li><b>汉街 / 江汉路沿街特产店</b>——吃完顺手买最省事，但<b>价格比超市贵一截</b>，认准牌子再结账。</li>
+        <li><b>最划算：本地超市</b>——武商超市、中百仓储，同款糕点、热干面礼盒便宜不少。</li>
+        <li><b>不想拎：线上下单直邮回家</b>——品牌旗舰店都有。你一个人出门，<b>别给自己加行李</b>，今晚更不要拎着礼盒去看日落。</li>
+      </ul>
+      <p style="margin-top:8px;"><b>三条避坑：</b>① 先看保质期（卤味锁鲜 7 天、糕点 3–15 天）；② 别在景区口买散装麻糖、藕粉；③ 拿不动的直接寄，留好购物凭证。</p>
+    </div>
+  </section>
+
+  <!-- 出门前 -->
+  <section class="sec rem">
+    <div class="sec-head">
+      <span class="num">05</span>
+      <h2>出门前，只有三件事要记</h2>
+    </div>
+    <ul>
+      <li><span class="n">1</span><div><b>先在公众号「黄鹤楼公园」买好日场票</b>（70 元，线上约 65）。<b>17:00 停止售票、17:20 停止入园</b>——路上就买，到门口刷身份证进。</div></li>
+      <li><span class="n">2</span><div><b>包里放 10 元现金</b>，坐园内电瓶车用。顺带带瓶水和两块饼干，孕期别空腹逛。</div></li>
+      <li><span class="n">3</span><div><b>任何不舒服，立刻打车回酒店。</b>你的酒店就在同济医院旁边，这是今晚最有利的条件，别硬撑。</div></li>
+    </ul>
+  </section>
+
+  <div class="total">
+    今晚合计约 <b>240–300 元</b>：打车三段 75–100 元 · 门票 65–70 元 · 园内电瓶车 10 元 · 晚饭 80–110 元。伴手礼另算。
+  </div>
+
+  <div class="foot">
+    门票、开放时间、电瓶车与电梯当日运行情况，以景区现场公告为准 · 2026 年 9 月 23 日
+  </div>
+
+</div>
+
+</body>
+</html>
