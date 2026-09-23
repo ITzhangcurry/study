@@ -17,11 +17,12 @@
     --sh:0 1px 2px rgba(16,23,32,.04),0 10px 26px rgba(16,23,32,.06);
   }
   *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;text-size-adjust:100%;}
   body{
     margin:0;background:var(--bg);color:var(--ink);
     font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,sans-serif;
     line-height:1.72;-webkit-font-smoothing:antialiased;
+    -webkit-tap-highlight-color:transparent;overflow-x:hidden;
   }
   .wrap{max-width:820px;margin:0 auto;padding:0 20px;}
 
@@ -175,12 +176,15 @@
   .btn{
     border:none;cursor:pointer;font-family:inherit;font-size:13.5px;font-weight:700;
     padding:9px 15px;border-radius:10px;background:var(--ink);color:#fff;transition:opacity .15s;
+    -webkit-tap-highlight-color:transparent;touch-action:manipulation;
   }
   .btn:hover{opacity:.86;}
+  .btn:active{opacity:.7;}
   .btn:disabled{opacity:.55;cursor:default;}
   .btn.blue{background:var(--blue);}
   .btn.ghost{background:#eef1f5;color:var(--ink-2);}
   #map{height:400px;border-radius:12px;overflow:hidden;background:#eef1f5;}
+  #map.picking{cursor:crosshair;box-shadow:inset 0 0 0 3px var(--red);}
   .leaflet-container{font-family:inherit;}
   .map-msg{
     margin-top:11px;font-size:13.4px;color:var(--ink-2);
@@ -195,8 +199,10 @@
   .geo-item{
     display:flex;align-items:center;gap:9px;font-size:13.5px;background:#f7f8fa;
     border-radius:9px;padding:8px 12px;color:var(--ink-2);cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
   }
   .geo-item:hover{background:#eef1f5;}
+  .geo-item:active{background:#e4e8ee;}
   .geo-item .no{
     flex:0 0 auto;width:20px;height:20px;border-radius:50%;background:var(--muted);color:#fff;
     font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center;
@@ -226,7 +232,7 @@
     border-radius:50%;background:rgba(26,115,232,.35);animation:pulse 2s ease-out infinite;
   }
   @keyframes pulse{0%{transform:scale(.5);opacity:.85}100%{transform:scale(3.2);opacity:0}}
-  .leaflet-popup-content{font-size:13.5px;line-height:1.65;margin:12px 14px;}
+  .leaflet-popup-content{font-size:13.5px;line-height:1.65;margin:12px 14px;max-width:min(74vw,270px);}
   .leaflet-popup-content b{color:var(--ink);}
   .leaflet-popup-content a{color:var(--blue);}
 
@@ -237,13 +243,48 @@
     .hero{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
     .stop,.rem li,.note{page-break-inside:avoid;}
   }
-  @media (max-width:560px){
-    .sec-head .sub{margin-left:0;width:100%;}
-    .sec-head{flex-wrap:wrap;}
-    #map{height:330px;}
-    .map-head .ttl{font-size:17.5px;}
-    .map-head .sp{margin-left:0;width:100%;}
-    .map-head .sp .btn{flex:1;}
+  /* ── 手机端适配（微信内置浏览器 / iOS Safari / Android WebView）── */
+  @media (max-width:720px){
+    .wrap{padding:0 14px;}
+    .hero{padding:26px 0 22px;}
+    .hero p{font-size:14.2px;margin-bottom:16px;}
+    .kicker{font-size:11px;margin-bottom:11px;}
+    .fact{font-size:12.2px;padding:6px 11px;}
+    .lead{padding:14px 15px;font-size:14px;margin:16px 0 20px;}
+    .sec{margin-bottom:26px;}
+    .sec-head{flex-wrap:wrap;gap:8px;padding-bottom:9px;}
+    .sec-head h2{font-size:17.5px;}
+    .sec-head .sub{font-size:12px;margin-left:0;width:100%;}
+    .card{padding:15px;}
+    .card h3{font-size:16.5px;}
+    .card p{font-size:14px;}
+    .timeline{padding-left:22px;}
+    .timeline::before{left:6px;}
+    .stop::before{left:-22px;top:20px;width:14px;height:14px;}
+    .nav-target{font-size:13.2px;padding:10px 12px;}
+    table{font-size:13.2px;min-width:460px;}
+    thead th{padding:10px 11px;font-size:12px;}
+    tbody td{padding:10px 11px;}
+    .note{padding:14px 15px;font-size:13.8px;}
+    .rem li{padding:13px 15px;font-size:13.9px;}
+    .total{padding:14px 15px;font-size:13.5px;}
+    .btn{padding:11px 14px;font-size:13.5px;border-radius:11px;}
+
+    /* 地图区 */
+    .map-card{padding:14px 14px 16px;margin-bottom:24px;}
+    .map-head{gap:8px;margin-bottom:10px;}
+    .map-head .ttl{font-size:16.5px;width:100%;}
+    .map-head .sp{margin-left:0;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+    .map-head .sp .btn{width:100%;}
+    #map{height:56vh;min-height:290px;max-height:420px;}
+    .map-msg{font-size:13px;padding:9px 12px;}
+    .geo-item{font-size:13px;padding:9px 11px;gap:8px;flex-wrap:wrap;}
+    .geo-item .d{font-size:12.2px;}
+    .foot{padding:24px 0 calc(24px + env(safe-area-inset-bottom));}
+  }
+  @media (max-width:380px){
+    .map-head .sp{grid-template-columns:1fr;}
+    table{min-width:420px;}
   }
 </style>
 </head>
@@ -276,11 +317,12 @@
       <h2 class="ttl">地图 · 我现在在哪</h2>
       <span class="sp">
         <button class="btn blue" id="locBtn" type="button">📍 定位我的位置</button>
+        <button class="btn ghost" id="pickBtn" type="button">✋ 手动标位置</button>
         <button class="btn ghost" id="fitBtn" type="button">看全程</button>
       </span>
     </div>
     <div id="map"></div>
-    <div class="map-msg" id="mapMsg">地图加载中……点上面的按钮，<b>蓝点就是你</b>。地图上 6 个点：酒店 → 黄鹤楼东门 → 主楼 → 西门 → 中华路城市阳台 → 楚河汉街（点标记能直接跳高德／百度导航）。</div>
+    <div class="map-msg" id="mapMsg">地图加载中……底图会自动在多路图源里挑一条能用的。点上面的按钮，<b>蓝点就是你</b>；<b>微信里定位失败很常见</b>，那就点「✋ 手动标位置」在地图上点一下你在哪，一样算距离。</div>
     <div class="geo-list" id="geoList"></div>
   </section>
 
@@ -581,14 +623,70 @@ window.__bootMap = function () {
   var ROUTE = [[30.578193,114.252496],[30.541982,114.308942],[30.544400,114.303000],
                [30.545180,114.300377],[30.548400,114.295200],[30.553405,114.346604]];
 
+  /* ---- 底图列表：上面的先试，哪个先加载出瓦片就用哪个，其余自动中止 ---- */
+  var BASEMAPS = [
+    { name:'高德·街道', crossOrigin:true,
+      url:'https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
+      opt:{ subdomains:['1','2','3','4'], maxZoom:19, crossOrigin:true, attribution:'底图 © 高德地图' } },
+    { name:'高德·路网', crossOrigin:true,
+      url:'https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}',
+      opt:{ subdomains:['1','2','3','4'], maxZoom:19, crossOrigin:true, attribution:'底图 © 高德地图' } },
+    { name:'OSM', crossOrigin:true,
+      url:'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      opt:{ maxZoom:19, crossOrigin:true, attribution:'底图 © OpenStreetMap contributors' } },
+    { name:'Esri 影像', crossOrigin:true,
+      url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      opt:{ maxZoom:18, crossOrigin:true, attribution:'影像 © Esri' } },
+    { name:'高德·卫星路网', crossOrigin:true,
+      url:'https://webst0{s}.is.autonavi.com/appmaptile?style=8&x={x}&y={y}&z={z}',
+      opt:{ subdomains:['1','2','3','4'], maxZoom:18, crossOrigin:true, attribution:'影像 © 高德地图' } }
+  ];
+
   /* ---- 起地图 ---- */
   var map = L.map('map', {
-    center: [30.5495, 114.3060], zoom: 13,
-    zoomControl: true, attributionControl: true
+    center: [30.5495, 114.3060], zoom: 13, zoomControl: true
   });
-  L.tileLayer('https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
-    subdomains: ['1','2','3','4'], minZoom: 10, maxZoom: 18, attribution: '底图 © 高德地图'
-  }).addTo(map);
+
+  /* ---- 底图探测：瓦片真的解码成功才算这一路可用 ---- */
+  var baseIdx = -1, baseLayer = null, baseName = '';
+  var msgEl0 = document.getElementById('mapMsg');
+  function tip(html) {
+    if (!msgEl0) return;
+    msgEl0.className = 'map-msg warn';
+    msgEl0.innerHTML = html;
+  }
+  /* 探测：瓦片真的解码成功（onload）才算这一路可用，否则按顺序换下一路 */
+  function probeBase(i) {
+    if (i >= BASEMAPS.length) {
+      tip('<b>底图没加载出来。</b>点标记、看距离、导航链接都还能用；网络恢复后刷新一次即可。');
+      return;
+    }
+    baseIdx = i; baseName = BASEMAPS[i].name;
+    tip('底图加载中……正在试「' + baseName + '」。');
+    var bm = BASEMAPS[i];
+    var layer = L.tileLayer(bm.url, bm.opt);
+    var done = false, timer = setTimeout(function () { next(); }, 8000);
+    function next() {
+      if (done) return; done = true; clearTimeout(timer);
+      if (baseLayer) map.removeLayer(baseLayer);
+      probeBase(i + 1);
+    }
+    layer.once('load', function () {
+      if (done) return; done = true; clearTimeout(timer);
+      baseLayer = layer;
+      tip('地图就绪（底图：' + baseName + '）。点上面的按钮，<b>蓝点就是你</b>。');
+      msgEl0.className = 'map-msg';
+      setTimeout(function () {
+        if (msgEl0 && /地图就绪/.test(msgEl0.innerHTML)) {
+          msgEl0.innerHTML = '地图上 6 个点：酒店 → 黄鹤楼东门 → 主楼 → 西门 → 中华路城市阳台 → 楚河汉街。' +
+            '点标记能直接跳<b>高德／百度导航</b>；<b>蓝点就是你</b>（微信里定位常被禁，那就点「✋ 手动标位置」）。';
+        }
+      }, 2600);
+    });
+    layer.on('tileerror', function () { next(); });
+    layer.addTo(map);
+  }
+  probeBase(0);
 
   /* 行程连线：灰虚线＝车程，红实线＝园内步行 */
   L.polyline(ROUTE, {color:'#8a94a0', weight:2.5, opacity:.65, dashArray:'6 8'}).addTo(map);
@@ -602,8 +700,13 @@ window.__bootMap = function () {
                 '&title=' + encodeURIComponent(s.n.replace(/（.*?）/g,'')) +
                 '&content=' + encodeURIComponent('今晚半日行程') +
                 '&output=html&coord_type=gcj02&src=webapp.wuhan-tonight';
-    return '<a href="' + amap + '" target="_blank" rel="noopener">高德地图打开</a>' +
-           ' &nbsp;·&nbsp; <a href="' + baidu + '" target="_blank" rel="noopener">百度地图打开</a>';
+    /* 腾讯地图：必须用 GCJ-02 原值，绝不加 mars 参数（若它当真做了二次偏移，点会偏 500 米以上） */
+    var tx = 'https://apis.map.qq.com/uri/v1/marker?marker=coord:' + s.lat + ',' + s.lng +
+             ';title:' + encodeURIComponent(s.n.replace(/（.*?）/g,'')) +
+             ';addr:' + encodeURIComponent('今晚半日行程') + '&referer=wuhan-tonight';
+    return '<a href="' + amap + '" target="_blank" rel="noopener">高德导航</a>' +
+           ' &nbsp;·&nbsp; <a href="' + tx + '" target="_blank" rel="noopener">腾讯导航</a>' +
+           ' &nbsp;·&nbsp; <a href="' + baidu + '" target="_blank" rel="noopener">百度导航</a>';
   }
 
   var markers = [];
@@ -689,20 +792,23 @@ window.__bootMap = function () {
   renderList(null);
 
   var meMarker = null, meCircle = null, watchId = null, gotFix = false;
+  var pickBtn = document.getElementById('pickBtn');
+  var picking = false;
   var meIcon = L.divIcon({className:'dot-wrap', html:'<div class="me-dot"></div>', iconSize:[16,16], iconAnchor:[8,8]});
 
-  function onPos(p) {
-    gotFix = true;
-    var g = wgs2gcj(p.coords.latitude, p.coords.longitude);
-    var acc = Math.round(p.coords.accuracy || 0);
+  /* 落点 + 算最近站点（GPS 定位与手动标记共用同一套逻辑）
+     g 必须是 GCJ-02：GPS 给的是 WGS-84，先换算；手动点地图拿到的本来就是 GCJ-02，直接收 */
+  function placeMe(g, acc, manual) {
     if (!meMarker) {
-      meMarker = L.marker(g, {icon: meIcon, zIndexOffset: 1200}).addTo(map);
-      meCircle = L.circle(g, {radius: p.coords.accuracy || 50, color:'#1a73e8', weight:1,
-                              fillColor:'#1a73e8', fillOpacity:.12}).addTo(map);
+      meMarker = L.marker(g, {icon: meIcon, zIndexOffset: 1200, interactive: false}).addTo(map);
+      if (!manual) {
+        meCircle = L.circle(g, {radius: acc, color:'#1a73e8', weight:1,
+                                fillColor:'#1a73e8', fillOpacity:.12, interactive: false}).addTo(map);
+      }
       map.setView(g, 15);
     }
     meMarker.setLatLng(g);
-    meCircle.setLatLng(g).setRadius(p.coords.accuracy || 50);
+    if (meCircle) meCircle.setLatLng(g).setRadius(acc);
 
     var arr = STOPS.filter(function (s) { return s.no !== '备'; }).map(function (s) {
       return {s: s, d: dist(g, [s.lat, s.lng])};
@@ -710,35 +816,64 @@ window.__bootMap = function () {
     var n = arr[0];
     var t = new Date();
     msgEl.className = 'map-msg ok';
-    msgEl.innerHTML = '📍 已定位（精度约 ±' + acc + ' 米）· 你离 <b>' + n.s.n + '</b> 最近，约 <b>' + fmtM(n.d) +
-      '</b>，' + (n.s.mode === 'taxi' ? '打车' : '步行') + '约 ' + etaMin(n.d, n.s.mode) + ' 分钟 · 更新于 ' +
+    msgEl.innerHTML = (manual ? '📍 已按你标的位置算' : '📍 已定位（精度约 ±' + Math.round(acc) + ' 米）') +
+      ' · 你离 <b>' + n.s.n + '</b> 最近，约 <b>' + fmtM(n.d) + '</b>，' +
+      (n.s.mode === 'taxi' ? '打车' : '步行') + '约 ' + etaMin(n.d, n.s.mode) + ' 分钟 · 更新于 ' +
       t.toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
     locBtn.disabled = false;
     locBtn.textContent = '📍 回到我的位置';
     renderList(g);
+  }
+
+  function onPos(p) {
+    gotFix = true;
+    placeMe(wgs2gcj(p.coords.latitude, p.coords.longitude), p.coords.accuracy || 50, false);
   }
   function clearWatch() {
     if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
   }
   function onErr(e) {
     var why = '定位失败。';
-    if (e && e.code === 1) { why = '浏览器拒绝了定位权限（地址栏里允许一下，或点允许后重试）。'; }
-    else if (e && e.code === 2) { why = '暂时拿不到位置信号（室内、地下或设备定位关闭时常见）。'; }
-    else if (e && e.code === 3) { why = '定位超时，可以再点一次。'; }
-    if (location.protocol === 'file:') {
-      why += '<br>这个页面是<b>从本地文件打开的</b>，部分浏览器（尤其手机端 Safari／微信）会直接禁用网页定位。';
-    }
+    if (e && e.code === 1) { why = '定位权限没拿到——微信／手机浏览器里这一步最常见。'; }
+    else if (e && e.code === 2) { why = '暂时拿不到位置信号（室内、地下或手机没开定位时这样）。'; }
+    else if (e && e.code === 3) { why = '定位超时了，可以再点一次。'; }
     msgEl.className = 'map-msg warn';
-    msgEl.innerHTML = '<b>' + why + '</b><br>最稳的替代办法：手机打开<b>高德地图</b>，蓝点就是你本人，点「路线」直接导航——本页上面 01 节写了每一段该输什么。';
+    msgEl.innerHTML = '<b>' + why + '</b><br>两个立刻能用的办法：<br>' +
+      '① 点上面的 <b>✋ 手动标位置</b>，在地图上点一下你现在在哪，一样给你算「离哪站多远、打车还是走」；<br>' +
+      '② 要看<b>真正的实时位置</b>，就用手机<b>高德地图</b>，那个蓝点是你本人——本页 01 节写了每一段该输什么。';
     locBtn.disabled = false;
     locBtn.textContent = '📍 再试一次';
   }
 
+  /* 手动标位置：微信里网页定位常被禁用，这是保底可用路径 */
+  function setPicking(on) {
+    picking = on;
+    mapEl.classList.toggle('picking', on);
+    pickBtn.textContent = on ? '✋ 点地图选位置' : '✋ 手动标位置';
+  }
+  pickBtn.addEventListener('click', function () {
+    if (picking) {
+      setPicking(false);
+      msgEl.className = 'map-msg';
+      msgEl.innerHTML = '已取消手动标记。';
+      return;
+    }
+    setPicking(true);
+    msgEl.className = 'map-msg';
+    msgEl.innerHTML = '请在<b>地图上点一下你所在的位置</b>（就是对着地图点，不用管经纬度），我按它给你算距离。';
+  });
+  map.on('click', function (ev) {
+    if (!picking) { return; }
+    setPicking(false);
+    placeMe([ev.latlng.lat, ev.latlng.lng], 80, true);
+  });
+
   locBtn.addEventListener('click', function () {
+    if (picking) { setPicking(false); }
     if (gotFix && meMarker) { map.setView(meMarker.getLatLng(), 16); return; }
     if (!navigator.geolocation) {
       msgEl.className = 'map-msg warn';
-      msgEl.innerHTML = '<b>这个浏览器不支持网页定位。</b>用手机高德地图看自己的位置就行。';
+      msgEl.innerHTML = '<b>这个浏览器不支持网页定位。</b>点 <b>✋ 手动标位置</b>，或用手机高德地图看自己的位置。';
       return;
     }
     locBtn.disabled = true;
